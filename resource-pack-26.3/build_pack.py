@@ -85,6 +85,36 @@ for i, (name, color) in enumerate(EFFECTS.items(), start=1):
         texture_path.parent.mkdir(parents=True, exist_ok=True)
         draw_icon(name, color, augmented).save(texture_path)
 
+# Build a dedicated HUD font so placeholders render actual pixel-art icons.
+# The private-use glyphs are scoped to this font and do not replace Minecraft's
+# default font or affect ordinary chat text.
+HUD_EFFECTS = {
+    "earth": (83, 160, 82), "emerald": EFFECTS["emerald"],
+    "ender": EFFECTS["ender"], "feather": EFFECTS["feather"],
+    "fire": EFFECTS["fire"], "frost": EFFECTS["frost"],
+    "haste": EFFECTS["haste"], "heart": EFFECTS["heart"],
+    "invisibility": EFFECTS["invisibility"], "ocean": EFFECTS["ocean"],
+    "regeneration": EFFECTS["regeneration"], "speed": EFFECTS["speed"],
+    "strength": EFFECTS["strength"], "thunder": EFFECTS["thunder"],
+}
+font_providers = []
+hud_dir = ASSETS / "infusesmp" / "textures" / "font"
+hud_dir.mkdir(parents=True, exist_ok=True)
+for index, (name, color) in enumerate(HUD_EFFECTS.items()):
+    for augmented, codepoint in ((False, 0xE000 + index), (True, 0xE010 + index)):
+        suffix = "_augmented" if augmented else ""
+        glyph = chr(codepoint)
+        texture_name = f"hud_{name}{suffix}.png"
+        draw_icon(name, color, augmented).resize((16, 16), Image.Resampling.NEAREST).save(hud_dir / texture_name)
+        font_providers.append({
+            "type": "bitmap",
+            "file": f"infusesmp:font/{texture_name[:-4]}",
+            "height": 16,
+            "ascent": 12,
+            "chars": [glyph],
+        })
+write_json(ASSETS / "infusesmp" / "font" / "hud.json", {"providers": font_providers})
+
 write_json(ASSETS / "minecraft" / "items" / "potion.json", {
     "model": {
         "type": "minecraft:range_dispatch",
