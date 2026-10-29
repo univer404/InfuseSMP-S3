@@ -13,35 +13,6 @@ disabled_worlds: [disabled_world]
 ritual_duration_seconds: 600
 primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]
 secondary_effects: [speed, fire, ocean, emerald]
-items:
-  colors:
-    emerald: "#0DFC00"
-    feather: "#BEA3CA"
-    fire: "#FC7803"
-    frost: "#7AE3FC"
-    thunder: "#FCED00"
-    haste: "#B96C00"
-    heart: "#FC0046"
-    invisibility: "#7E00FC"
-    ocean: "#005AFC"
-    regeneration: "#FC00DD"
-    speed: "#D1A44B"
-    strength: "#9E2020"
-    ender: "#831177"
-  names:
-    emerald: "ᴇᴍᴇʀᴀʟᴅ"
-    feather: "ғᴇᴀᴛʜᴇʀ"
-    fire: "ғɪʀᴇ"
-    frost: "ғʀᴏsᴛ"
-    thunder: "ᴛʜᴜɴᴅᴇʀ"
-    haste: "ʜᴀsᴛᴇ"
-    heart: "ʜᴇᴀʀᴛ"
-    invisibility: "ɪɴᴠɪsɪʙɪʟɪᴛʏ"
-    ocean: "ᴏᴄᴇᴀɴ"
-    regeneration: "ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ"
-    speed: "sᴘᴇᴇᴅ"
-    strength: "sᴛʀᴇɴɢᴛʜ"
-    ender: "ᴇɴᴅᴇʀ"
 effects:
   # Emerald effect settings
   emerald:
