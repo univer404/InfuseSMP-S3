@@ -1,7 +1,7 @@
-# InfuseSMP-S3 crafting recipe reference
-# Each shape is read left-to-right, top-to-bottom.
-# A space means an empty crafting slot. Ingredients are vanilla Bukkit Material names.
-# Keep these recipes in sync with the crafting GUI and ritual recipes.
+# InfuseSMP-S3 recipe reference
+# This file documents the recipes implemented by the original Infuse Skript.
+# Pattern characters are mapped to the vanilla material listed under ingredients.
+# This is documentation; it does not add new effects or recipes.
 
 emerald:
   type: shaped
@@ -21,13 +21,13 @@ feather:
   type: shaped
   shape:
     - "BPB"
-    - "FHF"
+    - "HFH"
     - "BPB"
   ingredients:
     B: BREEZE_ROD
     P: PHANTOM_MEMBRANE
-    F: FEATHER
     H: HEAVY_CORE
+    F: FEATHER
 
 fire:
   type: shaped
@@ -40,28 +40,6 @@ fire:
     R: RESPAWN_ANCHOR
     N: NETHERITE_INGOT
     P: MUSIC_DISC_PIGSTEP
-
-aug_ender:
-  type: shaped
-  shape:
-    - "RAR"
-    - "APA"
-    - "RAR"
-  ingredients:
-    R: DRAGON_HEAD
-    A: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-    P: DRAGON_EGG
-
-ender:
-  type: shaped
-  shape:
-    - "RAR"
-    - "AEA"
-    - "RAR"
-  ingredients:
-    R: DRAGON_HEAD
-    A: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-    E: ENDER_EYE
 
 frost:
   type: shaped
@@ -100,7 +78,7 @@ heart:
     E: ENCHANTED_GOLDEN_APPLE
     B: BEETROOT
 
-invis:
+invisibility:
   type: shaped
   shape:
     - "EME"
@@ -125,7 +103,7 @@ ocean:
     T: TRIDENT
     C: CONDUIT
 
-regen:
+regeneration:
   type: shaped
   shape:
     - "EHE"
@@ -136,7 +114,7 @@ regen:
     H: HONEY_BLOCK
     P: PEARLESCENT_FROGLIGHT
     A: AXOLOTL_BUCKET
-    M: MUSIC_DISC_CREATOR_MUSIC_BOX
+    M: MUSIC_DISC_CREATOR
 
 speed:
   type: shaped
@@ -177,27 +155,13 @@ thunder:
     T: TRIDENT
     C: CREEPER_HEAD
 
-apophis:
+ender:
   type: shaped
   shape:
-    - "BLB"
-    - "LCL"
-    - "BLB"
+    - "RAR"
+    - "AEA"
+    - "RAR"
   ingredients:
-    B: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-    L: NETHERITE_INGOT
-    C: NETHER_STAR
-
-thief:
-  type: shaped
-  shape:
-    - "BLB"
-    - "CDC"
-    - "ZXZ"
-  ingredients:
-    B: ENCHANTED_GOLDEN_APPLE
-    L: ENDER_EYE
-    C: PLAYER_HEAD
-    D: SHEARS
-    Z: RABBIT_FOOT
-    X: SCULK_CATALYST
+    R: DRAGON_HEAD
+    A: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+    E: ENDER_EYE
