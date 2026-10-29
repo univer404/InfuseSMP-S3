@@ -10,6 +10,7 @@ overwrite_enchants: true
 recharge_sound: "custom.health"
 use_sound: "custom.activate"
 disabled_worlds: [disabled_world]
+ritual_enabled: true
 ritual_duration_seconds: 600
 primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]
 secondary_effects: [speed, fire, ocean, emerald]
