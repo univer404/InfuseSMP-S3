@@ -93,7 +93,7 @@ public final class InfuseSMP extends JavaPlugin {
             String p=m.get("primary"),s=m.get("secondary");
             if(s==null)m.remove("primary");else m.put("primary",s);
             if(p==null)m.remove("secondary");else m.put("secondary",p);
-            log(id,"swapped primary and secondary");saveState();tell(sender,"swapped");return true;
+            log(id,"set primary "+m.getOrDefault("primary","none"));log(id,"set secondary "+m.getOrDefault("secondary","none"));saveState();tell(sender,"swapped");return true;
         }
         if(cmd.equals("toggledisplay")) {
             if(playerOnly(sender))return true; UUID id=((Player)sender).getUniqueId();
@@ -281,7 +281,7 @@ public final class InfuseSMP extends JavaPlugin {
         }catch(IllegalArgumentException ignored){getLogger().warning("Ignoring invalid UUID in players.yml: "+key);}
     }
     private void saveState() {
-        if(players==null)return;Set<UUID> ids=new HashSet<>(effects.keySet());ids.addAll(trusted.keySet());ids.addAll(binds.keySet());ids.addAll(simpleDisplay);ids.addAll(history.keySet());ids.addAll(disabled);
+        if(players==null)return;Set<UUID> ids=new HashSet<>(effects.keySet());ids.addAll(trusted.keySet());ids.addAll(binds.keySet());ids.addAll(simpleDisplay);ids.addAll(history.keySet());ids.addAll(slotHistory.keySet());ids.addAll(disabled);
         for(UUID id:ids){String k=id.toString();for(String sl:List.of("primary","secondary"))players.set(k+".effects."+sl,effects.getOrDefault(id,Map.of()).get(sl));
             players.set(k+".trusted",trusted.getOrDefault(id,Set.of()).stream().map(UUID::toString).toList());
             for(var e:binds.getOrDefault(id,Map.of()).entrySet())players.set(k+".binds."+e.getKey(),e.getValue());
