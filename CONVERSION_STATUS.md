@@ -1,18 +1,21 @@
 # Conversion status
 
-Source of truth: the supplied archive's `infuse_new/` tree for Minecraft 1.21.11. This is an active port and is not yet a verified feature-parity release.
+Source of truth: the supplied archive's `infuse_new/` tree for Minecraft 1.21.11. This remains an active conversion branch, not a verified production release.
 
 ## Implemented in the Java branch
-- Java 21 / Paper API Maven project and pull-request GitHub Actions build.
-- YAML configuration, non-italic MiniMessage output, small-cap styling for most plugin messages.
-- UUID-based player effect slots, history, trusted players, disabled state, binds and display preference saved in `players.yml`.
-- `/infuse add|remove|get|history|toggle`, `/activate`, `/bind`, `/swap`, `/trust`, `/item`, `/recipes`, `/resetcooldown`, `/resetcraft`, `/conf`, and drain aliases.
-- Custom-model-data potion items for the source effect IDs, drink-to-equip flow, primary/secondary selection, previous-item return, and equipped-item drops on death.
-- Protected recipe browser GUI with the original ingredient arrangements and protected brewing-stand ritual crafting GUI.
-- Craft limits and configurable augmented ritual duration with brewing-stand failure detection.
-- Base passive effects, spark cooldowns, fire/frost/thunder hit triggers, feather fall protection, and trust-aware target filtering.
+- Java 21 / Paper API Maven project and GitHub Actions build workflow.
+- Non-italic MiniMessage rendering, small-cap default text, and YAML-configurable item names/colors/model data/lore.
+- UUID-based player effect slots, disabled state, per-slot history, trust list, bind preferences, display preference and player state persistence.
+- Commands for `/infuse`, `/item`, `/activate`, `/bind`, `/swap`, `/trust`, `/toggledisplay`, drain aliases, `/recipes`, `/resetcooldown`, `/resetcraft`, `/conf`, and optional WorldGuard `/mapregion`.
+- Optional PlaceholderAPI expansion matching source identifiers for effect names, icons, augmented state, timers and tick counters.
+- Protected recipe browser and brewing-stand ritual crafting GUIs whose titles, slots, filler, control items and enabled flags are read from `gui.yml`.
+- Craft limits, augmented ritual duration, brewing-stand failure handling, and persistent craft tallies.
+- Custom-model-data potion items, drink-to-equip flow, previous-item return, death drops, configurable effect lore, and overflow item drops.
+- Base passive and spark effects, cooldown timers, fire/frost/thunder hit triggers, feather fall protection and launch, ocean pull, heart health/absorption, emerald XP/consumable behavior, and haste/emerald tool enchantments.
+- Optional WorldGuard region mapping via reflection; WorldGuard is not a hard dependency.
 
-## Not yet complete / must be verified
-- The original source has many effect-specific behaviors in `heartbeat.sk`, `listeners/damage.sk`, `listeners/projectiles.sk`, `listeners/per-effect.sk`, `events/spark.sk`, and `functions/per-effect.sk`. Several of these are still approximations or unported, including full ender curse/teleport behavior, full heart health transfer, ocean pull mechanics, feather wind-charge systems, emerald XP/consumable/enchant behavior, haste enchant/attack-speed behavior, frost boots/lava/block behavior, fire block/water interactions, and full projectile interactions.
-- Exact original item lore, all potion metadata, resource-pack icon/bar rendering, roll animations, region/WorldGuard integration, all ritual visual details, and edge cases still need parity work.
-- The GitHub Actions compile run exposed duplicate method visibility and an oversized `Map.of`; these were corrected. A fresh successful build has not yet been confirmed after the fixes. Do not use as a production release until CI passes and in-game testing confirms parity.
+## Still required for full parity and release
+- Exact parity for every branch in `heartbeat.sk`, `listeners/damage.sk`, `listeners/projectiles.sk`, `listeners/per-effect.sk`, `events/spark.sk`, `functions/per-effect.sk`, and the ritual/resource-pack scripts.
+- Remaining or approximate effect mechanics include complete ender curse/teleport behavior, full heart damage transfer, emerald enchant/XP edge cases, all feather wind-charge interactions, all frost block/boots/lava effects, fire water/block interactions, projectile behavior and region edge cases.
+- Exact original resource-pack font animation/bar rendering, all item metadata, all sounds/particles, roll animation parity and crossplay-specific visual alternatives.
+- A fresh successful CI build must be confirmed, followed by in-game testing on Paper/Purpur 1.21.11. A previous CI run found compilation issues that were fixed; do not merge or publish as production until a fresh build passes.
