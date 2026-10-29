@@ -42,21 +42,31 @@ public final class RecipesMenu implements Listener {
     private static void put(String e,String... mats){ RECIPES.put(e,Arrays.stream(mats).map(Material::matchMaterial).filter(Objects::nonNull).toList()); }
     public RecipesMenu(JavaPlugin plugin,InfuseItems items){this.plugin=plugin;this.items=items;this.menuKey=new NamespacedKey(plugin,"recipes_menu");this.gui=YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(),"gui.yml"));}
     public void openMain(Player p){
-        Inventory inv=Bukkit.createInventory(p,45,mm.deserialize("<gradient:#A2C81C:#21CD76>ʀᴇᴄɪᴘᴇs").decoration(TextDecoration.ITALIC,false));
-        fill(inv,Material.BLACK_STAINED_GLASS_PANE);
-        for(int i=0;i<EFFECTS.size();i++){String e=EFFECTS.get(i);inv.setItem(MAIN_SLOTS[i],effectIcon(e));}
-        inv.setItem(44,button(Material.BARRIER,"<#E13030><bold>ᴇxɪᴛ", "exit"));
+        int rows=Math.max(1,Math.min(6,gui.getInt("recipes.rows",5)));
+        Inventory inv=Bukkit.createInventory(p,rows*9,mm.deserialize(gui.getString("recipes.title","<gradient:#A2C81C:#21CD76>ʀᴇᴄɪᴘᴇs")).decoration(TextDecoration.ITALIC,false));
+        fill(inv,material("recipes.filler.material",Material.BLACK_STAINED_GLASS_PANE),gui.getString("recipes.filler.name"," "));
+        List<Integer> configured=gui.getIntegerList("recipes.main_slots");
+        for(int i=0;i<EFFECTS.size();i++){
+            String effect=EFFECTS.get(i);int slot=configured.size()>i?configured.get(i):MAIN_SLOTS[i];
+            if(slot>=0&&slot<inv.getSize())inv.setItem(slot,effectIcon(effect));
+        }
+        int exit=gui.getInt("recipes.exit.slot",44);
+        if(exit>=0&&exit<inv.getSize())inv.setItem(exit,button(material("recipes.exit.material",Material.BARRIER),gui.getString("recipes.exit.name","<#E13030><bold>ᴇxɪᴛ"),"exit"));
         openTagged(p,inv,"main");
     }
     private void openView(Player p,String effect){
-        Inventory inv=Bukkit.createInventory(p,45,mm.deserialize("<gradient:#A2C81C:#21CD76>ʀᴇᴄɪᴘᴇs").decoration(TextDecoration.ITALIC,false));
-        fill(inv,Material.BLACK_STAINED_GLASS_PANE);
-        List<Material> recipe=RECIPES.get(effect);int[] slots={11,12,13,20,21,22,29,30,31};
-        if(recipe!=null)for(int i=0;i<Math.min(9,recipe.size());i++)inv.setItem(slots[i],new ItemStack(recipe.get(i)));
-        inv.setItem(23,button(Material.ARROW,"<gray>▶ <white>ʀᴇsᴜʟᴛ","result"));
-        inv.setItem(24,effectIcon(effect));
-        inv.setItem(36,button(Material.ARROW,"<gray><bold>← ʙᴀᴄᴋ","back"));
-        inv.setItem(44,button(Material.BARRIER,"<#E13030><bold>ᴇxɪᴛ","exit"));
+        int rows=Math.max(1,Math.min(6,gui.getInt("recipes.rows",5)));
+        Inventory inv=Bukkit.createInventory(p,rows*9,mm.deserialize(gui.getString("recipes.title","<gradient:#A2C81C:#21CD76>ʀᴇᴄɪᴘᴇs")).decoration(TextDecoration.ITALIC,false));
+        fill(inv,material("recipes.filler.material",Material.BLACK_STAINED_GLASS_PANE),gui.getString("recipes.filler.name"," "));
+        List<Material> recipe=RECIPES.get(effect);List<Integer> slots=gui.getIntegerList("recipes.ingredient_slots");
+        if(slots.size()!=9)slots=Arrays.stream(new int[]{11,12,13,20,21,22,29,30,31}).boxed().toList();
+        if(recipe!=null)for(int i=0;i<Math.min(9,recipe.size());i++)if(slots.get(i)>=0&&slots.get(i)<inv.getSize())inv.setItem(slots.get(i),new ItemStack(recipe.get(i)));
+        int arrow=gui.getInt("recipes.result_arrow_slot",23),result=gui.getInt("recipes.result_slot",24);
+        if(arrow>=0&&arrow<inv.getSize())inv.setItem(arrow,button(material("recipes.result_arrow_material",Material.ARROW),gui.getString("recipes.result_arrow_name","<gray>▶ <white>ʀᴇsᴜʟᴛ"),"result"));
+        if(result>=0&&result<inv.getSize())inv.setItem(result,effectIcon(effect));
+        int back=gui.getInt("recipes.back.slot",36),exit=gui.getInt("recipes.exit.slot",44);
+        if(back>=0&&back<inv.getSize())inv.setItem(back,button(material("recipes.back.material",Material.ARROW),gui.getString("recipes.back.name","<gray><bold>← ʙᴀᴄᴋ"),"back"));
+        if(exit>=0&&exit<inv.getSize())inv.setItem(exit,button(material("recipes.exit.material",Material.BARRIER),gui.getString("recipes.exit.name","<#E13030><bold>ᴇxɪᴛ"),"exit"));
         openTagged(p,inv,effect);
     }
     private void openTagged(Player p,Inventory inv,String state){

@@ -57,13 +57,21 @@ public final class RitualCrafting implements Listener {
         if(e.getAction()!=Action.RIGHT_CLICK_BLOCK||e.getClickedBlock()==null||e.getClickedBlock().getType()!=Material.BREWING_STAND||!e.getPlayer().isSneaking())return;
         e.setCancelled(true);ritualBlocks.put(e.getPlayer().getUniqueId(),e.getClickedBlock().getLocation());open(e.getPlayer());
     }
+    private int[] ingredientSlots(){
+        List<Integer> configured=gui.getIntegerList("ritual.ingredient_slots");
+        if(configured.size()!=9)return SLOTS.clone();
+        return configured.stream().mapToInt(Integer::intValue).toArray();
+    }
+    private int craftSlot(){return gui.getInt("ritual.craft.slot",40);}
+    private int exitSlot(){return gui.getInt("ritual.exit.slot",44);}
     private void open(Player p){
-        Inventory inv=Bukkit.createInventory(p,45,mm.deserialize("<gradient:#A2C81C:#21CD76>ᴘᴏᴛɪᴏɴ ᴄʀᴀғᴛᴇʀ").decoration(TextDecoration.ITALIC,false));
-        ItemStack filler=button(Material.PURPLE_STAINED_GLASS_PANE," ","filler");
-        for(int i=0;i<45;i++)inv.setItem(i,filler);
-        for(int slot:SLOTS)inv.setItem(slot,null);
-        inv.setItem(40,button(Material.CRAFTING_TABLE,"<#81D681><bold>ᴄʀᴀғᴛ","craft"));
-        inv.setItem(44,button(Material.BARRIER,"<#E13030><bold>ᴇxɪᴛ","exit"));
+        int rows=Math.max(1,Math.min(6,gui.getInt("ritual.rows",5)));
+        Inventory inv=Bukkit.createInventory(p,rows*9,mm.deserialize(gui.getString("ritual.title","<gradient:#A2C81C:#21CD76>ᴘᴏᴛɪᴏɴ ᴄʀᴀғᴛᴇʀ")).decoration(TextDecoration.ITALIC,false));
+        ItemStack filler=button(material("ritual.filler.material",Material.PURPLE_STAINED_GLASS_PANE),gui.getString("ritual.filler.name"," "),"filler");
+        for(int i=0;i<inv.getSize();i++)inv.setItem(i,filler);
+        for(int slot:ingredientSlots())if(slot>=0&&slot<inv.getSize())inv.setItem(slot,null);
+        if(craftSlot()>=0&&craftSlot()<inv.getSize())inv.setItem(craftSlot(),button(material("ritual.craft.material",Material.CRAFTING_TABLE),gui.getString("ritual.craft.name","<#81D681><bold>ᴄʀᴀғᴛ"),"craft"));
+        if(exitSlot()>=0&&exitSlot()<inv.getSize())inv.setItem(exitSlot(),button(material("ritual.exit.material",Material.BARRIER),gui.getString("ritual.exit.name","<#E13030><bold>ᴇxɪᴛ"),"exit"));
         p.setMetadata("infuse-ritual-gui",new org.bukkit.metadata.FixedMetadataValue(plugin,true));
         p.openInventory(inv);
     }
@@ -77,17 +85,17 @@ public final class RitualCrafting implements Listener {
         if(e.getClickedInventory()==null)return;
         if(e.getClickedInventory()!=e.getView().getTopInventory()){e.setCancelled(true);return;}
         int slot=e.getRawSlot();
-        if(slot==44){e.setCancelled(true);p.closeInventory();return;}
-        if(slot==40){e.setCancelled(true);craft(p,e.getView().getTopInventory());return;}
-        if(Arrays.stream(SLOTS).noneMatch(s->s==slot)){e.setCancelled(true);return;}
+        if(slot==exitSlot()){e.setCancelled(true);p.closeInventory();return;}
+        if(slot==craftSlot()){e.setCancelled(true);craft(p,e.getView().getTopInventory());return;}
+        if(Arrays.stream(ingredientSlots()).noneMatch(s->s==slot)){e.setCancelled(true);return;}
         Bukkit.getScheduler().runTask(plugin,()->clamp(e.getView().getTopInventory(),p));
     }
     @EventHandler public void drag(InventoryDragEvent e){
         if(!(e.getWhoClicked() instanceof Player p)||!p.hasMetadata("infuse-ritual-gui"))return;
-        if(e.getRawSlots().stream().anyMatch(s->s<45&&!Arrays.stream(SLOTS).anyMatch(v->v==s)))e.setCancelled(true);
+        if(e.getRawSlots().stream().anyMatch(s->s<e.getView().getTopInventory().getSize()&&!Arrays.stream(ingredientSlots()).anyMatch(v->v==s)))e.setCancelled(true);
     }
     private void clamp(Inventory inv,Player p){
-        for(int slot:SLOTS){ItemStack i=inv.getItem(slot);if(i!=null&&i.getAmount()>1){ItemStack extra=i.clone();extra.setAmount(i.getAmount()-1);i.setAmount(1);inv.setItem(slot,i);p.getInventory().addItem(extra);}}
+        for(int slot:ingredientSlots()){ItemStack i=inv.getItem(slot);if(i!=null&&i.getAmount()>1){ItemStack extra=i.clone();extra.setAmount(i.getAmount()-1);i.setAmount(1);inv.setItem(slot,i);p.getInventory().addItem(extra);}}
     }
     private void craft(Player p,Inventory inv){
         String effect=match(inv);
@@ -95,7 +103,7 @@ public final class RitualCrafting implements Listener {
         int crafted=tally.getInt(effect+".crafted",0);
         int craftLimit=plugin.getConfig().getInt("effects."+effect+".craft_limit",-1);
         if(craftLimit>=0&&crafted>=craftLimit){p.sendMessage(mm.deserialize("<red>✖ ᴄʀᴀғᴛ ʟɪᴍɪᴛ ʀᴇᴀᴄʜᴇᴅ ғᴏʀ "+effect+"!").decoration(TextDecoration.ITALIC,false));return;}
-        for(int s:SLOTS)inv.setItem(s,null);
+        for(int s:ingredientSlots())inv.setItem(s,null);
         tally.set(effect+".crafted",crafted+1);saveTally();
         p.closeInventory();p.removeMetadata("infuse-ritual-gui",plugin);
         int augmentLimit=plugin.getConfig().getInt("effects."+effect+".augment_limit",0);
@@ -111,7 +119,8 @@ public final class RitualCrafting implements Listener {
     private String match(Inventory inv){
         for(var entry:RECIPES.entrySet()){
             List<Material> recipe=entry.getValue();boolean ok=recipe.size()==9;
-            for(int i=0;i<9&&ok;i++){ItemStack item=inv.getItem(SLOTS[i]);ok=item!=null&&item.getType()==recipe.get(i)&&item.getAmount()==1;}
+            int[] ingredientSlots=ingredientSlots();
+            for(int i=0;i<9&&ok;i++){ItemStack item=inv.getItem(ingredientSlots[i]);ok=item!=null&&item.getType()==recipe.get(i)&&item.getAmount()==1;}
             if(ok)return entry.getKey();
         }
         return null;
@@ -147,7 +156,7 @@ public final class RitualCrafting implements Listener {
     @EventHandler public void close(InventoryCloseEvent e){
         if(!(e.getPlayer() instanceof Player p)||!p.hasMetadata("infuse-ritual-gui"))return;
         Inventory inv=e.getInventory();
-        for(int s:SLOTS){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)p.getInventory().addItem(item);}
+        for(int s:ingredientSlots()){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)p.getInventory().addItem(item);}
         p.removeMetadata("infuse-ritual-gui",plugin);
     }
     public boolean resetCraft(String effect){
