@@ -49,6 +49,7 @@ public final class InfuseMechanics implements Listener {
         String effect = plugin.getEquippedEffect(p.getUniqueId(), slot);
         if (effect == null) { plugin.tellKey(p, "effects-empty"); return; }
         effect = effect.replace("_augmented", "");
+        if (!plugin.getConfig().getBoolean("effects." + effect + ".enabled", true)) { plugin.tellRaw(p, "<red>ᴛʜɪs ᴇғғᴇᴄᴛ ɪs ᴅɪsᴀʙʟᴇᴅ."); return; }
         long now = System.currentTimeMillis();
         long active = activeUntil.computeIfAbsent(p.getUniqueId(), k -> new ConcurrentHashMap<>()).getOrDefault(effect, 0L);
         if (active > now) { plugin.tellRaw(p, "<red>ᴛʜɪs sᴘᴀʀᴋ ɪs ᴀʟʀᴇᴀᴅʏ ᴀᴄᴛɪᴠᴇ."); return; }
@@ -228,6 +229,7 @@ public final class InfuseMechanics implements Listener {
             String value=plugin.getEquippedEffect(p.getUniqueId(),slot);
             if(value==null) continue;
             String e=value.replace("_augmented","");
+            if (!plugin.getConfig().getBoolean("effects." + e + ".enabled", true)) continue;
             switch(e) {
                 case "fire" -> p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,80,0,true,false,true));
                 case "emerald" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,80,2,true,false,true));
@@ -250,6 +252,7 @@ public final class InfuseMechanics implements Listener {
             String effect=plugin.getEquippedEffect(attacker.getUniqueId(),slot);
             if(effect==null) continue;
             effect=effect.replace("_augmented","");
+            if (!plugin.getConfig().getBoolean("effects." + effect + ".enabled", true)) continue;
             if(effect.equals("strength") && event.getEntity() instanceof LivingEntity target && isTargetAllowed(attacker,target)) event.setDamage(event.getDamage()*1.25);
             if(effect.equals("thunder")) {
                 Map<String,Integer> perEffect=hitCounts.computeIfAbsent(attacker.getUniqueId(),k->new ConcurrentHashMap<>());
