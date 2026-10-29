@@ -4,10 +4,10 @@ import org.bukkit.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -216,6 +216,8 @@ public final class InfuseMechanics implements Listener {
         for(Player p:Bukkit.getOnlinePlayers()) {
             if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) continue;
             applyPassives(p);
+            applyToolPassives(p);
+            updateDisplay(p);
             Map<String,Long> active=activeUntil.get(p.getUniqueId());
             if(active!=null) active.entrySet().removeIf(en -> en.getValue()<=now);
             Map<String,Long> playerCooldowns=cooldowns.get(p.getUniqueId());
@@ -243,6 +245,46 @@ public final class InfuseMechanics implements Listener {
             if(emerald&&weapon&&(overwrite||!item.containsEnchantment(Enchantment.LOOTING)))item.addUnsafeEnchantment(Enchantment.LOOTING,5);
         }
     }
+    private boolean hasEffect(Player p,String effect){
+        for(String slot:List.of("primary","secondary")){
+            String value=plugin.getEquippedEffect(p.getUniqueId(),slot);
+            if(value!=null&&value.replace("_augmented","").equals(effect)
+                &&plugin.getConfig().getBoolean("effects."+effect+".enabled",true))return true;
+        }
+        return false;
+    }
+    private void updateDisplay(Player p){
+        String primary=plugin.getEquippedEffect(p.getUniqueId(),"primary");
+        String secondary=plugin.getEquippedEffect(p.getUniqueId(),"secondary");
+        if(primary==null&&secondary==null){p.sendActionBar(Component.empty());return;}
+        boolean simple=plugin.isSimpleDisplay(p.getUniqueId());
+        String left=displayEffect(p,primary,simple),right=displayEffect(p,secondary,simple);
+        String separator=simple?" <dark_gray>• ":" <dark_gray>│ ";
+        net.kyori.adventure.text.minimessage.MiniMessage mm=net.kyori.adventure.text.minimessage.MiniMessage.miniMessage();
+        String rendered=(left.isEmpty()?"":left)+(left.isEmpty()||right.isEmpty()?"":separator)+(right.isEmpty()?"":right);
+        p.sendActionBar(mm.deserialize(rendered).decoration(TextDecoration.ITALIC,false));
+    }
+    private String displayEffect(Player p,String value,boolean simple){
+        if(value==null)return "";
+        String effect=value.replace("_augmented","");
+        long spark=getSparkRemainingMillis(p.getUniqueId(),effect),cooldown=getCooldownRemainingMillis(p.getUniqueId(),effect);
+        long remain=spark>0?spark:cooldown;
+        String timer=remain>0?String.format(Locale.ROOT,"%d:%02d",remain/60000,(remain/1000)%60):"";
+        if(simple)return "<white>"+effect.toUpperCase(Locale.ROOT)+(value.endsWith("_augmented")?" <gold>★":"")+(timer.isEmpty()?"":" <gray>"+timer);
+        int cp=iconCodepoint(effect,value.endsWith("_augmented"));
+        String icon=cp<0?"":new String(Character.toChars(cp));
+        return "<white>"+icon+(timer.isEmpty()?"":" <gray>"+timer);
+    }
+    private int iconCodepoint(String effect,boolean augmented){
+        List<String> order=List.of("earth","emerald","ender","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder");
+        int cp=0xE000;
+        for(String current:order){
+            if(current.equals("earth")||current.equals("ender")){if(current.equals(effect))return cp+20;cp+=42;}
+            else{if(current.equals(effect))return cp+(augmented?41:20);cp+=84;}
+        }
+        return -1;
+    }
+
     private void applyPassives(Player p) {
         for(String slot:List.of("primary","secondary")) {
             String value=plugin.getEquippedEffect(p.getUniqueId(),slot);
