@@ -50,6 +50,7 @@ public final class RitualCrafting implements Listener {
         this.plugin=plugin;this.items=items;this.key=new NamespacedKey(plugin,"ritual_action");
         tallyFile=new File(plugin.getDataFolder(),"rituals.yml");
         tally=org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(tallyFile);
+        gui=org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(),"gui.yml"));
     }
     @EventHandler(ignoreCancelled=true)
     public void onBrewingStand(PlayerInteractEvent e){
@@ -66,6 +67,7 @@ public final class RitualCrafting implements Listener {
         p.setMetadata("infuse-ritual-gui",new org.bukkit.metadata.FixedMetadataValue(plugin,true));
         p.openInventory(inv);
     }
+    private Material material(String path,Material fallback){Material m=Material.matchMaterial(gui.getString(path,""));return m==null?fallback:m;}
     private ItemStack button(Material mat,String title,String action){
         ItemStack i=new ItemStack(mat);ItemMeta m=i.getItemMeta();m.displayName(mm.deserialize(title).decoration(TextDecoration.ITALIC,false));
         m.getPersistentDataContainer().set(key,PersistentDataType.STRING,action);i.setItemMeta(m);return i;

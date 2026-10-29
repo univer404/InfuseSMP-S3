@@ -10,6 +10,8 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
+import java.io.File;
 import java.util.*;
 
 /** Recipe index copied from infuse_new/recipes.sk; every click in the top GUI is cancelled. */
@@ -18,6 +20,7 @@ public final class RecipesMenu implements Listener {
     private final MiniMessage mm=MiniMessage.miniMessage();
     private final NamespacedKey menuKey;
     private final InfuseItems items;
+    private final YamlConfiguration gui;
     private static final List<String> EFFECTS=List.of("emerald","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder","ender");
     private static final int[] MAIN_SLOTS={4,12,13,14,20,21,23,24,30,31,32,40,22};
     private static final Map<String,List<Material>> RECIPES=new LinkedHashMap<>();
@@ -37,7 +40,7 @@ public final class RecipesMenu implements Listener {
         put("ender","BLACK_SHULKER_BOX","DRAGON_HEAD","BLACK_SHULKER_BOX","SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE","DRAGON_EGG","SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE","BLACK_SHULKER_BOX","ELYTRA","BLACK_SHULKER_BOX");
     }
     private static void put(String e,String... mats){ RECIPES.put(e,Arrays.stream(mats).map(Material::matchMaterial).filter(Objects::nonNull).toList()); }
-    public RecipesMenu(JavaPlugin plugin,InfuseItems items){this.plugin=plugin;this.items=items;this.menuKey=new NamespacedKey(plugin,"recipes_menu");}
+    public RecipesMenu(JavaPlugin plugin,InfuseItems items){this.plugin=plugin;this.items=items;this.menuKey=new NamespacedKey(plugin,"recipes_menu");this.gui=YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(),"gui.yml"));}
     public void openMain(Player p){
         Inventory inv=Bukkit.createInventory(p,45,mm.deserialize("<gradient:#A2C81C:#21CD76>ʀᴇᴄɪᴘᴇs").decoration(TextDecoration.ITALIC,false));
         fill(inv,Material.BLACK_STAINED_GLASS_PANE);
@@ -62,7 +65,8 @@ public final class RecipesMenu implements Listener {
         p.getOpenInventory().getTopInventory().setItem(44, inv.getItem(44));
         p.setMetadata("infuse-recipes-state",new org.bukkit.metadata.FixedMetadataValue(plugin,state));
     }
-    private void fill(Inventory inv,Material m){ItemStack filler=button(m," ","filler");for(int i=0;i<inv.getSize();i++)inv.setItem(i,filler);}
+    private Material material(String path,Material fallback){Material m=Material.matchMaterial(gui.getString(path,""));return m==null?fallback:m;}
+    private void fill(Inventory inv,Material m,String name){ItemStack filler=button(m,name,"filler");for(int i=0;i<inv.getSize();i++)inv.setItem(i,filler);}
     private ItemStack effectIcon(String effect){
         Material mat=switch(effect){case "emerald"->Material.EMERALD;case "feather"->Material.FEATHER;case "fire"->Material.BLAZE_POWDER;case "frost"->Material.PACKED_ICE;case "haste"->Material.DIAMOND_PICKAXE;case "heart"->Material.ENCHANTED_GOLDEN_APPLE;case "invisibility"->Material.ENDER_EYE;case "ocean"->Material.HEART_OF_THE_SEA;case "regeneration"->Material.GHAST_TEAR;case "speed"->Material.RABBIT_FOOT;case "strength"->Material.NETHERITE_SWORD;case "thunder"->Material.TRIDENT;default->Material.DRAGON_EGG;};
         ItemStack custom=items.create(effect,false,true); return custom==null?button(mat,"<#A2C81C>"+effect.toUpperCase(Locale.ROOT),"effect:"+effect):tag(custom,"effect:"+effect);
