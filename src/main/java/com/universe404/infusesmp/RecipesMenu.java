@@ -90,14 +90,11 @@ public final class RecipesMenu implements Listener {
     }
     @EventHandler public void click(InventoryClickEvent e){
         if(!(e.getWhoClicked() instanceof Player p)||!p.hasMetadata("infuse-recipes-state"))return;
-        if(e.getView().getTopInventory()!=e.getClickedInventory() && e.getClickedInventory()!=null)return;
-        if(e.getClickedInventory()==null)return;
         e.setCancelled(true);
-        if(e.getClickedInventory()!=e.getView().getTopInventory())return;
+        if(e.getClickedInventory()==null||e.getClickedInventory()!=e.getView().getTopInventory())return;
         ItemStack item=e.getCurrentItem();if(item==null||!item.hasItemMeta())return;
         String action=item.getItemMeta().getPersistentDataContainer().get(menuKey,PersistentDataType.STRING);
         if(action==null)return;
-        String state=p.getMetadata("infuse-recipes-state").getFirst().asString();
         switch(action){
             case "exit"->{p.removeMetadata("infuse-recipes-state",plugin);p.closeInventory();}
             case "back"->openMain(p);
