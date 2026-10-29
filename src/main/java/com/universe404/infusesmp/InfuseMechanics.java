@@ -1,6 +1,8 @@
 package com.universe404.infusesmp;
 
 import org.bukkit.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
