@@ -54,13 +54,13 @@ public final class InfuseItemListener implements Listener {
         String current=plugin.getEquippedEffect(p.getUniqueId(),slot);
         String otherEffect=plugin.getEquippedEffect(p.getUniqueId(),other);
         if(current!=null&&plugin.isSparkActive(p.getUniqueId(),current.replace("_augmented",""))){
-            p.getInventory().addItem(item.clone());plugin.tellRaw(p,"<red>ᴡᴀɪᴛ ᴜɴᴛɪʟ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ sᴘᴀʀᴋ ғɪɴɪsʜᴇs.");return;
+            ItemStack refund=item.clone();refund.setAmount(1);plugin.giveOrDrop(p,refund);plugin.tellRaw(p,"<red>ᴡᴀɪᴛ ᴜɴᴛɪʟ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ sᴘᴀʀᴋ ғɪɴɪsʜᴇs.");return;
         }
         if(!plugin.getConfig().getBoolean("allow_same_effects",false)&&effect.equals(otherEffect==null?null:otherEffect.replace("_augmented",""))){
-            p.getInventory().addItem(item.clone());plugin.tellRaw(p,"<red>ʏᴏᴜ ᴀʟʀᴇᴀᴅʏ ʜᴀᴠᴇ ᴛʜɪs ᴇғғᴇᴄᴛ ɪɴ ʏᴏᴜʀ "+other+" sʟᴏᴛ.");return;
+            ItemStack refund=item.clone();refund.setAmount(1);plugin.giveOrDrop(p,refund);plugin.tellRaw(p,"<red>ʏᴏᴜ ᴀʟʀᴇᴀᴅʏ ʜᴀᴠᴇ ᴛʜɪs ᴇғғᴇᴄᴛ ɪɴ ʏᴏᴜʀ "+other+" sʟᴏᴛ.");return;
         }
         if(effect.equals(current==null?null:current.replace("_augmented",""))){
-            p.getInventory().addItem(item.clone());plugin.tellRaw(p,"<red>ʏᴏᴜ ᴀʟʀᴇᴀᴅʏ ʜᴀᴠᴇ ᴛʜɪs ᴇғғᴇᴄᴛ ᴇǫᴜɪᴘᴘᴇᴅ.");return;
+            ItemStack refund=item.clone();refund.setAmount(1);plugin.giveOrDrop(p,refund);plugin.tellRaw(p,"<red>ʏᴏᴜ ᴀʟʀᴇᴀᴅʏ ʜᴀᴠᴇ ᴛʜɪs ᴇғғᴇᴄᴛ ᴇǫᴜɪᴘᴘᴇᴅ.");return;
         }
         if(current!=null){ItemStack old=items.create(current.replace("_augmented",""),current.endsWith("_augmented"),false);if(old!=null)plugin.giveOrDrop(p,old);}
         plugin.setEquippedEffect(p.getUniqueId(),slot,effect,items.isAugmented(item));
