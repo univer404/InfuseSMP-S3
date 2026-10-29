@@ -13,6 +13,18 @@ disabled_worlds: [disabled_world]
 ritual_duration_seconds: 600
 primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]
 secondary_effects: [speed, fire, ocean, emerald]
+# Effect settings
+# Each effect below has its own settings. Keep the effect names unchanged.
+# Common settings:
+#   enabled: turns the effect on or off.
+#   cooldown_seconds: wait time after activating its spark.
+#   spark_seconds: how long the spark ability lasts.
+#   trigger_hits: number of successful hits needed to trigger hit-based effects.
+#   craft_limit: maximum normal crafts; -1 means unlimited.
+#   augment_limit: maximum augmented crafts; -1 means unlimited.
+# Time values ending in _seconds are seconds; values ending in _ticks are Minecraft ticks (20 ticks = 1 second).
+# Values ending in _radius or _range are measured in blocks unless otherwise noted.
+# The remaining options tune only the named effect and should normally be left at their defaults.
 effects:
   # Emerald effect settings
   emerald:
