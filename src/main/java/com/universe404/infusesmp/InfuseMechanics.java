@@ -38,6 +38,7 @@ public final class InfuseMechanics implements Listener {
     private final Map<UUID,Map<UUID,Integer>> hitsFrom = new ConcurrentHashMap<>();
     private final Map<UUID,Double> recentDamage = new ConcurrentHashMap<>();
     private final Map<UUID,Integer> enderCurses = new ConcurrentHashMap<>();
+    private final Map<UUID,Integer> windCharges = new ConcurrentHashMap<>();
     private final Map<UUID,Double> speedStacks = new ConcurrentHashMap<>();
     private final Map<UUID,Double> attackStacks = new ConcurrentHashMap<>();
     private final Map<UUID, Double> maxHealthBeforeHeart = new ConcurrentHashMap<>();
@@ -176,10 +177,12 @@ public final class InfuseMechanics implements Listener {
         if(activateBound(e.getPlayer(),action))e.setCancelled(true);
     }
     @EventHandler public void onSneak(PlayerToggleSneakEvent e){
-        if(e.isSneaking())activateBound(e.getPlayer(),"sneak");
+        if(e.isSneaking())shootStoredWindCharge(e.getPlayer());
+        else activateBound(e.getPlayer(),"sneak");
     }
     @EventHandler public void onDeath(PlayerDeathEvent e){
         Player p=e.getEntity();UUID id=p.getUniqueId();
+        windCharges.remove(id);
         for(String slot:List.of("primary","secondary")){
             String value=plugin.getEquippedEffect(id,slot);
             if(value==null)continue;
@@ -226,7 +229,7 @@ public final class InfuseMechanics implements Listener {
     @EventHandler public void onQuit(PlayerQuitEvent e) {
         Player p=e.getPlayer();UUID id=p.getUniqueId();
         // Keep timestamp-based spark windows and cooldowns while the player is offline; otherwise relogging bypasses them.
-        hitCounts.remove(id);recentDamage.remove(id);
+        hitCounts.remove(id);windCharges.remove(id);recentDamage.remove(id);
         hitsFrom.remove(id);for(Map<UUID,Integer> map:hitsFrom.values())map.remove(id);
         removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"speed_stack");
         removeAttributeModifier(p,Attribute.ATTACK_SPEED,"attack_speed_stack");
@@ -451,6 +454,124 @@ public final class InfuseMechanics implements Listener {
             }
         }
     }
+    @EventHandler(ignoreCancelled=true)
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        Projectile projectile = event.getEntity();
+        if (!(projectile.getShooter() instanceof Player shooter)) return;
+        if (!hasEffect(shooter, "feather") && !hasEffect(shooter, "fire") && !hasEffect(shooter, "speed") && !hasEffect(shooter, "strength")) return;
+
+        if (projectile.getType() == EntityType.WIND_CHARGE && hasEffect(shooter, "feather")) {
+            projectile.setVelocity(projectile.getVelocity().multiply(plugin.getConfig().getDouble("effects.feather.wind_charge_speed", 2.0)));
+            shooter.setCooldown(Material.WIND_CHARGE, Math.max(0, plugin.getConfig().getInt("effects.feather.wind_charge_cooldown_ticks", 100)));
+        }
+        if (hasEffect(shooter, "fire")) {
+            projectile.setFireTicks(Math.max(projectile.getFireTicks(), plugin.getConfig().getInt("effects.fire.eternal_ticks", 32767)));
+            if (projectile instanceof Snowball) {
+                Vector launchVelocity = projectile.getVelocity().clone().multiply(3.0);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (!shooter.isOnline() || !projectile.isValid()) return;
+                    Location spawnAt = shooter.getEyeLocation();
+                    projectile.remove();
+                    Entity entity = shooter.getWorld().spawnEntity(spawnAt, EntityType.FIREBALL);
+                    if (entity instanceof Fireball fireball) {
+                        fireball.setShooter(shooter);
+                        fireball.setVelocity(launchVelocity);
+                        fireball.setYield(3);
+                        fireball.setIsIncendiary(true);
+                    }
+                    shooter.setCooldown(Material.SNOWBALL, Math.max(0, plugin.getConfig().getInt("effects.fire.snowball_cooldown_ticks", 300)));
+                    shooter.playSound(shooter.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
+                }, 1L);
+            }
+        }
+        if (hasEffect(shooter, "speed") && projectile.getType() != EntityType.ENDER_PEARL) {
+            projectile.setVelocity(projectile.getVelocity().multiply(2.0));
+        }
+        if (hasEffect(shooter, "strength") && projectile instanceof Arrow arrow) {
+            arrow.setPierceLevel((byte) 127);
+        }
+    }
+
+    @EventHandler(ignoreCancelled=true)
+    public void onProjectileHit(ProjectileHitEvent event) {
+        Projectile projectile = event.getEntity();
+        if (!(projectile.getShooter() instanceof Player shooter)) return;
+        Entity hit = event.getHitEntity();
+        if (!(hit instanceof LivingEntity target)) return;
+
+        if (hasEffect(shooter, "frost")) {
+            target.setFreezeTicks(Math.max(target.getFreezeTicks(), plugin.getConfig().getInt("effects.frost.freeze_ticks", 600)));
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 1, true, false, true));
+            if (target instanceof Player victim) victim.setCooldown(Material.WIND_CHARGE, Math.max(0, plugin.getConfig().getInt("effects.frost.wind_charge_cooldown_ticks", 200)));
+        }
+        if (hasEffect(shooter, "invisibility")) {
+            target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, plugin.getConfig().getInt("effects.invisibility.blindness_ticks", 200), 0, true, false, true));
+        }
+        if (hasEffect(shooter, "ender") && target instanceof Player victim && !plugin.isTrusted(shooter.getUniqueId(), victim.getUniqueId())) {
+            enderCurses.merge(victim.getUniqueId(), 1, Integer::sum);
+            Map<String,Long> playerCooldowns = cooldowns.get(shooter.getUniqueId());
+            if (playerCooldowns != null && playerCooldowns.remove("ender") != null) {
+                shooter.playSound(shooter.getLocation(), plugin.getConfig().getString("recharge_sound", "custom.health"), 1f, 1f);
+            }
+            long curseTicks = Math.max(1, plugin.getConfig().getLong("effects.ender.curse_duration_seconds", 15)) * 20L;
+            Bukkit.getScheduler().runTaskLater(plugin, () -> enderCurses.computeIfPresent(victim.getUniqueId(), (id, count) -> count <= 1 ? null : count - 1), curseTicks);
+        }
+        if (projectile instanceof Trident && hasEffect(shooter, "ocean")) {
+            double distance = shooter.getLocation().distance(target.getLocation());
+            double force = (Math.min(plugin.getConfig().getDouble("effects.ocean.trident_pull_cap", 16), distance)
+                - plugin.getConfig().getDouble("effects.ocean.trident_pull_offset", 1.5))
+                * plugin.getConfig().getDouble("effects.ocean.trident_pull_coefficient", 0.27);
+            if (force > 0) {
+                target.setVelocity(new Vector(0, 0, 0));
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (!target.isValid() || target.isDead()) return;
+                    Vector pull = shooter.getLocation().toVector().subtract(target.getLocation().toVector());
+                    if (pull.lengthSquared() > 0) target.setVelocity(new Vector(0, 0.2, 0).add(pull.normalize().multiply(force)));
+                }, 1L);
+                shooter.setCooldown(Material.TRIDENT, 100);
+                target.getWorld().spawnParticle(Particle.BUBBLE, target.getLocation().add(0, 1, 0), 3, .2, .3, .2, .02);
+                target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, 1f, 1f);
+            }
+        }
+        if (projectile instanceof Trident && hasEffect(shooter, "thunder")) {
+            target.getWorld().strikeLightningEffect(target.getLocation());
+            trueDamage(shooter, target, plugin.getConfig().getDouble("effects.thunder.true_damage", 1));
+            target.getWorld().playSound(target.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1f, 1f);
+            shooter.setCooldown(Material.TRIDENT, Math.max(0, plugin.getConfig().getInt("effects.thunder.trident_cooldown_ticks", 200)));
+        }
+    }
+
+    @EventHandler(ignoreCancelled=true)
+    public void onEnderDragonBreath(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (event.getAction() != org.bukkit.event.block.Action.RIGHT_CLICK_AIR
+            && event.getAction() != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) return;
+        ItemStack hand = event.getItem();
+        if (hand == null || hand.getType() != Material.DRAGON_BREATH || !hasEffect(player, "ender")) return;
+        if (player.getCooldown(Material.DRAGON_BREATH) > 0) return;
+        event.setCancelled(true);
+        if (hand.getAmount() > 1) hand.setAmount(hand.getAmount() - 1);
+        else if (event.getHand() == org.bukkit.inventory.EquipmentSlot.OFF_HAND) player.getInventory().setItemInOffHand(null);
+        else player.getInventory().setItemInMainHand(null);
+        DragonFireball fireball = player.getWorld().spawn(player.getEyeLocation(), DragonFireball.class);
+        fireball.setShooter(player);
+        fireball.setVelocity(player.getLocation().getDirection().normalize().multiply(plugin.getConfig().getDouble("effects.ender.dragon_fireball_speed", 2)));
+        player.setCooldown(Material.DRAGON_BREATH, Math.max(0, plugin.getConfig().getInt("effects.ender.dragon_fireball_cooldown_ticks", 200)));
+        player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_SHOOT, 1f, 1f);
+    }
+
+    private void shootStoredWindCharge(Player player) {
+        UUID id = player.getUniqueId();
+        int count = windCharges.getOrDefault(id, 0);
+        if (count <= 0 || !hasEffect(player, "feather")) return;
+        windCharges.compute(id, (key, value) -> value == null || value <= 1 ? null : value - 1);
+        Entity entity = player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.WIND_CHARGE);
+        entity.setVelocity(player.getLocation().getDirection().normalize().multiply(2.0));
+        if (entity instanceof Projectile projectile) projectile.setShooter(player);
+        player.playSound(player.getLocation(), Sound.ENTITY_WIND_CHARGE_THROW, 1f, 1f);
+        player.sendActionBar(Component.text("ᴡɪɴᴅ ᴄʜᴀʀɢᴇs: " + windCharges.getOrDefault(id, 0)));
+    }
+
     private List<Material> consumableCooldownMaterials(){
         return List.of(Material.BREAD,Material.COOKED_BEEF,Material.COOKED_CHICKEN,Material.COOKED_MUTTON,Material.COOKED_PORKCHOP,Material.COOKED_RABBIT,Material.GOLDEN_CARROT,Material.GOLDEN_APPLE,Material.ENCHANTED_GOLDEN_APPLE,Material.COOKIE,Material.MELON_SLICE,Material.PUMPKIN_PIE,Material.BEETROOT_SOUP,Material.MUSHROOM_STEW,Material.RABBIT_STEW,Material.SUSPICIOUS_STEW,Material.BAKED_POTATO,Material.CARROT,Material.POTATO,Material.APPLE,Material.DRIED_KELP,Material.CHORUS_FRUIT,Material.SWEET_BERRIES,Material.GLOW_BERRIES,Material.HONEY_BOTTLE,Material.COD,Material.SALMON,Material.COOKED_COD,Material.COOKED_SALMON,Material.TROPICAL_FISH,Material.PUFFERFISH,Material.BEEF,Material.PORKCHOP,Material.MUTTON,Material.CHICKEN,Material.RABBIT,Material.POISONOUS_POTATO,Material.SPIDER_EYE,Material.ROTTEN_FLESH,Material.EXPERIENCE_BOTTLE);
     }
