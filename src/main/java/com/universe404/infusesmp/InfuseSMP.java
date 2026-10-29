@@ -47,7 +47,7 @@ public final class InfuseSMP extends JavaPlugin {
 
         mechanics = new InfuseMechanics(this);
         getServer().getPluginManager().registerEvents(mechanics, this);
-        getServer().getScheduler().runTaskTimer(this, () -> mechanics.tick(), 20L, 20L);
+        getServer().getScheduler().runTaskTimer(this, () -> mechanics.tick(), 1L, 1L);
 
         infuseItems = new InfuseItems(this);
         getServer().getPluginManager().registerEvents(new InfuseItemListener(this, infuseItems), this);
