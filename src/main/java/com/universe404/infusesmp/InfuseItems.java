@@ -22,10 +22,17 @@ public final class InfuseItems {
     public ItemStack create(String effect,boolean augmented,boolean recipeInfo){
         effect=effect.toLowerCase(Locale.ROOT);
         if(!IDS.containsKey(effect))return null;
-        ItemStack item=new ItemStack(Material.POTION);PotionMeta meta=(PotionMeta)item.getItemMeta();
-        String color=COLORS.get(effect);meta.setColor(Color.fromRGB(Integer.parseInt(color.substring(1,3),16),Integer.parseInt(color.substring(3,5),16),Integer.parseInt(color.substring(5,7),16)));
-        meta.setCustomModelData(414001+IDS.get(effect)-1+(augmented?100:0));
-        meta.displayName(mm.deserialize(color+NAMES.get(effect)+" ᴇғғᴇᴄᴛ").decoration(TextDecoration.ITALIC,false));
+        Material configured=Material.matchMaterial(plugin.getConfig().getString("items.material","POTION"));
+        if(configured==null||configured!=Material.POTION){if(configured!=null)plugin.getLogger().warning("items.material must be POTION for Infuse resource-pack models; using POTION.");configured=Material.POTION;}
+        ItemStack item=new ItemStack(configured);PotionMeta meta=(PotionMeta)item.getItemMeta();
+        String color=plugin.getConfig().getString("items.colors."+effect,COLORS.get(effect));
+        if(color==null||!color.matches("#[0-9A-Fa-f]{6}"))color=COLORS.get(effect);
+        meta.setColor(Color.fromRGB(Integer.parseInt(color.substring(1,3),16),Integer.parseInt(color.substring(3,5),16),Integer.parseInt(color.substring(5,7),16)));
+        int modelBase=plugin.getConfig().getInt("items.model_data_base",414001);
+        int augmentedOffset=plugin.getConfig().getInt("items.augmented_model_offset",100);
+        meta.setCustomModelData(modelBase+IDS.get(effect)-1+(augmented?augmentedOffset:0));
+        String display=plugin.getConfig().getString("items.names."+effect,NAMES.get(effect));
+        meta.displayName(mm.deserialize(color+display+" ᴇғғᴇᴄᴛ").decoration(TextDecoration.ITALIC,false));
         List<net.kyori.adventure.text.Component> lore=new ArrayList<>();
         lore.add(mm.deserialize("<dark_gray>ɪɴғᴜsᴇ s3").decoration(TextDecoration.ITALIC,false));
         lore.add(mm.deserialize(augmented?"<gold>ᴀᴜɢᴍᴇɴᴛᴇᴅ":"<gray>ɴᴏʀᴍᴀʟ").decoration(TextDecoration.ITALIC,false));
@@ -36,7 +43,7 @@ public final class InfuseItems {
         meta.lore(lore);
         meta.getPersistentDataContainer().set(effectKey,PersistentDataType.STRING,effect);
         meta.getPersistentDataContainer().set(augmentedKey,PersistentDataType.BYTE,(byte)(augmented?1:0));
-        meta.setEnchantmentGlintOverride(true);
+        meta.setEnchantmentGlintOverride(plugin.getConfig().getBoolean("items.glint",true));
         item.setItemMeta(meta);return item;
     }
     public String getEffect(ItemStack item){if(item==null||!item.hasItemMeta())return null;return item.getItemMeta().getPersistentDataContainer().get(effectKey,PersistentDataType.STRING);}

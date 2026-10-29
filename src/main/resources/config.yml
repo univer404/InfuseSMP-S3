@@ -1,4 +1,4 @@
-# Infuse S3 settings; values are read by the plugin.
+# General behavior and effect tuning
 allow_same_effects: false
 trust_list_max: 3
 trust_list_delay_seconds: 10
@@ -15,15 +15,48 @@ disabled_worlds: [disabled_world]
 ritual_duration_seconds: 600
 primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]
 secondary_effects: [speed, fire, ocean, emerald]
+items:
+  material: POTION
+  model_data_base: 414001
+  augmented_model_offset: 100
+  glint: true
+  colors:
+    emerald: "#0DFC00"
+    feather: "#BEA3CA"
+    fire: "#FC7803"
+    frost: "#7AE3FC"
+    thunder: "#FCED00"
+    haste: "#B96C00"
+    heart: "#FC0046"
+    invisibility: "#7E00FC"
+    ocean: "#005AFC"
+    regeneration: "#FC00DD"
+    speed: "#D1A44B"
+    strength: "#9E2020"
+    ender: "#831177"
+  names:
+    emerald: "ᴇᴍᴇʀᴀʟᴅ"
+    feather: "ғᴇᴀᴛʜᴇʀ"
+    fire: "ғɪʀᴇ"
+    frost: "ғʀᴏsᴛ"
+    thunder: "ᴛʜᴜɴᴅᴇʀ"
+    haste: "ʜᴀsᴛᴇ"
+    heart: "ʜᴇᴀʀᴛ"
+    invisibility: "ɪɴᴠɪsɪʙɪʟɪᴛʏ"
+    ocean: "ᴏᴄᴇᴀɴ"
+    regeneration: "ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ"
+    speed: "sᴘᴇᴇᴅ"
+    strength: "sᴛʀᴇɴɢᴛʜ"
+    ender: "ᴇɴᴅᴇʀ"
 effects:
   emerald: {enabled: true, cooldown_seconds: 30, spark_seconds: 10, trigger_hits: 10, spark_xp_gain: 2, craft_limit: -1, augment_limit: 0}
   feather: {enabled: true, cooldown_seconds: 40, spark_seconds: 5, craft_limit: -1, augment_limit: 0}
   fire: {enabled: true, cooldown_seconds: 90, spark_seconds: 4, trigger_hits: 5, ignite_radius: 6, ignite_duration_ticks: 200, craft_limit: -1, augment_limit: 0}
-  frost: {enabled: true, cooldown_seconds: 60, spark_seconds: 10, trigger_hits: 10, craft_limit: -1, augment_limit: 0}
+  frost: {enabled: true, cooldown_seconds: 60, spark_seconds: 10, trigger_hits: 10, mining_fatigue_ticks: 200, craft_limit: -1, augment_limit: 0}
   haste: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, craft_limit: -1, augment_limit: 0}
   heart: {enabled: true, cooldown_seconds: 120, spark_seconds: 60, passive_hearts: 15, spark_hearts: 20, craft_limit: -1, augment_limit: 0}
   invisibility: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, craft_limit: -1, augment_limit: 0}
-  ocean: {enabled: true, cooldown_seconds: 90, spark_seconds: 5, craft_limit: -1, augment_limit: 0}
+  ocean: {enabled: true, cooldown_seconds: 90, spark_seconds: 5, pull_radius: 6, pull_strength: 0.1, craft_limit: -1, augment_limit: 0}
   regeneration: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, craft_limit: -1, augment_limit: 0}
   speed: {enabled: true, cooldown_seconds: 20, spark_seconds: 1, multiplier: 0.2, craft_limit: -1, augment_limit: 0}
   strength: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, mob_damage: 2, craft_limit: -1, augment_limit: 0}
