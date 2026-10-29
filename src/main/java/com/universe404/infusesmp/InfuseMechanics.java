@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -331,16 +332,8 @@ public final class InfuseMechanics implements Listener {
     /** Keep permanent slot passives refreshed, and end temporary spark windows. */
     public void tick() {
         long now=System.currentTimeMillis();
+        int tick=++tickCounter;
         for(Player p:Bukkit.getOnlinePlayers()) {
-            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) {
-                p.sendActionBar(Component.empty());
-                if(p.getMaxHealth()!=20){p.setMaxHealth(20);if(p.getHealth()>20)p.setHealth(20);}
-                continue;
-            }
-            applyHeartHealth(p);
-            applyPassives(p);
-            applyToolPassives(p);
-            updateDisplay(p);
             Map<String,Long> active=activeUntil.get(p.getUniqueId());
             if(active!=null) {
                 for(var entry:new ArrayList<>(active.entrySet())) {
@@ -354,13 +347,126 @@ public final class InfuseMechanics implements Listener {
                 }
             }
             Map<String,Long> playerCooldowns=cooldowns.get(p.getUniqueId());
-            if(playerCooldowns!=null){
-                for(var entry:new ArrayList<>(playerCooldowns.entrySet()))if(entry.getValue()>0&&entry.getValue()<=now){
-                    playerCooldowns.remove(entry.getKey(),entry.getValue());
-                    p.playSound(p.getLocation(),plugin.getConfig().getString("recharge_sound","custom.health"),1f,1f);
-                }
+            if(playerCooldowns!=null)for(var entry:new ArrayList<>(playerCooldowns.entrySet()))if(entry.getValue()>0&&entry.getValue()<=now){
+                playerCooldowns.remove(entry.getKey(),entry.getValue());
+                p.playSound(p.getLocation(),plugin.getConfig().getString("recharge_sound","custom.health"),1f,1f);
+            }
+            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) {
+                p.sendActionBar(Component.empty());
+                if(p.getMaxHealth()!=20){p.setMaxHealth(20);if(p.getHealth()>20)p.setHealth(20);}
+                removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed");
+                removeAttributeModifier(p,Attribute.KNOCKBACK_RESISTANCE,"frost_kbres");
+                continue;
+            }
+            applyHeartHealth(p);
+            applyPassives(p);
+            applyFrostTerrain(p);
+            applyEnderGlow(p);
+            if(now-lastToolUpdate.getOrDefault(p.getUniqueId(),0L)>=1000L){applyToolPassives(p);lastToolUpdate.put(p.getUniqueId(),now);}
+            if(tick%5==0)applyFireWorld(p);
+            if(tick%20==0){
+                applyOceanAura(p,now);
+                if(hasEffect(p,"haste")&&attackStacks.getOrDefault(p.getUniqueId(),0.0)>0)changeAttributeStack(p,Attribute.ATTACK_SPEED,attackStacks,"attack_speed_stack",plugin.getConfig().getDouble("effects.haste.decay_amount",-0.1),0,1);
+            }
+            updateDisplay(p);
+        }
+    }
+
+    private void applyFrostTerrain(Player p) {
+        UUID id=p.getUniqueId();
+        if(!hasEffect(p,"frost")) {
+            removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed");
+            removeAttributeModifier(p,Attribute.KNOCKBACK_RESISTANCE,"frost_kbres");
+            return;
+        }
+        p.setFreezeTicks(0);
+        Material under=p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
+        boolean icy=under==Material.ICE||under==Material.PACKED_ICE||under==Material.BLUE_ICE||under==Material.SNOW_BLOCK;
+        if(icy) {
+            ensureAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed",plugin.getConfig().getDouble("effects.frost.spark_move_speed",2.0));
+            ensureAttributeModifier(p,Attribute.KNOCKBACK_RESISTANCE,"frost_kbres",plugin.getConfig().getDouble("effects.frost.knockback_resistance",1.3));
+        } else {
+            removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed");
+            removeAttributeModifier(p,Attribute.KNOCKBACK_RESISTANCE,"frost_kbres");
+            Material[] lavaReplacement={Material.MAGMA_BLOCK,Material.BASALT,Material.OBSIDIAN,Material.NETHERRACK};
+            for(int x=-2;x<=2;x++)for(int y=-2;y<=2;y++)for(int z=-2;z<=2;z++){
+                Block block=p.getLocation().getBlock().getRelative(x,y,z);
+                if(block.getType()==Material.LAVA&&!plugin.isInDisabledRegion(block.getLocation()))block.setType(lavaReplacement[ThreadLocalRandom.current().nextInt(lavaReplacement.length)],false);
             }
         }
+        if(plugin.getConfig().getBoolean("effects.frost.replace_floor",true)&&freezeStacks.getOrDefault(id,0)>0
+            &&(under==Material.GRASS_BLOCK||under==Material.DIRT||under==Material.STONE)) {
+            Material[] floor={Material.ICE,Material.PACKED_ICE,Material.BLUE_ICE,Material.SNOW_BLOCK};
+            p.getLocation().getBlock().getRelative(BlockFace.DOWN).setType(floor[ThreadLocalRandom.current().nextInt(floor.length)],false);
+        }
+    }
+
+    private void applyEnderGlow(Player p) {
+        if(!hasEffect(p,"ender"))return;
+        double radius=plugin.getConfig().getDouble("effects.ender.untrust_glow_radius",5);
+        for(Player target:p.getWorld().getPlayers())if(!target.equals(p)&&target.getLocation().distanceSquared(p.getLocation())<=radius*radius&&!plugin.isInDisabledRegion(target.getLocation()))
+            target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,4,0,true,false,true));
+    }
+
+    private void applyFireWorld(Player p) {
+        if(p.isBurning()) {
+            if(hasEffect(p,"fire"))for(int x=-3;x<=3;x++)for(int y=-3;y<=3;y++)for(int z=-3;z<=3;z++){
+                Block block=p.getLocation().getBlock().getRelative(x,y,z);
+                if(block.getType()==Material.WATER&&!plugin.isInDisabledRegion(block.getLocation()))block.setType(Material.AIR,false);
+            }
+            boolean spread=false;
+            for(Player nearby:p.getWorld().getPlayers())if(nearby.getLocation().distanceSquared(p.getLocation())<=36&&hasEffect(nearby,"fire")){spread=true;break;}
+            if(spread)for(Player target:p.getWorld().getPlayers())if(!target.equals(p)&&target.getLocation().distanceSquared(p.getLocation())<=2.25&&!plugin.isInDisabledRegion(target.getLocation())){
+                target.setFireTicks(Math.max(target.getFireTicks(),200));
+                target.getWorld().spawnParticle(Particle.FLAME,target.getLocation().add(0,1,0),5,.3,.5,.3,.05);
+            }
+        }
+        if(hasEffect(p,"fire")&&p.isSneaking()&&p.getLocation().getBlock().getType()==Material.LAVA){
+            p.setGliding(true);
+            p.setVelocity(p.getVelocity().add(p.getLocation().getDirection().normalize().multiply(plugin.getConfig().getDouble("effects.fire.swim_power",0.4))));
+        }
+    }
+
+    private void applyOceanAura(Player owner,long now) {
+        if(hasEffect(owner,"ocean")) {
+            double radius=plugin.getConfig().getDouble("effects.ocean.passive_radius",8);
+            for(Player target:owner.getWorld().getPlayers()) {
+                if(target.equals(owner)||target.getLocation().distanceSquared(owner.getLocation())>radius*radius
+                    ||plugin.isDisabled(target.getUniqueId())||plugin.getConfig().getStringList("disabled_worlds").contains(target.getWorld().getName())
+                    ||plugin.isInDisabledRegion(target.getLocation())||plugin.isTrusted(owner.getUniqueId(),target.getUniqueId())
+                    ||target.hasPotionEffect(PotionEffectType.WATER_BREATHING))continue;
+                int respiration=target.getInventory().getHelmet()!=null?target.getInventory().getHelmet().getEnchantmentLevel(Enchantment.RESPIRATION):0;
+                int max=15+respiration*15;
+                oceanMaxAir.put(target.getUniqueId(),max);
+                int air=oceanAir.getOrDefault(target.getUniqueId(),max)-1;
+                if(air<=0){air=0;target.damage(plugin.getConfig().getDouble("effects.ocean.drown_damage",2),owner);}
+                oceanAir.put(target.getUniqueId(),air);
+                oceanActiveAt.put(target.getUniqueId(),now);
+                updateOxygenBar(target,air,max);
+            }
+        }
+        for(UUID id:new HashSet<>(oceanAir.keySet())) {
+            if(now-oceanActiveAt.getOrDefault(id,0L)<=1100L)continue;
+            Player target=Bukkit.getPlayer(id);
+            if(target==null){removeOxygenBar(id);oceanAir.remove(id);oceanMaxAir.remove(id);oceanActiveAt.remove(id);continue;}
+            int max=oceanMaxAir.getOrDefault(id,15);
+            int air=Math.min(max,oceanAir.getOrDefault(id,max)+2);
+            if(air>=max){oceanAir.remove(id);oceanMaxAir.remove(id);oceanActiveAt.remove(id);removeOxygenBar(id);}
+            else {oceanAir.put(id,air);updateOxygenBar(target,air,max);}
+        }
+    }
+
+    private void updateOxygenBar(Player player,int air,int max) {
+        BossBar bar=oxygenBars.computeIfAbsent(player.getUniqueId(),id->Bukkit.createBossBar("ᴏxʏɢᴇɴ",BarColor.BLUE,BarStyle.SOLID));
+        if(!bar.getPlayers().contains(player))bar.addPlayer(player);
+        double progress=Math.max(0,Math.min(1,(double)air/Math.max(1,max)));
+        bar.setProgress(progress);
+        bar.setColor(progress<=0.2?BarColor.RED:progress<=0.5?BarColor.YELLOW:BarColor.BLUE);
+    }
+
+    private void removeOxygenBar(UUID id) {
+        BossBar bar=oxygenBars.remove(id);
+        if(bar!=null)bar.removeAll();
     }
     private void beginCooldown(Player player,String effect,long now) {
         long cooldown=Math.max(0,plugin.getConfig().getLong("effects."+effect+".cooldown_seconds",defaultCooldown(effect)));
