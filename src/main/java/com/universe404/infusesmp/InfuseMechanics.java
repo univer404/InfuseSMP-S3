@@ -105,10 +105,19 @@ public final class InfuseMechanics implements Listener {
             case "speed" -> p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,ticks,2,true,false,true));
             case "haste" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE,ticks,2,true,false,true));
             case "invisibility" -> p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,ticks,0,true,false,true));
-            case "ocean" -> { p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,ticks,0,true,false,true)); p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,ticks,1,true,false,true)); }
+            case "ocean" -> {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,ticks,0,true,false,true));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,ticks,1,true,false,true));
+                double radius=plugin.getConfig().getDouble("effects.ocean.pull_radius",6);
+                double strength=plugin.getConfig().getDouble("effects.ocean.pull_strength",0.1);
+                for(Entity ent:p.getNearbyEntities(radius,radius,radius))if(ent instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target)){
+                    Vector pull=p.getLocation().toVector().subtract(target.getLocation().toVector()).normalize().multiply(strength);
+                    target.setVelocity(target.getVelocity().add(pull));
+                }
+            }
             case "regeneration" -> p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,ticks,2,true,false,true));
             case "strength" -> p.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH,ticks,1,true,false,true));
-            case "feather" -> p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,ticks,0,true,false,true));
+            case "feather" -> {p.setVelocity(p.getVelocity().setY(Math.max(1.1,p.getVelocity().getY()+1.1)));p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,ticks,0,true,false,true));}
             case "thunder" -> {
                 for(Entity ent:p.getNearbyEntities(12,8,12)) if(ent instanceof LivingEntity target && target!=p && isTargetAllowed(p,target)) {
                     target.getWorld().strikeLightningEffect(target.getLocation());
@@ -202,7 +211,7 @@ public final class InfuseMechanics implements Listener {
             if(effect.equals("thunder")) {
                 Map<String,Integer> perEffect=hitCounts.computeIfAbsent(attacker.getUniqueId(),k->new ConcurrentHashMap<>());
                 int hits=perEffect.merge(effect,1,Integer::sum);
-                int threshold=plugin.getConfig().getInt("effects.thunder.trigger_hits",10);
+                int threshold=attacker.getWorld().hasStorm()?5:plugin.getConfig().getInt("effects.thunder.trigger_hits",10);
                 if(hits>=threshold) { perEffect.put(effect,0); attacker.getWorld().strikeLightningEffect(event.getEntity().getLocation()); }
             }
         }
