@@ -14,10 +14,6 @@ ritual_duration_seconds: 600
 primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]
 secondary_effects: [speed, fire, ocean, emerald]
 items:
-  material: POTION
-  model_data_base: 414001
-  augmented_model_offset: 100
-  glint: true
   colors:
     emerald: "#0DFC00"
     feather: "#BEA3CA"
@@ -46,153 +42,200 @@ items:
     speed: "sᴘᴇᴇᴅ"
     strength: "sᴛʀᴇɴɢᴛʜ"
     ender: "ᴇɴᴅᴇʀ"
-  lore:
-    emerald:
-      - "<#09B000>ᴘᴀꜱꜱɪᴠᴇ ᴇꜰꜰᴇᴄᴛꜱ:"
-      - "<#0DFC00>💲 <#6D6D6D>ʟᴏᴏᴛɪɴɢ 5"
-      - "<#0DFC00>💲 <#6D6D6D>ᴘᴇʀᴍᴀɴᴇɴᴛ ʜᴇʀᴏ ᴏғ ᴛʜᴇ ᴠɪʟʟᴀɢᴇ"
-      - "<#0DFC00>💲 <#6D6D6D>2.0x xᴘ ɢᴀɪɴ"
-      - "<#0DFC00>💲 <#6D6D6D>ᴄᴏɴsᴜᴍᴀʙʟᴇs ʜᴀᴠᴇ ᴀ 50% ᴄʜᴀɴᴄᴇ ᴏғ ɴᴏᴛ ʙᴇɪɴɢ ᴄᴏɴsᴜᴍᴇᴅ"
-      - "<#0DFC00>💲 <#6D6D6D>ʀᴇᴄᴇɪᴠɪɴɢ 10 ʜɪᴛs ʟᴏᴄᴋs ᴛʜᴇ ᴀᴛᴛᴀᴄᴋᴇʀ's ғᴏᴏᴅ ᴀɴᴅ xᴘ"
-      - "<#09B000>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#0DFC00>💲 <#6D6D6D>ʜᴇʀᴏ ᴏғ ᴛʜᴇ ᴠɪʟʟᴀɢᴇ 5"
-      - "<#0DFC00>💲 <#6D6D6D>4.0x xᴘ ɢᴀɪɴ"
-      - "<#0DFC00>💲 <#6D6D6D>ᴄᴏɴsᴜᴍᴀʙʟᴇs ʜᴀᴠᴇ ᴀ 75% ᴄʜᴀɴᴄᴇ ɴᴏᴛ ᴛᴏ ʙᴇ ᴄᴏɴsᴜᴍᴇᴅ"
-      - "<#0DFC00>💲 <#6D6D6D>sʜᴀʀᴇ xᴘ ᴡɪᴛʜ ɴᴇᴀʀʙʏ ᴛᴇᴀᴍᴍᴀᴛᴇs ʙʏ ʜɪᴛᴛɪɴɢ ᴛʜᴇᴍ"
-    feather:
-      - "<#84728C>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#BEA3CA>☁ <#6D6D6D>ɴᴏ ғᴀʟʟ ᴅᴀᴍᴀɢᴇ"
-      - "<#BEA3CA>☁ <#6D6D6D>ɪᴍᴍᴜɴᴇ ᴛᴏ ᴋɪɴᴇᴛɪᴄ ᴇɴᴇʀɢʏ"
-      - "<#BEA3CA>☁ <#6D6D6D>ᴡɪɴᴅʙᴜʀsᴛ ᴏɴ ᴀʟʟ ᴀᴛᴛᴀᴄᴋs"
-      - "<#BEA3CA>☁ <#6D6D6D>ғᴀʟʟɪɴɢ ғʀᴏᴍ ʜɪɢʜᴇʀ ᴅᴇᴀʟs ᴍᴏʀᴇ ᴅᴀᴍᴀɢᴇ"
-      - "<#BEA3CA>☁ <#6D6D6D>ᴡɪɴᴅ ᴄʜᴀʀɢᴇs ʜᴀᴠᴇ 2.0x ᴠᴇʟᴏᴄɪᴛʏ ᴀɴᴅ 0.5x ᴜsᴇ sᴘᴇᴇᴅ"
-      - "<#BEA3CA>☁ <#6D6D6D>ʀᴇᴄᴇɪᴠɪɴɢ 10 ʜɪᴛs sᴘᴀᴡɴs ᴀ ᴡɪɴᴅ ᴄʜᴀʀɢᴇ (ᴄʀᴏᴜᴄʜ ᴛᴏ ᴜsᴇ)"
-      - "<#84728C>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#BEA3CA>☁ <#6D6D6D>ʟᴀᴜɴᴄʜᴇs ʏᴏᴜ ᴜᴘᴡᴀʀᴅ"
-      - "<#BEA3CA>☁ <#6D6D6D>ғᴀʟʟɪɴɢ ғʀᴏᴍ ʜɪɢʜᴇʀ ᴅᴇᴀʟs 2.0 ʜᴇᴀʀᴛs ᴏɴ ɪᴍᴘᴀᴄᴛ"
-      - "<#BEA3CA>☁ <#6D6D6D>ɪᴍᴘᴀᴄᴛ ʀᴀᴅɪᴜs ᴀɴᴅ ʙᴏᴜɴᴄᴇ ʜᴇɪɢʜᴛ sᴄᴀʟᴇ ᴡɪᴛʜ ᴅɪsᴛᴀɴᴄᴇ ғᴀʟʟᴇɴ"
-      - "<#BEA3CA>☁ <#6D6D6D>ᴇɴᴇᴍɪᴇs ʜɪᴛ ʙʏ ᴛʜᴇ sʜᴏᴄᴋᴡᴀᴠᴇ ɢᴇᴛ sʟᴏᴡ ғᴀʟʟɪɴɢ"
-      - "<#BEA3CA>☁ <#6D6D6D>ᴄʀᴏᴜᴄʜ ᴛᴏ ᴄᴀɴᴄᴇʟ ᴛʜᴇ ʙᴏᴜɴᴄᴇ"
-    fire:
-      - "<#B05302>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#FC7803>🔥 <#6D6D6D>ᴘᴇʀᴍᴀɴᴇɴᴛ ғɪʀᴇ ʀᴇsɪsᴛᴀɴᴄᴇ"
-      - "<#FC7803>🔥 <#6D6D6D>ᴘʀᴏᴘᴇʟ ʏᴏᴜʀsᴇʟғ ᴛʜʀᴏᴜɢʜ ʟᴀᴠᴀ"
-      - "<#FC7803>🔥 <#6D6D6D>ʟᴀᴠᴀ ʙʀᴇᴀᴋs ʏᴏᴜʀ ғᴀʟʟ"
-      - "<#FC7803>🔥 <#6D6D6D>sɴᴏᴡʙᴀʟʟs ᴛᴜʀɴ ɪɴᴛᴏ ғɪʀᴇʙᴀʟʟs"
-      - "<#FC7803>🔥 <#6D6D6D>5ᴛʜ ʜɪᴛ sᴇᴛs ᴇɴᴇᴍɪᴇs ᴏɴ ғɪʀᴇ"
-      - "<#FC7803>🔥 <#6D6D6D>ғʟᴀᴍᴇ ᴏɴ ʀᴀɴɢᴇᴅ ᴀᴛᴛᴀᴄᴋs"
-      - "<#FC7803>🔥 <#6D6D6D>ғɪʀᴇ sᴘʀᴇᴀᴅs ᴛᴏ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs ᴛʜᴀᴛ ᴛᴏᴜᴄʜ"
-      - "<#FC7803>🔥 <#6D6D6D>ᴇxᴛɪɴɢᴜɪsʜ ɴᴇᴀʀʙʏ ᴡᴀᴛᴇʀ ᴡʜᴇɴ ʙᴜʀɴɪɴɢ"
-      - "<#B05302>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#FC7803>🔥 <#6D6D6D>ɪɢɴɪᴛᴇs ɴᴇᴀʀʙʏ ᴘʟᴀʏᴇʀs ᴀɴᴅ ʟᴀᴜɴᴄʜᴇs ᴛʜᴇᴍ ᴜᴘᴡᴀʀᴅ"
-      - "<#FC7803>🔥 <#6D6D6D>ᴇxᴛɪɴɢᴜɪsʜᴇs ᴡᴀᴛᴇʀ ᴀɴᴅ sᴇᴛs sᴏᴍᴇ ɴᴇᴀʀʙʏ ᴀɪʀ ʙʟᴏᴄᴋs ᴏɴ ғɪʀᴇ"
-    frost:
-      - "<#559FB0>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#7AE3FC>❄ <#6D6D6D>10ᴛʜ ʜɪᴛ ғʀᴇᴇᴢᴇs ᴇɴᴇᴍɪᴇs ᴀɴᴅ ᴘᴜᴛs ᴡɪɴᴅ ᴄʜᴀʀɢᴇs ᴏɴ ᴄᴏᴏʟᴅᴏᴡɴ"
-      - "<#7AE3FC>❄ <#6D6D6D>ғʀᴏsᴛᴇᴅ ᴇɴᴇᴍɪᴇs ᴄʀᴇᴀᴛᴇ ɪᴄᴇ ᴛʀᴀɪʟs ᴀɴᴅ ɢᴇᴛ ᴍɪɴɪɴɢ ғᴀᴛɪɢᴜᴇ"
-      - "<#7AE3FC>❄ <#6D6D6D>1.5x sᴘᴇᴇᴅ ᴀɴᴅ 30% ᴋʙ ʀᴇsɪsᴛᴀɴᴄᴇ ᴏɴ ɪᴄᴇ/sɴᴏᴡ"
-      - "<#7AE3FC>❄ <#6D6D6D>ᴄᴏᴏʟs ᴅᴏᴡɴ ᴀɴᴅ sᴏʟɪᴅɪғɪᴇs ʟᴀᴠᴀ"
-      - "<#7AE3FC>❄ <#6D6D6D>ғʀᴏsᴛ ᴏɴ ʀᴀɴɢᴇᴅ ᴀᴛᴛᴀᴄᴋs"
-      - "<#559FB0>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#7AE3FC>❄ <#6D6D6D>ᴀᴘᴘʟɪᴇs ғʀᴏsᴛ ᴀɴᴅ ᴍɪɴɪɴɢ ғᴀᴛɪɢᴜᴇ 2 ᴏɴ ʜɪᴛ"
-      - "<#7AE3FC>❄ <#6D6D6D>2.0x sᴘᴇᴇᴅ ᴏɴ ɪᴄᴇ/sɴᴏᴡ"
-    thunder:
-      - "<#B0A600>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#FCED00>⚡ <#6D6D6D>sᴍɪᴛᴇs ᴘʟᴀʏᴇʀs ᴇᴠᴇʀʏ 10ᴛʜ ʜɪᴛ (5ᴛʜ ɪғ ʀᴀɪɴɪɴɢ)"
-      - "<#FCED00>⚡ <#6D6D6D>ᴛʜᴜɴᴅᴇʀ ᴄʜᴀɪɴs ᴛᴏ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs ᴜᴘ ᴛᴏ 10 ᴛɪᴍᴇs"
-      - "<#FCED00>⚡ <#6D6D6D>ᴛʀɪᴅᴇɴᴛs sᴍɪᴛᴇ ᴇɴᴇᴍɪᴇs ᴡʜᴇɴ ᴛʜʀᴏᴡɴ"
-      - "<#B0A600>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#FCED00>⚡ <#6D6D6D>sᴍɪᴛᴇs ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs ᴜᴘ ᴛᴏ 5 ᴛɪᴍᴇs"
-      - "<#FCED00>⚡ <#6D6D6D>ʀᴀᴅɪᴜs ɪɴᴄʀᴇᴀsᴇs ᴡɪᴛʜ ᴍᴏʀᴇ ᴇɴᴇᴍɪᴇs"
-    haste:
-      - "<#804B00>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#B96C00>⛏ <#6D6D6D>ʙʀᴇᴀᴋ ʙʟᴏᴄᴋs ғᴀsᴛᴇʀ"
-      - "<#B96C00>⛏ <#6D6D6D>ᴛᴏᴏʟs ʜᴀᴠᴇ ғᴏʀᴛᴜɴᴇ 5 ᴀɴᴅ ᴜɴʙʀᴇᴀᴋɪɴɢ 10"
-      - "<#B96C00>⛏ <#6D6D6D>ᴇɴᴇᴍɪᴇs ʜᴀᴠᴇ ʀᴇᴅᴜᴄᴇᴅ ɪ-ғʀᴀᴍᴇs"
-      - "<#B96C00>⛏ <#6D6D6D>ᴇᴀᴄʜ ʜɪᴛ ɪɴᴄʀᴇᴀsᴇs ᴀᴛᴛᴀᴄᴋ sᴘᴇᴇᴅ"
-      - "<#B96C00>⛏ <#6D6D6D>ᴀᴛᴛᴀᴄᴋ sᴘᴇᴇᴅ ᴅᴇᴄᴀʏs ᴇᴠᴇʀʏ 1 s"
-      - "<#804B00>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#B96C00>⛏ <#6D6D6D>ɪɴsᴛᴀ ᴍɪɴᴇ ᴀʟʟ ʙʟᴏᴄᴋs"
-    heart:
-      - "<#B00030>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#FC0046>❤ <#6D6D6D>+5 ʜᴇᴀʀᴛs"
-      - "<#FC0046>❤ <#6D6D6D>ғᴏᴏᴅ ɪᴛᴇᴍs ɢɪᴠᴇ 2 ᴀʙsᴏʀᴘᴛɪᴏɴ ʜᴇᴀʀᴛs"
-      - "<#FC0046>❤ <#6D6D6D>ᴇɴᴄʜᴀɴᴛᴇᴅ ɢᴏʟᴅᴇɴ ᴀᴘᴘʟᴇs ɢɪᴠᴇ 10 ᴀʙsᴏʀᴘᴛɪᴏɴ ʜᴇᴀʀᴛs"
-      - "<#FC0046>❤ <#6D6D6D>ʜɪᴛ ᴛᴇᴀᴍᴍᴀᴛᴇs ᴛᴏ ɢɪᴠᴇ ᴛʜᴇᴍ ʏᴏᴜʀ ᴇxᴛʀᴀ ʜᴘ ᴀs ᴀʙsᴏʀᴘᴛɪᴏɴ"
-      - "<#B00030>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#FC0046>❤ <#6D6D6D>+10 ʜᴇᴀʀᴛs"
-      - "<#FC0046>❤ <#6D6D6D>ʜᴇᴀʟs ʏᴏᴜ ʙʏ 20% ᴏғ ᴅᴀᴍᴀɢᴇ ᴅᴇᴀʟᴛ ɪɴ ᴛʜᴇ ᴘᴀsᴛ 30 s"
-    invisibility:
-      - "<#5800B0>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#7E00FC>👁 <#6D6D6D>ɪɴᴠɪsɪʙɪʟɪᴛʏ"
-      - "<#7E00FC>👁 <#6D6D6D>ɴᴏ ᴇɴᴛɪᴛʏ ᴄᴏʟʟɪsɪᴏɴ"
-      - "<#7E00FC>👁 <#6D6D6D>ᴍᴏʙs ᴅᴏɴ'ᴛ ᴛᴀʀɢᴇᴛ ʏᴏᴜ"
-      - "<#7E00FC>👁 <#6D6D6D>ɪᴍᴍᴜɴᴇ ᴛᴏ ᴡɪᴛʜᴇʀ ᴀɴᴅ ᴅᴀʀᴋɴᴇss"
-      - "<#7E00FC>👁 <#6D6D6D>ᴏʙsᴄᴜʀᴇs ᴋɪʟʟ ᴄʀᴇᴅɪᴛ"
-      - "<#7E00FC>👁 <#6D6D6D>ʙʟɪɴᴅɴᴇss ᴏɴ ʀᴀɴɢᴇᴅ ᴀᴛᴛᴀᴄᴋs"
-      - "<#7E00FC>👁 <#6D6D6D>10ᴛʜ ʜɪᴛ ɢɪᴠᴇs ʙʟɪɴᴅɴᴇss"
-      - "<#5800B0>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#7E00FC>👁 <#6D6D6D>ᴄʀᴇᴀᴛᴇs ᴀ sᴍᴏᴋᴇ sᴄʀᴇᴇɴ"
-      - "<#7E00FC>👁 <#6D6D6D>ɢɪᴠᴇs ᴛʀᴜᴇ ɪɴᴠɪs ᴛᴏ ʏᴏᴜ ᴀɴᴅ ᴛʀᴜsᴛᴇᴅ ᴛᴇᴀᴍᴍᴀᴛᴇs"
-      - "<#7E00FC>👁 <#6D6D6D>sᴍᴏᴋᴇ ʀᴀᴅɪᴜs ɪɴᴄʀᴇᴀsᴇs ᴡɪᴛʜ ᴍᴏʀᴇ ᴛᴇᴀᴍᴍᴀᴛᴇs"
-    ocean:
-      - "<#003EB0>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#005AFC>🌊 <#6D6D6D>ᴅᴏʟᴘʜɪɴ's ɢʀᴀᴄᴇ ᴀɴᴅ ᴡᴀᴛᴇʀ ʙʀᴇᴀᴛʜɪɴɢ"
-      - "<#005AFC>🌊 <#6D6D6D>ᴅʀᴏᴡɴ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs"
-      - "<#005AFC>🌊 <#6D6D6D>sᴛᴀɴᴅɪɴɢ ɪɴ ʀᴀɪɴ ɪɴᴄʀᴇᴀsᴇs ᴅʀᴏᴡɴɪɴɢ ᴅᴀᴍᴀɢᴇ"
-      - "<#005AFC>🌊 <#6D6D6D>ɴᴇᴀʀʙʏ ᴛᴇᴀᴍᴍᴀᴛᴇs ɢᴇᴛ ᴡᴀᴛᴇʀ ʙʀᴇᴀᴛʜɪɴɢ"
-      - "<#005AFC>🌊 <#6D6D6D>ᴛʀɪᴅᴇɴᴛs ʜᴀᴠᴇ ʟᴏʏᴀʟᴛʏ 5 ᴀɴᴅ ᴘᴜʟʟ ᴇɴᴇᴍɪᴇs"
-      - "<#003EB0>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#005AFC>🌊 <#6D6D6D>ᴄʀᴇᴀᴛᴇs ᴀ ᴡʜɪʀʟᴘᴏᴏʟ ᴛʜᴀᴛ ᴘᴜʟʟs ɪɴ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs"
-    regeneration:
-      - "<#B0009A>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#FC00DD>+ <#6D6D6D>ɴᴏ ʜᴜɴɢᴇʀ ʟᴏss"
-      - "<#FC00DD>+ <#6D6D6D>ᴘᴇʀᴍᴀɴᴇɴᴛ ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ"
-      - "<#FC00DD>+ <#6D6D6D>ᴇᴠᴇʀʏ ʜɪᴛ ɢɪᴠᴇs ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ 2 ғᴏʀ 3 s"
-      - "<#FC00DD>+ <#6D6D6D>ᴀʟʟ ғᴏᴏᴅ ɢɪᴠᴇs +3 sᴀᴛᴜʀᴀᴛɪᴏɴ ʙᴀʀs"
-      - "<#FC00DD>+ <#6D6D6D>ᴇᴀᴛ ᴀɴʏᴛɪᴍᴇ"
-      - "<#FC00DD>+ <#6D6D6D>10ᴛʜ ʜɪᴛ ᴛᴀᴋᴇs ᴀᴡᴀʏ 1 ʜᴜɴɢᴇʀ ʙᴀʀ ғʀᴏᴍ ᴛᴀʀɢᴇᴛ"
-      - "<#B0009A>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#FC00DD>+ <#6D6D6D>ᴅᴀᴍᴀɢᴇ ᴅᴇᴀʟᴛ ʜᴇᴀʟs ʏᴏᴜ ᴀɴᴅ ᴛᴇᴀᴍᴍᴀᴛᴇs"
-    speed:
-      - "<#b5883a>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#d1a44b>⏩ <#6D6D6D>+0.2x ᴍᴏᴠᴇᴍᴇɴᴛ sᴘᴇᴇᴅ"
-      - "<#d1a44b>⏩ <#6D6D6D>ᴇᴀᴄʜ ʜɪᴛ ɪɴᴄʀᴇᴀsᴇs sᴘᴇᴇᴅ"
-      - "<#d1a44b>⏩ <#6D6D6D>ɢᴇᴛᴛɪɴɢ ʜɪᴛ ʟᴏᴡᴇʀs sᴘᴇᴇᴅ"
-      - "<#d1a44b>⏩ <#6D6D6D>ɪᴍᴘʀᴏᴠᴇᴅ ᴘʀᴏᴊᴇᴄᴛɪʟᴇ sᴘᴇᴇᴅ, ᴀᴄᴄᴜʀᴀᴄʏ ᴀɴᴅ ʀᴀɴɢᴇ"
-      - "<#b5883a>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#d1a44b>⏩ <#6D6D6D>ᴅᴀsʜ ғᴏʀᴡᴀʀᴅ ᴅᴇᴀʟɪɴɢ ᴅᴀᴍᴀɢᴇ"
-    strength:
-      - "<#6F1616>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#9E2020>🛡 <#6D6D6D>sʜɪᴇʟᴅ ᴅɪsᴀʙʟᴇs ᴀʀᴇ 2x ʟᴏɴɢᴇʀ"
-      - "<#9E2020>🛡 <#6D6D6D>ᴅᴀᴍᴀɢᴇs sʜɪᴇʟᴅs ʙʏ 20 ᴡʜᴇɴ ᴅɪsᴀʙʟɪɴɢ"
-      - "<#9E2020>🛡 <#6D6D6D>0.5x ᴅᴀᴍᴀɢᴇ ᴘᴇɴᴇᴛʀᴀᴛᴇs ᴡʜᴇɴ ᴅɪsᴀʙʟɪɴɢ sʜɪᴇʟᴅs"
-      - "<#9E2020>🛡 <#6D6D6D>2x ᴅᴀᴍᴀɢᴇ ᴛᴏ ᴀʟʟ ᴍᴏʙs"
-      - "<#9E2020>🛡 <#6D6D6D>+0.3 ᴀᴛᴛᴀᴄᴋ ᴅᴀᴍᴀɢᴇ ғᴏʀ ᴇᴀᴄʜ 1 ʜᴘ ʟᴏsᴛ"
-      - "<#9E2020>🛡 <#6D6D6D>ᴘɪᴇʀᴄɪɴɢ ᴏɴ ʀᴀɴɢᴇᴅ ᴀᴛᴛᴀᴄᴋs"
-      - "<#6F1616>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#9E2020>🛡 <#6D6D6D>ᴀʟʟ ᴀᴛᴛᴀᴄᴋs ᴀʀᴇ ᴄʀɪᴛɪᴄᴀʟ"
-    ender:
-      - "<#831177>ᴘᴀꜱꜱɪᴠᴇ ᴇғғᴇᴄᴛs:"
-      - "<#541351>⭐ <#6D6D6D>ᴀʟʟ ɴᴇᴀʀʙʏ ᴜɴᴛʀᴜsᴛᴇᴅ ᴘʟᴀʏᴇʀs ʜᴀᴠᴇ ɢʟᴏᴡɪɴɢ"
-      - "<#541351>⭐ <#6D6D6D>ᴜsᴇ ᴅʀᴀɢᴏɴ's ʙʀᴇᴀᴛʜ ᴛᴏ sʜᴏᴏᴛ ᴘᴏᴡᴇʀғᴜʟ ғɪʀᴇʙᴀʟʟs ᴛʜᴀᴛ ᴄᴜʀsᴇ ᴘʟᴀʏᴇʀs"
-      - "<#541351>⭐ <#6D6D6D>ᴄᴜʀsᴇ ᴜɴᴛʀᴜsᴛᴇᴅ ᴘʟᴀʏᴇʀs ᴏɴ ʜɪᴛ ᴛᴏ sʜᴀʀᴇ ᴅᴀᴍᴀɢᴇ"
-      - "<#831177>ꜱᴘᴀʀᴋ ᴇғғᴇᴄᴛs:"
-      - "<#541351>⭐ <#6D6D6D>ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ᴛʜᴇ ᴄᴜʀsᴏʀ ᴡɪᴛʜɪɴ 15 ʙʟᴏᴄᴋs"
-      - "<#541351>⭐ <#6D6D6D>ɪɴsᴛᴀɴᴛʟʏ ᴋɪʟʟs ɴᴇᴀʀʙʏ ᴍᴏʙs ᴀɴᴅ ᴄᴜʀsᴇs ᴘʟᴀʏᴇʀs"
-      - "<#541351>⭐ <#6D6D6D>ᴄᴜʀsɪɴɢ ᴀ ᴘʟᴀʏᴇʀ ʀᴇsᴇᴛs sᴘᴀʀᴋ ᴄᴏᴏʟᴅᴏᴡɴ"
-
 effects:
-  emerald: {enabled: true, cooldown_seconds: 30, spark_seconds: 10, trigger_hits: 10, xp_gain: 1, spark_xp_gain: 2, no_consume_chance: 0.5, spark_no_consume_chance: 0.75, craft_limit: -1, augment_limit: 0}
-  feather: {enabled: true, cooldown_seconds: 40, spark_seconds: 5, wind_burst_fall_min: 10, wind_burst_power: 1.5, wind_burst_damage_multiplier: 0.5, wind_charge_speed: 2.0, wind_charge_cooldown_ticks: 100, max_wind_charge: 3, trigger_hits: 10, initial_bounce_power: 2.0, fall_trigger_threshold: 3, min_shockwave_radius: 3, max_shockwave_radius: 12, shockwave_true_damage: 2, slow_falling_ticks: 100, bounce_coefficient: 1.5, shockwave_rings: 8, shockwave_draw_interval_ticks: 1, craft_limit: -1, augment_limit: 0}
-  fire: {enabled: true, cooldown_seconds: 90, spark_seconds: 4, trigger_hits: 5, eternal_ticks: 32767, ignite_ticks: 100, ignite_radius: 6, ignite_duration_ticks: 200, launch_radius: 6, launch_power: 3, burn_radius: 6, snowball_cooldown_ticks: 300, swim_power: 0.4, craft_limit: -1, augment_limit: 0}
-  frost: {enabled: true, cooldown_seconds: 60, spark_seconds: 10, trigger_hits: 10, freeze_ticks: 600, wind_charge_cooldown_ticks: 200, mining_fatigue_ticks: 200, mining_fatigue_tier: 2, spark_move_speed: 2.0, lava_walk: true, move_speed: 1.5, knockback_resistance: 1.3, replace_floor: true, craft_limit: -1, augment_limit: 0}
-  haste: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, break_speed_multiplier: 1.5, attack_speed_stack: 0.2, iframe_duration: 19, decay_amount: -0.1, spark_atkspd_increase: 0.5, craft_limit: -1, augment_limit: 0}
-  heart: {enabled: true, cooldown_seconds: 120, spark_seconds: 60, passive_hearts: 15, spark_hearts: 20, food_item_absorption_tier: 1, egap_absorption_tier: 5, food_item_duration_seconds: 60, egap_item_duration_seconds: 60, return_after_hit: 10, transfer_health_max_duration: 480, spark_heal_percentage: 0.2, craft_limit: -1, augment_limit: 0}
-  invisibility: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, trigger_hits: 10, blindness_ticks: 200, curse_duration_seconds: 30, craft_limit: -1, augment_limit: 0}
-  ocean: {enabled: true, cooldown_seconds: 90, spark_seconds: 5, drown_damage: 2, passive_radius: 8, pull_radius: 6, pull_strength: 0.1, pull_iteration: 50, pull_interval_ticks: 2, trident_pull_cap: 16, trident_pull_offset: 1.5, trident_pull_coefficient: 0.27, craft_limit: -1, augment_limit: 0}
-  regeneration: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, food: 3, saturation: 0, duration_hit_ticks: 60, effect_hit_tier: 2, trigger_hits: 10, spark_heal_radius: 8, spark_heal_interval_ticks: 20, spark_heal_iteration: 15, spark_heal_percentage: 0.2, craft_limit: -1, augment_limit: 0}
-  speed: {enabled: true, cooldown_seconds: 20, spark_seconds: 1, multiplier: 0.2, hit_increase: 0.01, hit_decrease: -0.02, max_penalty: -0.2, stack_cap: 0.2, dash_power: 2.6, dash_damping: 0.6, dash_iteration: 14, dash_true_damage: 2, dash_effect_radius: 1.5, dash_interval_ticks: 1, craft_limit: -1, augment_limit: 0}
-  strength: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, mob_damage: 2, hp_loss_atk_bonus: 0.3, double_crit_mult: 1.334, shield_disable_time_seconds: 10, shield_disable_ticks: 200, shield_disable_damage: 20, shield_penetration: 2, craft_limit: -1, augment_limit: 0}
-  thunder: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, trigger_hits: 10, true_damage: 1, lightning_chain_max: 10, lightning_chain_radius: 12, strike_time_max: 5, trident_cooldown_ticks: 200, craft_limit: -1, augment_limit: 0}
-  ender: {enabled: true, cooldown_seconds: 30, spark_seconds: 1, curse_duration_seconds: 15, teleport_max_radius: 15, untrust_glow_radius: 5, dragon_fireball_speed: 2, dragon_fireball_cooldown_ticks: 200, craft_limit: 1, augment_limit: 1}
+  # Emerald effect settings
+  emerald:
+    enabled: true
+    cooldown_seconds: 30
+    spark_seconds: 10
+    trigger_hits: 10
+    xp_gain: 1
+    spark_xp_gain: 2
+    no_consume_chance: 0.5
+    spark_no_consume_chance: 0.75
+    craft_limit: -1
+    augment_limit: 0
+  # Feather effect settings
+  feather:
+    enabled: true
+    cooldown_seconds: 40
+    spark_seconds: 5
+    wind_burst_fall_min: 10
+    wind_burst_power: 1.5
+    wind_burst_damage_multiplier: 0.5
+    wind_charge_speed: 2.0
+    wind_charge_cooldown_ticks: 100
+    max_wind_charge: 3
+    trigger_hits: 10
+    initial_bounce_power: 2.0
+    fall_trigger_threshold: 3
+    min_shockwave_radius: 3
+    max_shockwave_radius: 12
+    shockwave_true_damage: 2
+    slow_falling_ticks: 100
+    bounce_coefficient: 1.5
+    shockwave_rings: 8
+    shockwave_draw_interval_ticks: 1
+    craft_limit: -1
+    augment_limit: 0
+  # Fire effect settings
+  fire:
+    enabled: true
+    cooldown_seconds: 90
+    spark_seconds: 4
+    trigger_hits: 5
+    eternal_ticks: 32767
+    ignite_ticks: 100
+    ignite_radius: 6
+    ignite_duration_ticks: 200
+    launch_radius: 6
+    launch_power: 3
+    burn_radius: 6
+    snowball_cooldown_ticks: 300
+    swim_power: 0.4
+    craft_limit: -1
+    augment_limit: 0
+  # Frost effect settings
+  frost:
+    enabled: true
+    cooldown_seconds: 60
+    spark_seconds: 10
+    trigger_hits: 10
+    freeze_ticks: 600
+    wind_charge_cooldown_ticks: 200
+    mining_fatigue_ticks: 200
+    mining_fatigue_tier: 2
+    spark_move_speed: 2.0
+    lava_walk: true
+    move_speed: 1.5
+    knockback_resistance: 1.3
+    replace_floor: true
+    craft_limit: -1
+    augment_limit: 0
+  # Haste effect settings
+  haste:
+    enabled: true
+    cooldown_seconds: 60
+    spark_seconds: 15
+    break_speed_multiplier: 1.5
+    attack_speed_stack: 0.2
+    iframe_duration: 19
+    decay_amount: -0.1
+    spark_atkspd_increase: 0.5
+    craft_limit: -1
+    augment_limit: 0
+  # Heart effect settings
+  heart:
+    enabled: true
+    cooldown_seconds: 120
+    spark_seconds: 60
+    passive_hearts: 15
+    spark_hearts: 20
+    food_item_absorption_tier: 1
+    egap_absorption_tier: 5
+    food_item_duration_seconds: 60
+    egap_item_duration_seconds: 60
+    return_after_hit: 10
+    transfer_health_max_duration: 480
+    spark_heal_percentage: 0.2
+    craft_limit: -1
+    augment_limit: 0
+  # Invisibility effect settings
+  invisibility:
+    enabled: true
+    cooldown_seconds: 90
+    spark_seconds: 10
+    trigger_hits: 10
+    blindness_ticks: 200
+    curse_duration_seconds: 30
+    craft_limit: -1
+    augment_limit: 0
+  # Ocean effect settings
+  ocean:
+    enabled: true
+    cooldown_seconds: 90
+    spark_seconds: 5
+    drown_damage: 2
+    passive_radius: 8
+    pull_radius: 6
+    pull_strength: 0.1
+    pull_iteration: 50
+    pull_interval_ticks: 2
+    trident_pull_cap: 16
+    trident_pull_offset: 1.5
+    trident_pull_coefficient: 0.27
+    craft_limit: -1
+    augment_limit: 0
+  # Regeneration effect settings
+  regeneration:
+    enabled: true
+    cooldown_seconds: 60
+    spark_seconds: 15
+    food: 3
+    saturation: 0
+    duration_hit_ticks: 60
+    effect_hit_tier: 2
+    trigger_hits: 10
+    spark_heal_radius: 8
+    spark_heal_interval_ticks: 20
+    spark_heal_iteration: 15
+    spark_heal_percentage: 0.2
+    craft_limit: -1
+    augment_limit: 0
+  # Speed effect settings
+  speed:
+    enabled: true
+    cooldown_seconds: 20
+    spark_seconds: 1
+    multiplier: 0.2
+    hit_increase: 0.01
+    hit_decrease: -0.02
+    max_penalty: -0.2
+    stack_cap: 0.2
+    dash_power: 2.6
+    dash_damping: 0.6
+    dash_iteration: 14
+    dash_true_damage: 2
+    dash_effect_radius: 1.5
+    dash_interval_ticks: 1
+    craft_limit: -1
+    augment_limit: 0
+  # Strength effect settings
+  strength:
+    enabled: true
+    cooldown_seconds: 60
+    spark_seconds: 15
+    mob_damage: 2
+    hp_loss_atk_bonus: 0.3
+    double_crit_mult: 1.334
+    shield_disable_time_seconds: 10
+    shield_disable_ticks: 200
+    shield_disable_damage: 20
+    shield_penetration: 2
+    craft_limit: -1
+    augment_limit: 0
+  # Thunder effect settings
+  thunder:
+    enabled: true
+    cooldown_seconds: 90
+    spark_seconds: 10
+    trigger_hits: 10
+    true_damage: 1
+    lightning_chain_max: 10
+    lightning_chain_radius: 12
+    strike_time_max: 5
+    trident_cooldown_ticks: 200
+    craft_limit: -1
+    augment_limit: 0
+  # Ender effect settings
+  ender:
+    enabled: true
+    cooldown_seconds: 30
+    spark_seconds: 1
+    curse_duration_seconds: 15
+    teleport_max_radius: 15
+    untrust_glow_radius: 5
+    dragon_fireball_speed: 2
+    dragon_fireball_cooldown_ticks: 200
+    craft_limit: 1
+    augment_limit: 1
