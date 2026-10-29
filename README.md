@@ -3,7 +3,7 @@
 Java Paper/Purpur conversion of the Infuse S3 Skript for Minecraft 1.21.11.
 
 ## Build
-Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions is configured to build the conversion branch and pull requests and upload a JAR artifact when the build succeeds.
+Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions builds the plugin and generates separate downloadable plugin JAR and Java 26.3 resource-pack ZIP artifacts when both steps succeed.
 
 ## Configuration and data
 - `config.yml`: general settings, effect tuning, cooldowns, craft limits, item colors/names/lore and disabled worlds.
@@ -18,4 +18,4 @@ Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions is configured
 - WorldGuard: `/mapregion add|delete|list|clear` region mapping; the plugin can run without WorldGuard installed.
 
 ## Source and release status
-The supplied archive contains `infuse_old` and `infuse_new`; this port targets `infuse_new/`. It is still in progress and must not be treated as production-ready until CI succeeds and remaining effect/resource-pack behavior is tested. See [CONVERSION_STATUS.md](CONVERSION_STATUS.md).
+The supplied archive contains `infuse_old` and `infuse_new`; this port targets `infuse_new/`. The resource pack targets Java Edition 26.3 (resource pack format 97.1). The plugin port is still in progress and must not be treated as production-ready until CI succeeds and remaining effect behavior is tested in-game. See [CONVERSION_STATUS.md](CONVERSION_STATUS.md).
