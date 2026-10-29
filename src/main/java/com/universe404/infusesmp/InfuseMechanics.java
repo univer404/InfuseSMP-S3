@@ -536,7 +536,7 @@ public final class InfuseMechanics implements Listener {
                 target.getWorld().spawnParticle(Particle.FLAME,target.getLocation().add(0,1,0),10,.3,.5,.3,.05);
             }
         }
-        if(hasEffect(attacker,"frost")&&(isActive(attackerId,"frost")||targetHitsFromAttacker%Math.max(1,plugin.getConfig().getInt("effects.frost.trigger_hits",10))==0)){
+        if(hasEffect(attacker,"frost")&&(isActive(attackerId,"frost")||globalHits%Math.max(1,plugin.getConfig().getInt("effects.frost.trigger_hits",10))==0)){
             target.setFreezeTicks(Math.max(target.getFreezeTicks(),plugin.getConfig().getInt("effects.frost.freeze_ticks",600)));
             target.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE,plugin.getConfig().getInt("effects.frost.mining_fatigue_ticks",200),1,true,false,true));
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,100,1,true,false,true));
@@ -544,8 +544,8 @@ public final class InfuseMechanics implements Listener {
         }
         if(hasEffect(attacker,"strength")){
             if(!(target instanceof Player))event.setDamage(event.getDamage()*plugin.getConfig().getDouble("effects.strength.mob_damage",2.0));
-            event.setDamage(event.getDamage()+Math.max(0,attacker.getMaxHealth()-attacker.getHealth())*plugin.getConfig().getDouble("effects.strength.hp_loss_atk_bonus",0.3));
-            if(isActive(attackerId,"strength")){
+            if(target instanceof Player)event.setDamage(event.getDamage()+Math.max(0,attacker.getMaxHealth()-attacker.getHealth())*plugin.getConfig().getDouble("effects.strength.hp_loss_atk_bonus",0.3));
+            if(target instanceof Player && isActive(attackerId,"strength")){
                 boolean critical=attacker.getFallDistance()>0&&!attacker.isOnGround()&&attacker.getAttackCooldown()>.9;
                 event.setDamage(event.getDamage()*(critical?plugin.getConfig().getDouble("effects.strength.double_crit_mult",1.334):1.5));
                 target.getWorld().spawnParticle(Particle.CRIT,target.getLocation().add(0,1,0),10,.3,.4,.3,.2);
@@ -561,15 +561,15 @@ public final class InfuseMechanics implements Listener {
             changeAttributeStack(attacker,Attribute.ATTACK_SPEED,attackStacks,"attack_speed_stack",plugin.getConfig().getDouble("effects.haste.attack_speed_stack",0.2),0,1);
             Bukkit.getScheduler().runTaskLater(plugin,()->{if(target.isValid())target.setNoDamageTicks(Math.max(0,plugin.getConfig().getInt("effects.haste.iframe_duration",19)));},1L);
         }
-        if(hasEffect(attacker,"invisibility")&&globalHits%Math.max(1,plugin.getConfig().getInt("effects.invisibility.trigger_hits",10))==0)
+        if(target instanceof Player && hasEffect(attacker,"invisibility")&&globalHits%Math.max(1,plugin.getConfig().getInt("effects.invisibility.trigger_hits",10))==0)
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,plugin.getConfig().getInt("effects.invisibility.blindness_ticks",200),0,true,false,true));
-        if(hasEffect(attacker,"regeneration")){
+        if(target instanceof Player victim && hasEffect(attacker,"regeneration")){
             attacker.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,plugin.getConfig().getInt("effects.regeneration.duration_hit_ticks",60),Math.max(0,plugin.getConfig().getInt("effects.regeneration.effect_hit_tier",2)-1),true,false,true));
-            if(globalHits%Math.max(1,plugin.getConfig().getInt("effects.regeneration.trigger_hits",10))==0&&target instanceof Player victim)victim.setSaturation(Math.max(0,victim.getSaturation()-1));
+            if(globalHits%Math.max(1,plugin.getConfig().getInt("effects.regeneration.trigger_hits",10))==0)victim.setSaturation(Math.max(0,victim.getSaturation()-1));
         }
-        if(hasEffect(attacker,"speed"))changeAttributeStack(attacker,Attribute.MOVEMENT_SPEED,speedStacks,"speed_stack",plugin.getConfig().getDouble("effects.speed.hit_increase",0.01),plugin.getConfig().getDouble("effects.speed.max_penalty",-0.2),plugin.getConfig().getDouble("effects.speed.stack_cap",0.2));
-        if(target instanceof Player victim&&hasEffect(victim,"speed"))changeAttributeStack(victim,Attribute.MOVEMENT_SPEED,speedStacks,"speed_stack",plugin.getConfig().getDouble("effects.speed.hit_decrease",-0.02),plugin.getConfig().getDouble("effects.speed.max_penalty",-0.2),plugin.getConfig().getDouble("effects.speed.stack_cap",0.2));
         if(target instanceof Player victim){
+            if(hasEffect(attacker,"speed"))changeAttributeStack(attacker,Attribute.MOVEMENT_SPEED,speedStacks,"speed_stack",plugin.getConfig().getDouble("effects.speed.hit_increase",0.01),plugin.getConfig().getDouble("effects.speed.max_penalty",-0.2),plugin.getConfig().getDouble("effects.speed.stack_cap",0.2));
+            if(hasEffect(victim,"speed"))changeAttributeStack(victim,Attribute.MOVEMENT_SPEED,speedStacks,"speed_stack",plugin.getConfig().getDouble("effects.speed.hit_decrease",-0.02),plugin.getConfig().getDouble("effects.speed.max_penalty",-0.2),plugin.getConfig().getDouble("effects.speed.stack_cap",0.2));
             int hits=targetHitsFromAttacker;
             if(hasEffect(attacker,"emerald")){
                 int xp=plugin.getConfig().getInt(plugin.isTrusted(attackerId,victim.getUniqueId())?"effects.emerald.xp_share_amount":"effects.emerald.xp_steal_amount",2);
