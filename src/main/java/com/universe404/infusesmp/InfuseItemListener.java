@@ -36,7 +36,7 @@ public final class InfuseItemListener implements Listener {
         if(effect.equals(current==null?null:current.replace("_augmented",""))){
             p.getInventory().addItem(item.clone());plugin.tellRaw(p,"<red>ʏᴏᴜ ᴀʟʀᴇᴀᴅʏ ʜᴀᴠᴇ ᴛʜɪs ᴇғғᴇᴄᴛ ᴇǫᴜɪᴘᴘᴇᴅ.");return;
         }
-        if(current!=null){ItemStack old=items.create(current.replace("_augmented",""),current.endsWith("_augmented"),false);if(old!=null)p.getInventory().addItem(old);}
+        if(current!=null){ItemStack old=items.create(current.replace("_augmented",""),current.endsWith("_augmented"),false);if(old!=null)plugin.giveOrDrop(p,old);}
         plugin.setEquippedEffect(p.getUniqueId(),slot,effect,items.isAugmented(item));
         p.playSound(p.getLocation(),Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,slot.equals("primary")?1.1f:1.4f);
         plugin.tellRaw(p,"<white>ᴀᴘᴘʟɪᴇᴅ <green>"+effect+" <gray>ᴛᴏ "+slot+" sʟᴏᴛ.");

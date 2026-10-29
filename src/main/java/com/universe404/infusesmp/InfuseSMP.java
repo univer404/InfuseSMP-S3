@@ -82,7 +82,7 @@ public final class InfuseSMP extends JavaPlugin {
         String cmd=command.getName().toLowerCase(Locale.ROOT);
         if(cmd.equals("infuse"))return infuse(sender,args);
         if(cmd.equals("recipes")) { if(playerOnly(sender))return true; if(!recipesMenu.isEnabled()){tellRaw(sender,"<red>ʀᴇᴄɪᴘᴇ ɢᴜɪ ɪs ᴅɪsᴀʙʟᴇᴅ.");return true;} recipesMenu.openMain((Player)sender); return true; }
-        if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){p.getInventory().addItem(infuseItems.create(e,false,false));if(!e.equals("ender"))p.getInventory().addItem(infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}p.getInventory().addItem(result);}return true; }
+        if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){giveOrDrop(p,infuseItems.create(e,false,false));if(!e.equals("ender"))giveOrDrop(p,infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}giveOrDrop(p,result);}return true; }
         if(cmd.equals("swap")) {
             if(playerOnly(sender))return true; UUID id=((Player)sender).getUniqueId(); Map<String,String> m=slots(id);
             String p=m.get("primary"),s=m.get("secondary");
@@ -257,6 +257,7 @@ public final class InfuseSMP extends JavaPlugin {
     public void setEquippedEffect(UUID id,String slot,String effect,boolean augmented){String value=effect+(augmented?"_augmented":"");slots(id).put(slot,value);log(id,"equipped "+slot+" "+value);saveState();}
     public boolean isSparkActive(UUID id,String effect){return mechanics!=null&&mechanics.isActive(id,effect);}
     public ItemStack createInfuseItem(String effect,boolean augmented){return infuseItems.create(effect,augmented,false);}
+    public void giveOrDrop(Player player,ItemStack item){if(item==null)return;Map<Integer,ItemStack> leftover=player.getInventory().addItem(item);leftover.values().forEach(stack->player.getWorld().dropItemNaturally(player.getLocation(),stack));}
     public boolean isDisabled(UUID id){ return disabled.contains(id); }
     public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }
     public void tellKey(CommandSender sender,String key){ tell(sender,key); }

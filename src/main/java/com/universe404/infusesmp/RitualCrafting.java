@@ -109,10 +109,10 @@ public final class RitualCrafting implements Listener {
         int augmentLimit=plugin.getConfig().getInt("effects."+effect+".augment_limit",0);
         if(augmentLimit>crafted){
             Location block=ritualBlocks.get(p.getUniqueId());
-            if(block==null||block.getBlock().getType()!=Material.BREWING_STAND){p.getInventory().addItem(items.create(effect,false,false));return;}
+            if(block==null||block.getBlock().getType()!=Material.BREWING_STAND){plugin.giveOrDrop(p,items.create(effect,false,false));return;}
             startRitual(p,effect,block);
         }else{
-            p.getInventory().addItem(items.create(effect,false,false));p.playSound(p,Sound.ENTITY_EXPERIENCE_ORB_PICKUP,.5f,1);
+            plugin.giveOrDrop(p,items.create(effect,false,false));p.playSound(p,Sound.ENTITY_EXPERIENCE_ORB_PICKUP,.5f,1);
             p.sendMessage(mm.deserialize("<green>✔ ᴄʀᴀғᴛɪɴɢ ᴄᴏᴍᴘʟᴇᴛᴇ!").decoration(TextDecoration.ITALIC,false));
         }
     }
@@ -143,7 +143,7 @@ public final class RitualCrafting implements Listener {
                 remaining--;bar.setProgress(Math.max(0,(double)remaining/duration));
                 if(remaining%5==0){loc.getWorld().spawnParticle(Particle.END_ROD,loc.clone().add(.5,1,.5),8,.3,.4,.3,.02);}
                 if(remaining<=0){
-                    ItemStack result=items.create(effect,true,false);p.getInventory().addItem(result);
+                    ItemStack result=items.create(effect,true,false);plugin.giveOrDrop(p,result);
                     loc.getWorld().strikeLightningEffect(loc);loc.getWorld().playSound(loc,Sound.ENTITY_LIGHTNING_BOLT_THUNDER,1,1);
                     loc.getWorld().playSound(loc,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1,1);
                     p.sendMessage(mm.deserialize("<green>ᴛʜᴇ ʀɪᴛᴜᴀʟ ᴡᴀs sᴜᴄᴄᴇssғᴜʟ!").decoration(TextDecoration.ITALIC,false));

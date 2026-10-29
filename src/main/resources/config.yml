@@ -59,4 +59,3 @@ effects:
   strength: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, mob_damage: 2, craft_limit: -1, augment_limit: 0}
   thunder: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, trigger_hits: 10, true_damage: 1, craft_limit: -1, augment_limit: 0}
   ender: {enabled: true, cooldown_seconds: 30, spark_seconds: 1, craft_limit: 1, augment_limit: 1}
-  earth: {enabled: true, cooldown_seconds: 60, spark_seconds: 10, craft_limit: 1, augment_limit: 1}
