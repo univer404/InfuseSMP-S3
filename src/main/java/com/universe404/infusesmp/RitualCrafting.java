@@ -122,12 +122,12 @@ public final class RitualCrafting implements Listener {
         BukkitTask task=Bukkit.getScheduler().runTaskTimer(plugin,new Runnable(){
             int remaining=duration;
             @Override public void run(){
-                if(!p.isOnline()){bar.removeAll();rituals.remove(p.getUniqueId());cancel();return;}
+                if(!p.isOnline()){bar.removeAll();stopRitual(p.getUniqueId());return;}
                 if(loc.getBlock().getType()!=Material.BREWING_STAND){
                     bar.setTitle("Ritual Failed");bar.setColor(BarColor.RED);bar.setProgress(0);
                     tally.set(effect+".crafted",Math.max(0,tally.getInt(effect+".crafted",1)-1));saveTally();
                     p.sendMessage(mm.deserialize("<red>ʀɪᴛᴜᴀʟ ғᴀɪʟᴇᴅ — ʙʀᴇᴡɪɴɢ sᴛᴀɴᴅ ʀᴇᴍᴏᴠᴇᴅ.").decoration(TextDecoration.ITALIC,false));
-                    bar.removeAll();rituals.remove(p.getUniqueId());cancel();return;
+                    bar.removeAll();stopRitual(p.getUniqueId());return;
                 }
                 remaining--;bar.setProgress(Math.max(0,(double)remaining/duration));
                 if(remaining%5==0){loc.getWorld().spawnParticle(Particle.END_ROD,loc.clone().add(.5,1,.5),8,.3,.4,.3,.02);}
@@ -136,7 +136,7 @@ public final class RitualCrafting implements Listener {
                     loc.getWorld().strikeLightningEffect(loc);loc.getWorld().playSound(loc,Sound.ENTITY_LIGHTNING_BOLT_THUNDER,1,1);
                     loc.getWorld().playSound(loc,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1,1);
                     p.sendMessage(mm.deserialize("<green>ᴛʜᴇ ʀɪᴛᴜᴀʟ ᴡᴀs sᴜᴄᴄᴇssғᴜʟ!").decoration(TextDecoration.ITALIC,false));
-                    bar.removeAll();rituals.remove(p.getUniqueId());cancel();
+                    bar.removeAll();stopRitual(p.getUniqueId());
                 }
             }
         },20L,20L);
@@ -148,5 +148,5 @@ public final class RitualCrafting implements Listener {
         for(int s:SLOTS){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)p.getInventory().addItem(item);}
         p.removeMetadata("infuse-ritual-gui",plugin);
     }
-    private void saveTally(){try{tally.save(tallyFile);}catch(IOException ex){plugin.getLogger().severe("Could not save rituals.yml: "+ex.getMessage());}}
+    private void stopRitual(UUID id){BukkitTask running=rituals.remove(id);if(running!=null)running.cancel();}\n    private void saveTally(){try{tally.save(tallyFile);}catch(IOException ex){plugin.getLogger().severe("Could not save rituals.yml: "+ex.getMessage());}}
 }
