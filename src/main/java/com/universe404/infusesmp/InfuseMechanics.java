@@ -7,6 +7,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -45,6 +48,13 @@ public final class InfuseMechanics implements Listener {
     private final Map<UUID,Double> speedStacks = new ConcurrentHashMap<>();
     private final Map<UUID,Double> attackStacks = new ConcurrentHashMap<>();
     private final Map<UUID, Double> maxHealthBeforeHeart = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> lastToolUpdate = new ConcurrentHashMap<>();
+    private final Map<UUID, Integer> freezeStacks = new ConcurrentHashMap<>();
+    private final Map<UUID, Integer> oceanAir = new ConcurrentHashMap<>();
+    private final Map<UUID, Integer> oceanMaxAir = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> oceanActiveAt = new ConcurrentHashMap<>();
+    private final Map<UUID, BossBar> oxygenBars = new ConcurrentHashMap<>();
+    private int tickCounter = 0;
 
     public InfuseMechanics(InfuseSMP plugin) { this.plugin = plugin; }
 
@@ -409,7 +419,7 @@ public final class InfuseMechanics implements Listener {
     }
 
     private void applyFireWorld(Player p) {
-        if(p.isBurning()) {
+        if(p.getFireTicks() > 0) {
             if(hasEffect(p,"fire"))for(int x=-3;x<=3;x++)for(int y=-3;y<=3;y++)for(int z=-3;z<=3;z++){
                 Block block=p.getLocation().getBlock().getRelative(x,y,z);
                 if(block.getType()==Material.WATER&&!plugin.isInDisabledRegion(block.getLocation()))block.setType(Material.AIR,false);
