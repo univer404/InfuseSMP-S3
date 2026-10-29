@@ -49,12 +49,18 @@ public final class InfusePlaceholderExpansion extends PlaceholderExpansion {
      * The font tag is important: without it Minecraft renders private-use
      * characters as missing-glyph boxes. Augmented effects use their own icon.
      */
+    /** Return the original Skript-compatible private-use HUD glyph. */
     private String icon(String value){
         if(value==null)return "";
         String effect=value.replace("_augmented","");
-        int index=ICON_ORDER.indexOf(effect);
-        if(index<0)return "";
-        int codepoint=(augmented(value)?0xE010:0xE000)+index;
-        return "<font:infusesmp:hud>"+new String(Character.toChars(codepoint))+"</font>";
+        int codepoint=0xE000;
+        for(String candidate:List.of("earth","emerald","ender","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder")){
+            if(candidate.equals(effect)){
+                if(!candidate.equals("earth")&&!candidate.equals("ender")&&augmented(value)) codepoint+=21;
+                return new String(Character.toChars(codepoint));
+            }
+            codepoint += (candidate.equals("earth")||candidate.equals("ender"))?42:84;
+        }
+        return "";
     }
 }
