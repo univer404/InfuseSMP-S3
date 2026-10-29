@@ -1,4 +1,4 @@
-name: InfuseSMP-S3
+name: Infuse
 version: 1.0.0
 main: com.universe404.infusesmp.InfuseSMP
 api-version: '1.21.11'
