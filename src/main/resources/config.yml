@@ -46,6 +46,45 @@ items:
     speed: "sᴘᴇᴇᴅ"
     strength: "sᴛʀᴇɴɢᴛʜ"
     ender: "ᴇɴᴅᴇʀ"
+  lore:
+    emerald:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ᴇɴʜᴀɴᴄᴇᴅ ʟᴏᴏᴛ"
+      - "<green>sᴘᴀʀᴋ: <gray>ɢᴀɪɴ ᴇxᴘᴇʀɪᴇɴᴄᴇ ᴀɴᴅ ᴠɪʟʟᴀɢᴇʀ ʙᴏᴏsᴛ"
+    feather:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ʀᴇᴅᴜᴄᴇ ғᴀʟʟ ᴅᴀᴍᴀɢᴇ"
+      - "<green>sᴘᴀʀᴋ: <gray>ʟᴇᴀᴘ ɪɴᴛᴏ ᴛʜᴇ ᴀɪʀ"
+    fire:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ғɪʀᴇ ʀᴇsɪsᴛᴀɴᴄᴇ"
+      - "<green>sᴘᴀʀᴋ: <gray>ʙᴜʀsᴛ ᴏғ ғɪʀᴇ ᴀʀᴏᴜɴᴅ ʏᴏᴜ"
+    frost:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ғʀᴏsᴛ ʜɪᴛs ғʀᴇᴇᴢᴇ ᴛᴀʀɢᴇᴛs"
+      - "<green>sᴘᴀʀᴋ: <gray>ғʀᴇᴇᴢᴇ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs"
+    haste:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ғᴀsᴛᴇʀ ᴍɪɴɪɴɢ ᴀɴᴅ ᴇɴᴄʜᴀɴᴛᴇᴅ ᴛᴏᴏʟs"
+      - "<green>sᴘᴀʀᴋ: <gray>ʙᴏᴏsᴛ ᴍɪɴɪɴɢ sᴘᴇᴇᴅ"
+    heart:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ɪɴᴄʀᴇᴀsᴇᴅ ᴍᴀx ʜᴇᴀʟᴛʜ"
+      - "<green>sᴘᴀʀᴋ: <gray>ʜᴇᴀʟ ᴀɴᴅ ɢᴀɪɴ ᴀʙsᴏʀᴘᴛɪᴏɴ"
+    invisibility:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ɪɴᴠɪsɪʙɪʟɪᴛʏ"
+      - "<green>sᴘᴀʀᴋ: <gray>ᴇɴʜᴀɴᴄᴇᴅ sᴛᴇᴀʟᴛʜ"
+    ocean:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ᴡᴀᴛᴇʀ ʙʀᴇᴀᴛʜɪɴɢ ᴀɴᴅ ᴡᴀᴛᴇʀ sᴘᴇᴇᴅ"
+      - "<green>sᴘᴀʀᴋ: <gray>ᴘᴜʟʟ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs"
+    regeneration:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ ᴀɴᴅ sᴀᴛᴜʀᴀᴛɪᴏɴ"
+      - "<green>sᴘᴀʀᴋ: <gray>ʀᴀᴘɪᴅ ʀᴇɢᴇɴᴇʀᴀᴛɪᴏɴ"
+    speed:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ɪɴᴄʀᴇᴀsᴇᴅ ᴍᴏᴠᴇᴍᴇɴᴛ sᴘᴇᴇᴅ"
+      - "<green>sᴘᴀʀᴋ: <gray>ᴛᴇᴍᴘᴏʀᴀʀʏ sᴘᴇᴇᴅ ʙᴏᴏsᴛ"
+    strength:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ɪɴᴄʀᴇᴀsᴇᴅ ᴅᴀᴍᴀɢᴇ"
+      - "<green>sᴘᴀʀᴋ: <gray>ᴛᴇᴍᴘᴏʀᴀʀʏ ᴘᴏᴡᴇʀ ʙᴏᴏsᴛ"
+    thunder:
+      - "<green>ᴘᴀssɪᴠᴇ: <gray>ʟɪɢʜᴛɴɪɴɢ ᴛʀɪɢɢᴇʀs ᴏɴ ʜɪᴛs"
+      - "<green>sᴘᴀʀᴋ: <gray>sᴛʀɪᴋᴇ ɴᴇᴀʀʙʏ ᴇɴᴇᴍɪᴇs"
+    ender:
+      - "<green>sᴘᴀʀᴋ: <gray>ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ"
 effects:
   emerald: {enabled: true, cooldown_seconds: 30, spark_seconds: 10, trigger_hits: 10, spark_xp_gain: 2, craft_limit: -1, augment_limit: 0}
   feather: {enabled: true, cooldown_seconds: 40, spark_seconds: 5, craft_limit: -1, augment_limit: 0}

@@ -35,6 +35,7 @@ public final class InfuseItems {
         meta.displayName(mm.deserialize(color+display+" ᴇғғᴇᴄᴛ").decoration(TextDecoration.ITALIC,false));
         List<net.kyori.adventure.text.Component> lore=new ArrayList<>();
         lore.add(mm.deserialize("<dark_gray>ɪɴғᴜsᴇ s3").decoration(TextDecoration.ITALIC,false));
+        for(String line:plugin.getConfig().getStringList("items.lore."+effect))lore.add(mm.deserialize(line).decoration(TextDecoration.ITALIC,false));
         lore.add(mm.deserialize(augmented?"<gold>ᴀᴜɢᴍᴇɴᴛᴇᴅ":"<gray>ɴᴏʀᴍᴀʟ").decoration(TextDecoration.ITALIC,false));
         lore.add(mm.deserialize("<gray>ᴅʀɪɴᴋ ᴛᴏ ᴇǫᴜɪᴘ ᴘʀɪᴍᴀʀʏ").decoration(TextDecoration.ITALIC,false));
         lore.add(mm.deserialize("<gray>ᴄʀᴏᴜᴄʜ ᴀɴᴅ ᴅʀɪɴᴋ ᴛᴏ ᴇǫᴜɪᴘ sᴇᴄᴏɴᴅᴀʀʏ").decoration(TextDecoration.ITALIC,false));
