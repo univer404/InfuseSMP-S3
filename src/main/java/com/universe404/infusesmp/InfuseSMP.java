@@ -191,6 +191,8 @@ public final class InfuseSMP extends JavaPlugin {
         saveState();return true;
     }
     public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }
+    public String getBind(UUID id,String slot){return binds.getOrDefault(id,Map.of()).getOrDefault(slot,"none");}
+    public void clearEquippedEffect(UUID id,String slot){String old=slots(id).remove(slot);if(old!=null)log(id,"cleared "+slot+" "+old);saveState();}
     public void setEquippedEffect(UUID id,String slot,String effect,boolean augmented){String value=effect+(augmented?"_augmented":"");slots(id).put(slot,value);log(id,"equipped "+slot+" "+value);saveState();}
     public boolean isSparkActive(UUID id,String effect){return mechanics!=null&&mechanics.isActive(id,effect);}
     public ItemStack createInfuseItem(String effect,boolean augmented){return infuseItems.create(effect,augmented,false);}

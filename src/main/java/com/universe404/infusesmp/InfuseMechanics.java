@@ -6,6 +6,10 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -100,6 +104,34 @@ public final class InfuseMechanics implements Listener {
         return !(target instanceof Player other) || (!other.equals(owner) && !plugin.isTrusted(owner.getUniqueId(), other.getUniqueId()));
     }
 
+    private boolean activateBound(Player p,String action){
+        boolean activated=false;
+        for(String slot:List.of("primary","secondary"))if(plugin.getBind(p.getUniqueId(),slot).equalsIgnoreCase(action)){
+            startSpark(p,slot);activated=true;
+        }
+        return activated;
+    }
+    @EventHandler(ignoreCancelled=true) public void onSwap(PlayerSwapHandItemsEvent e){
+        String action=e.getPlayer().isSneaking()?"sneak-swap":"swap";
+        if(activateBound(e.getPlayer(),action))e.setCancelled(true);
+    }
+    @EventHandler(ignoreCancelled=true) public void onDrop(PlayerDropItemEvent e){
+        String action=e.getPlayer().isSneaking()?"sneak-drop":"drop";
+        if(activateBound(e.getPlayer(),action))e.setCancelled(true);
+    }
+    @EventHandler public void onSneak(PlayerToggleSneakEvent e){
+        if(e.isSneaking())activateBound(e.getPlayer(),"sneak");
+    }
+    @EventHandler public void onDeath(PlayerDeathEvent e){
+        Player p=e.getEntity();UUID id=p.getUniqueId();
+        for(String slot:List.of("primary","secondary")){
+            String value=plugin.getEquippedEffect(id,slot);
+            if(value==null)continue;
+            ItemStack item=plugin.createInfuseItem(value.replace("_augmented",""),value.endsWith("_augmented"));
+            if(item!=null)e.getDrops().add(item);
+            plugin.clearEquippedEffect(id,slot);
+        }
+    }
     @EventHandler public void onJoin(PlayerJoinEvent e) { Bukkit.getScheduler().runTaskLater(plugin, () -> applyPassives(e.getPlayer()), 2L); }
     @EventHandler public void onQuit(PlayerQuitEvent e) {
         UUID id=e.getPlayer().getUniqueId();
