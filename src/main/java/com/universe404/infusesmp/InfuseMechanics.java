@@ -374,6 +374,17 @@ public final class InfuseMechanics implements Listener {
         UUID attackerId=attacker.getUniqueId();
         int globalHits=hitCounts.computeIfAbsent(attackerId,k->new ConcurrentHashMap<>()).merge("hits",1,Integer::sum);
         int targetHitsFromAttacker=hitsFrom.computeIfAbsent(target.getUniqueId(),k->new ConcurrentHashMap<>()).merge(attackerId,1,Integer::sum);
+        if(target instanceof Player featherVictim && hasEffect(featherVictim,"feather")
+            && targetHitsFromAttacker % Math.max(1,plugin.getConfig().getInt("effects.feather.trigger_hits",10)) == 0) {
+            int maxCharges=Math.max(0,plugin.getConfig().getInt("effects.feather.max_wind_charge",3));
+            int current=windCharges.getOrDefault(featherVictim.getUniqueId(),0);
+            if(current<maxCharges) {
+                windCharges.put(featherVictim.getUniqueId(),current+1);
+                featherVictim.getWorld().spawnParticle(Particle.CLOUD,featherVictim.getEyeLocation(),12,.25,.25,.25,.03);
+                featherVictim.playSound(featherVictim.getLocation(),Sound.ENTITY_WIND_CHARGE_WIND_BURST,0.7f,1.2f);
+                featherVictim.sendActionBar(Component.text("ᴡɪɴᴅ ᴄʜᴀʀɢᴇs: "+(current+1)+"/"+maxCharges));
+            }
+        }
         double dealt=Math.max(0,event.getFinalDamage());
         recentDamage.merge(attackerId,dealt,Double::sum);
         Bukkit.getScheduler().runTaskLater(plugin,()->recentDamage.computeIfPresent(attackerId,(id,value)->Math.max(0,value-dealt)),600L);
