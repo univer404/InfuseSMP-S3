@@ -45,29 +45,16 @@ public final class InfusePlaceholderExpansion extends PlaceholderExpansion {
         return alternate?minutes+":"+String.format(Locale.ROOT,"%02d:%02d",seconds,centiseconds):minutes+":"+String.format(Locale.ROOT,"%02d",seconds);
     }
     /**
-     * Return visible HUD labels instead of private-use glyphs that render as
-     * missing-character boxes unless a matching custom font is installed.
+     * Return a pixel-art glyph from the resource pack's dedicated HUD font.
+     * The font tag is important: without it Minecraft renders private-use
+     * characters as missing-glyph boxes. Augmented effects use their own icon.
      */
     private String icon(String value){
         if(value==null)return "";
         String effect=value.replace("_augmented","");
-        String abbreviation=switch(effect){
-            case "earth" -> "EAR";
-            case "emerald" -> "EMR";
-            case "ender" -> "END";
-            case "feather" -> "FTH";
-            case "fire" -> "FIR";
-            case "frost" -> "FRO";
-            case "haste" -> "HST";
-            case "heart" -> "HRT";
-            case "invisibility" -> "INV";
-            case "ocean" -> "OCN";
-            case "regeneration" -> "REG";
-            case "speed" -> "SPD";
-            case "strength" -> "STR";
-            case "thunder" -> "THN";
-            default -> "";
-        };
-        return abbreviation.isEmpty() ? "" : abbreviation + (augmented(value) ? "+" : "");
+        int index=ICON_ORDER.indexOf(effect);
+        if(index<0)return "";
+        int codepoint=(augmented(value)?0xE010:0xE000)+index;
+        return "<font:infusesmp:hud>"+new String(Character.toChars(codepoint))+"</font>";
     }
 }
