@@ -13,7 +13,7 @@ public final class InfuseItems {
     private final JavaPlugin plugin;
     private final NamespacedKey effectKey, augmentedKey;
     private final MiniMessage mm=MiniMessage.miniMessage();
-    private static final Map<String,Integer> IDS=Map.of("emerald",1,"feather",2,"fire",3,"frost",4,"thunder",5,"haste",6,"heart",7,"invisibility",8,"ocean",9,"regeneration",10,"speed",11,"strength",12,"ender",13);
+    private static final Map<String,Integer> IDS=Map.ofEntries(Map.entry("emerald",1),Map.entry("feather",2),Map.entry("fire",3),Map.entry("frost",4),Map.entry("thunder",5),Map.entry("haste",6),Map.entry("heart",7),Map.entry("invisibility",8),Map.entry("ocean",9),Map.entry("regeneration",10),Map.entry("speed",11),Map.entry("strength",12),Map.entry("ender",13));
     private static final Map<String,String> COLORS=Map.ofEntries(
       Map.entry("emerald","#0DFC00"),Map.entry("feather","#BEA3CA"),Map.entry("fire","#FC7803"),Map.entry("frost","#7AE3FC"),Map.entry("thunder","#FCED00"),Map.entry("haste","#B96C00"),Map.entry("heart","#FC0046"),Map.entry("invisibility","#7E00FC"),Map.entry("ocean","#005AFC"),Map.entry("regeneration","#FC00DD"),Map.entry("speed","#D1A44B"),Map.entry("strength","#9E2020"),Map.entry("ender","#831177"));
     private static final Map<String,String> NAMES=Map.ofEntries(

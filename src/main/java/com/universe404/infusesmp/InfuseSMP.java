@@ -50,7 +50,7 @@ public final class InfuseSMP extends JavaPlugin {
         for(var e:vars.entrySet()) value=value.replace("{"+e.getKey()+"}",e.getValue());
         tellRaw(sender,value);
     }
-    private void tellRaw(CommandSender sender,String value) { sender.sendMessage(render(value)); }
+    public void tellRaw(CommandSender sender,String value) { sender.sendMessage(render(value)); }
     private boolean playerOnly(CommandSender s) { if(s instanceof Player)return false; tell(s,"player-only"); return true; }
     private boolean isSlot(String s) { return Set.of("primary","secondary","p","s").contains(s.toLowerCase(Locale.ROOT)); }
     private String slot(String s) { return (s.equalsIgnoreCase("p")||s.equalsIgnoreCase("primary"))?"primary":"secondary"; }
@@ -218,7 +218,6 @@ public final class InfuseSMP extends JavaPlugin {
     public boolean isDisabled(UUID id){ return disabled.contains(id); }
     public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }
     public void tellKey(CommandSender sender,String key){ tell(sender,key); }
-    public void tellRaw(CommandSender sender,String value){ sender.sendMessage(render(value)); }
     public void recordHistory(UUID id,String line){ log(id,line); }
     public void saveStatePublic(){ saveState(); }
 
