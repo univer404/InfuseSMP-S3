@@ -20,7 +20,6 @@ recipes:
     material: BARRIER
     name: "<#E13030><bold>ᴇxɪᴛ"
 ritual:
-  enabled: true
   title: "<gradient:#A2C81C:#21CD76>ᴘᴏᴛɪᴏɴ ᴄʀᴀғᴛᴇʀ"
   rows: 5
   ingredient_slots: [12, 13, 14, 21, 22, 23, 30, 31, 32]
