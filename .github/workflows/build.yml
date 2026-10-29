@@ -7,6 +7,8 @@ on:
     paths:
       - '**.java'
       - '**.yml'
+      - '**.py'
+      - 'resource-pack-26.3/**'
       - 'pom.xml'
   workflow_dispatch:
 permissions:
@@ -29,5 +31,16 @@ jobs:
         with:
           name: InfuseSMP-S3-${{ github.run_number }}
           path: target/InfuseSMP-S3-*.jar
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build Java 26.3 resource pack
+        run: |
+          python -m pip install --disable-pip-version-check Pillow
+          python resource-pack-26.3/build_pack.py
+      - name: Upload Java 26.3 resource pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: InfuseSMP-S3-ResourcePack-26.3-${{ github.run_number }}
+          path: target/InfuseSMP-S3-ResourcePack-26.3.zip
           if-no-files-found: error
           retention-days: 30
