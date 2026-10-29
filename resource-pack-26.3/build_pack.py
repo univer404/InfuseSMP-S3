@@ -93,7 +93,10 @@ font_dir.mkdir(parents=True, exist_ok=True)
 hud_dir = ASSETS / "infusesmp" / "textures" / "font"
 hud_dir.mkdir(parents=True, exist_ok=True)
 codepoint = 0xE000
-for name, color in EFFECTS.items():
+HUD_ORDER = ["earth", "emerald", "ender", "feather", "fire", "frost", "haste", "heart", "invisibility", "ocean", "regeneration", "speed", "strength", "thunder"]
+HUD_COLORS = {"earth": (83, 160, 82), **EFFECTS}
+for name in HUD_ORDER:
+    color = HUD_COLORS[name]
     variants = [("augmented", codepoint), ("augmented_spark", codepoint + 21)] if name in ("earth", "ender") else [
         ("normal", codepoint), ("augmented", codepoint + 21),
         ("augmented_spark", codepoint + 42), ("spark", codepoint + 63)
