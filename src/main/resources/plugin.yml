@@ -2,7 +2,7 @@ name: InfuseSMP-S3
 version: 1.0.0
 main: com.universe404.infusesmp.InfuseSMP
 api-version: '1.21.11'
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, WorldGuard]
 authors: [univer404]
 description: Java conversion of the Infuse S3 Skript.
 commands:
@@ -42,6 +42,9 @@ commands:
   resetcraft:
     description: Reset ritual crafting tallies.
     aliases: [rscraft]
+    permission: infuse.admin
+  mapregion:
+    description: Map WorldGuard regions where Infuse effects are disabled.
     permission: infuse.admin
   item:
     description: Give Infuse custom items.

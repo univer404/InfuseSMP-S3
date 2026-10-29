@@ -48,7 +48,7 @@ public final class InfuseMechanics implements Listener {
     public boolean isActive(UUID id,String effect){return activeUntil.getOrDefault(id,Map.of()).getOrDefault(effect,0L)>System.currentTimeMillis();}
 
     public void startSpark(Player p, String slot) {
-        if (plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())) { plugin.tellKey(p, "disabled"); return; }
+        if (plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) { plugin.tellKey(p, "disabled"); return; }
         String effect = plugin.getEquippedEffect(p.getUniqueId(), slot);
         if (effect == null) { plugin.tellKey(p, "effects-empty"); return; }
         effect = effect.replace("_augmented", "");
@@ -266,7 +266,7 @@ public final class InfuseMechanics implements Listener {
         Player attacker=null;
         if(event.getDamager() instanceof Player p) attacker=p;
         else if(event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player p) attacker=p;
-        if(attacker==null || plugin.isDisabled(attacker.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(attacker.getWorld().getName())) return;
+        if(attacker==null || plugin.isDisabled(attacker.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(attacker.getWorld().getName()) || plugin.isInDisabledRegion(attacker.getLocation())) return;
         for(String slot:List.of("primary","secondary")) {
             String effect=plugin.getEquippedEffect(attacker.getUniqueId(),slot);
             if(effect==null) continue;

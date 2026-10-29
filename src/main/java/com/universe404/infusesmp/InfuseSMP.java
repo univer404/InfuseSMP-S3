@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -29,6 +30,7 @@ public final class InfuseSMP extends JavaPlugin {
     private RecipesMenu recipesMenu;
     private InfuseItems infuseItems;
     private RitualCrafting ritualCrafting;
+    private DisabledRegions disabledRegions;
     private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
@@ -39,6 +41,8 @@ public final class InfuseSMP extends JavaPlugin {
         players = YamlConfiguration.loadConfiguration(playersFile);
         messages = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
         loadState();
+        disabledRegions = new DisabledRegions(this);
+        getServer().getPluginManager().registerEvents(disabledRegions, this);
 
         mechanics = new InfuseMechanics(this);
         getServer().getPluginManager().registerEvents(mechanics, this);
@@ -80,6 +84,7 @@ public final class InfuseSMP extends JavaPlugin {
 
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         String cmd=command.getName().toLowerCase(Locale.ROOT);
+        if(cmd.equals("mapregion"))return disabledRegions.command(sender,args);
         if(cmd.equals("infuse"))return infuse(sender,args);
         if(cmd.equals("recipes")) { if(playerOnly(sender))return true; if(!recipesMenu.isEnabled()){tellRaw(sender,"<red>ʀᴇᴄɪᴘᴇ ɢᴜɪ ɪs ᴅɪsᴀʙʟᴇᴅ.");return true;} recipesMenu.openMain((Player)sender); return true; }
         if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){giveOrDrop(p,infuseItems.create(e,false,false));if(!e.equals("ender"))giveOrDrop(p,infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}giveOrDrop(p,result);}return true; }
@@ -253,6 +258,7 @@ public final class InfuseSMP extends JavaPlugin {
     }
     public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }
     public boolean isSimpleDisplay(UUID id){return simpleDisplay.contains(id);}
+    public boolean isInDisabledRegion(Location location){return disabledRegions!=null&&disabledRegions.isDisabled(location);}
     public String getBind(UUID id,String slot){return binds.getOrDefault(id,Map.of()).getOrDefault(slot,"none");}
     public void clearEquippedEffect(UUID id,String slot){String old=slots(id).remove(slot);if(old!=null)log(id,"cleared "+slot+" "+old);saveState();}
     public void setEquippedEffect(UUID id,String slot,String effect,boolean augmented){String value=effect+(augmented?"_augmented":"");slots(id).put(slot,value);log(id,"equipped "+slot+" "+value);saveState();}
