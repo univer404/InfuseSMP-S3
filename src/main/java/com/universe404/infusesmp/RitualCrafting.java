@@ -161,7 +161,7 @@ public final class RitualCrafting implements Listener {
         p.removeMetadata("infuse-ritual-gui",plugin);
     }
     public boolean resetCraft(String effect){
-        if(effect==null){for(String e:RECIPES.keySet())tally.set(e+".crafted",0);saveTally();return true;}
+        if(effect==null){for(String e:RECIPES.keySet())if(!e.equalsIgnoreCase("ender"))tally.set(e+".crafted",0);saveTally();return true;}
         if(!RECIPES.containsKey(effect.toLowerCase(Locale.ROOT)))return false;
         tally.set(effect.toLowerCase(Locale.ROOT)+".crafted",0);saveTally();return true;
     }
