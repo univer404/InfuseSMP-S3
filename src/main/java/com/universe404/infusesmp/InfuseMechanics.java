@@ -35,6 +35,7 @@ public final class InfuseMechanics implements Listener {
     private final Map<UUID, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
     private final Map<UUID, Map<String, Long>> activeUntil = new ConcurrentHashMap<>();
     private final Map<UUID, Map<String, Integer>> hitCounts = new ConcurrentHashMap<>();
+    private final Map<UUID, Map<String, Integer>> effectHitCounts = new ConcurrentHashMap<>();
     private final Map<UUID,Map<UUID,Integer>> hitsFrom = new ConcurrentHashMap<>();
     private final Map<UUID,Double> recentDamage = new ConcurrentHashMap<>();
     private final Map<UUID,Integer> enderCurses = new ConcurrentHashMap<>();
@@ -225,7 +226,7 @@ public final class InfuseMechanics implements Listener {
 
     @EventHandler public void onQuit(PlayerQuitEvent e) {
         Player p=e.getPlayer();UUID id=p.getUniqueId();
-        cooldowns.remove(id);activeUntil.remove(id);hitCounts.remove(id);recentDamage.remove(id);enderCurses.remove(id);
+        cooldowns.remove(id);activeUntil.remove(id);hitCounts.remove(id);effectHitCounts.remove(id);recentDamage.remove(id);enderCurses.remove(id);
         hitsFrom.remove(id);for(Map<UUID,Integer> map:hitsFrom.values())map.remove(id);
         removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"speed_stack");
         removeAttributeModifier(p,Attribute.ATTACK_SPEED,"attack_speed_stack");
@@ -368,8 +369,12 @@ public final class InfuseMechanics implements Listener {
           ||plugin.isInDisabledRegion(attacker.getLocation()))return;
         if(!(event.getEntity() instanceof LivingEntity target))return;
         UUID attackerId=attacker.getUniqueId();
-        Map<String,Integer> counts=hitCounts.computeIfAbsent(attackerId,k->new ConcurrentHashMap<>());
-        int globalHits=counts.merge("hits",1,Integer::sum);
+        hitCounts.computeIfAbsent(attackerId,k->new ConcurrentHashMap<>()).merge("hits",1,Integer::sum);
+        int fireHits = hasEffect(attacker,"fire") ? nextEffectHitCount(attackerId,"fire") : 0;
+        int frostHits = hasEffect(attacker,"frost") ? nextEffectHitCount(attackerId,"frost") : 0;
+        int thunderHits = hasEffect(attacker,"thunder") ? nextEffectHitCount(attackerId,"thunder") : 0;
+        int invisibilityHits = hasEffect(attacker,"invisibility") ? nextEffectHitCount(attackerId,"invisibility") : 0;
+        int regenerationHits = hasEffect(attacker,"regeneration") ? nextEffectHitCount(attackerId,"regeneration") : 0;
         double dealt=Math.max(0,event.getFinalDamage());
         recentDamage.merge(attackerId,dealt,Double::sum);
         Bukkit.getScheduler().runTaskLater(plugin,()->recentDamage.computeIfPresent(attackerId,(id,value)->Math.max(0,value-dealt)),600L);
@@ -383,12 +388,12 @@ public final class InfuseMechanics implements Listener {
             if(isActive(attackerId,"fire")){
                 target.setFireTicks(Math.max(target.getFireTicks(),plugin.getConfig().getInt("effects.fire.eternal_ticks",32767)));
                 target.getWorld().spawnParticle(Particle.FLAME,target.getLocation().add(0,1,0),15,.3,.5,.3,.05);
-            }else if(globalHits%Math.max(1,plugin.getConfig().getInt("effects.fire.trigger_hits",5))==0){
+            }else if(fireHits%Math.max(1,plugin.getConfig().getInt("effects.fire.trigger_hits",5))==0){
                 target.setFireTicks(Math.max(target.getFireTicks(),plugin.getConfig().getInt("effects.fire.ignite_ticks",100)));
                 target.getWorld().spawnParticle(Particle.FLAME,target.getLocation().add(0,1,0),10,.3,.5,.3,.05);
             }
         }
-        if(hasEffect(attacker,"frost")&&(isActive(attackerId,"frost")||globalHits%Math.max(1,plugin.getConfig().getInt("effects.frost.trigger_hits",10))==0)){
+        if(hasEffect(attacker,"frost")&&(isActive(attackerId,"frost")||frostHits%Math.max(1,plugin.getConfig().getInt("effects.frost.trigger_hits",10))==0)){
             target.setFreezeTicks(Math.max(target.getFreezeTicks(),plugin.getConfig().getInt("effects.frost.freeze_ticks",600)));
             target.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE,plugin.getConfig().getInt("effects.frost.mining_fatigue_ticks",200),1,true,false,true));
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,100,1,true,false,true));
@@ -407,17 +412,17 @@ public final class InfuseMechanics implements Listener {
                 }
             }
         }
-        if(hasEffect(attacker,"thunder")&&globalHits%Math.max(1,attacker.getWorld().hasStorm()?plugin.getConfig().getInt("effects.thunder.trigger_hits",10)/2:plugin.getConfig().getInt("effects.thunder.trigger_hits",10))==0)
+        if(hasEffect(attacker,"thunder")&&thunderHits%Math.max(1,attacker.getWorld().hasStorm()?plugin.getConfig().getInt("effects.thunder.trigger_hits",10)/2:plugin.getConfig().getInt("effects.thunder.trigger_hits",10))==0)
             lightningChain(attacker,target,plugin.getConfig().getDouble("effects.thunder.true_damage",1),plugin.getConfig().getInt("effects.thunder.lightning_chain_max",10),plugin.getConfig().getDouble("effects.thunder.lightning_chain_radius",12),new HashSet<>());
         if(hasEffect(attacker,"haste")){
             changeAttributeStack(attacker,Attribute.ATTACK_SPEED,attackStacks,"attack_speed_stack",plugin.getConfig().getDouble("effects.haste.attack_speed_stack",0.2),0,1);
             Bukkit.getScheduler().runTaskLater(plugin,()->{if(target.isValid())target.setNoDamageTicks(Math.max(0,plugin.getConfig().getInt("effects.haste.iframe_duration",19)));},1L);
         }
-        if(hasEffect(attacker,"invisibility")&&globalHits%Math.max(1,plugin.getConfig().getInt("effects.invisibility.trigger_hits",10))==0)
+        if(hasEffect(attacker,"invisibility")&&invisibilityHits%Math.max(1,plugin.getConfig().getInt("effects.invisibility.trigger_hits",10))==0)
             target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,plugin.getConfig().getInt("effects.invisibility.blindness_ticks",200),0,true,false,true));
         if(hasEffect(attacker,"regeneration")){
             attacker.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,plugin.getConfig().getInt("effects.regeneration.duration_hit_ticks",60),Math.max(0,plugin.getConfig().getInt("effects.regeneration.effect_hit_tier",2)-1),true,false,true));
-            if(globalHits%Math.max(1,plugin.getConfig().getInt("effects.regeneration.trigger_hits",10))==0&&target instanceof Player victim)victim.setSaturation(Math.max(0,victim.getSaturation()-1));
+            if(regenerationHits%Math.max(1,plugin.getConfig().getInt("effects.regeneration.trigger_hits",10))==0&&target instanceof Player victim)victim.setSaturation(Math.max(0,victim.getSaturation()-1));
         }
         if(hasEffect(attacker,"speed"))changeAttributeStack(attacker,Attribute.MOVEMENT_SPEED,speedStacks,"speed_stack",plugin.getConfig().getDouble("effects.speed.hit_increase",0.01),plugin.getConfig().getDouble("effects.speed.max_penalty",-0.2),plugin.getConfig().getDouble("effects.speed.stack_cap",0.2));
         if(target instanceof Player victim&&hasEffect(victim,"speed"))changeAttributeStack(victim,Attribute.MOVEMENT_SPEED,speedStacks,"speed_stack",plugin.getConfig().getDouble("effects.speed.hit_decrease",-0.02),plugin.getConfig().getDouble("effects.speed.max_penalty",-0.2),plugin.getConfig().getDouble("effects.speed.stack_cap",0.2));
@@ -450,6 +455,11 @@ public final class InfuseMechanics implements Listener {
             }
         }
     }
+    private int nextEffectHitCount(UUID playerId, String effect) {
+        return effectHitCounts.computeIfAbsent(playerId, id -> new ConcurrentHashMap<>())
+            .merge(effect, 1, Integer::sum);
+    }
+
     private List<Material> consumableCooldownMaterials(){
         return List.of(Material.BREAD,Material.COOKED_BEEF,Material.COOKED_CHICKEN,Material.COOKED_MUTTON,Material.COOKED_PORKCHOP,Material.COOKED_RABBIT,Material.GOLDEN_CARROT,Material.GOLDEN_APPLE,Material.ENCHANTED_GOLDEN_APPLE,Material.COOKIE,Material.MELON_SLICE,Material.PUMPKIN_PIE,Material.BEETROOT_SOUP,Material.MUSHROOM_STEW,Material.RABBIT_STEW,Material.SUSPICIOUS_STEW,Material.BAKED_POTATO,Material.CARROT,Material.POTATO,Material.APPLE,Material.DRIED_KELP,Material.CHORUS_FRUIT,Material.SWEET_BERRIES,Material.GLOW_BERRIES,Material.HONEY_BOTTLE,Material.COD,Material.SALMON,Material.COOKED_COD,Material.COOKED_SALMON,Material.TROPICAL_FISH,Material.PUFFERFISH,Material.BEEF,Material.PORKCHOP,Material.MUTTON,Material.CHICKEN,Material.RABBIT,Material.POISONOUS_POTATO,Material.SPIDER_EYE,Material.ROTTEN_FLESH,Material.EXPERIENCE_BOTTLE);
     }
