@@ -23,7 +23,7 @@ public final class InfuseSMP extends JavaPlugin {
     private final Set<UUID> simpleDisplay = ConcurrentHashMap.newKeySet();
     private File playersFile;
     private YamlConfiguration players;
-    private YamlConfiguration messages;\n    private InfuseMechanics mechanics;\n    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
+    private YamlConfiguration messages;\n    private InfuseMechanics mechanics;\n    private RecipesMenu recipesMenu;\n    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
         saveDefaultConfig(); saveResource("messages.yml", false); saveResource("gui.yml", false);
@@ -56,7 +56,7 @@ public final class InfuseSMP extends JavaPlugin {
 
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         String cmd=command.getName().toLowerCase(Locale.ROOT);
-        if(cmd.equals("infuse"))return infuse(sender,args);
+        if(cmd.equals("infuse"))return infuse(sender,args);\n        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; recipesMenu.openMain((Player)sender); return true; }
         if(cmd.equals("swap")) {
             if(playerOnly(sender))return true; UUID id=((Player)sender).getUniqueId(); Map<String,String> m=slots(id);
             String p=m.get("primary"),s=m.get("secondary");

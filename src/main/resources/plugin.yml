@@ -7,7 +7,7 @@ description: Java conversion of the Infuse S3 Skript.
 commands:
   infuse:
     description: Manage Infuse effects.
-    usage: /infuse <add|remove|get|history>
+    usage: /infuse <add|remove|get|history|toggle>
     permission: infuse.command
   bind:
     description: Bind an Infuse slot activation.
@@ -23,6 +23,7 @@ commands:
     aliases: [swapeff, swapeffects, swapslots]
   trust:
     description: Manage trusted players.
+    aliases: [t]
   ldrain:
     description: Drain the primary effect.
   pdrain:
@@ -33,6 +34,8 @@ commands:
     description: Drain the secondary effect.
   conf:
     description: Read or change supported configuration.
+  recipes:
+    description: View Infuse crafting recipes.
 permissions:
   infuse.command:
     default: true
