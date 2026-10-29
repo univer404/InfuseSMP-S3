@@ -6,7 +6,7 @@ Java Paper/Purpur conversion of the Infuse S3 Skript for Minecraft 1.21.11.
 Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions builds the plugin and generates separate downloadable plugin JAR and Java 26.3 resource-pack ZIP artifacts when both steps succeed.
 
 ## Configuration and data
-- `config.yml`: general settings, effect tuning, cooldowns, craft limits, item colors/names/lore and disabled worlds.
+- `config.yml`: general settings, effect tuning, cooldowns, craft limits, effect tuning and disabled worlds. Infuse item colors, names, and lore are fixed in code to preserve the intended design..
 - `messages.yml`: MiniMessage messages rendered without italics.
 - `gui.yml`: recipe and ritual GUI titles, slots, materials, names and enable switches.
 - `players.yml`: UUID-keyed player state and per-slot history.
