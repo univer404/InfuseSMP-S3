@@ -71,19 +71,7 @@ public final class InfuseMechanics implements Listener {
         long cd = cooldowns.computeIfAbsent(p.getUniqueId(), k -> new ConcurrentHashMap<>()).getOrDefault(effect, 0L);
         if (cd > now) { plugin.tellRaw(p, "<red>ᴄᴏᴏʟᴅᴏᴡɴ: " + Math.max(1, (cd-now+999)/1000) + "s"); return; }
         long duration = Math.max(1, plugin.getConfig().getLong("effects."+effect+".spark_seconds", defaultSpark(effect)));
-        long cooldown = Math.max(0, plugin.getConfig().getLong("effects."+effect+".cooldown_seconds", defaultCooldown(effect)));
-        int factor=0;
-        for(String equippedSlot:List.of("primary","secondary")){
-            String equipped=plugin.getEquippedEffect(p.getUniqueId(),equippedSlot);
-            if(equipped!=null&&equipped.replace("_augmented","").equals(effect)){
-                factor++;
-                if(equipped.endsWith("_augmented"))factor++;
-            }
-        }
-        int denominator=Math.max(1,Math.min(4,factor));
-        cooldown=Math.max(0,cooldown/denominator);
         activeUntil.get(p.getUniqueId()).put(effect, now + duration * 1000);
-        cooldowns.get(p.getUniqueId()).put(effect, now + cooldown * 1000);
         p.playSound(p.getLocation(),plugin.getConfig().getString("use_sound","custom.activate"),1f,1.3f);
         p.getWorld().spawnParticle(Particle.ENCHANT, p.getLocation().add(0,1,0), 35, .7,.8,.7,.1);
         activate(p, effect, duration);
@@ -254,7 +242,17 @@ public final class InfuseMechanics implements Listener {
             applyToolPassives(p);
             updateDisplay(p);
             Map<String,Long> active=activeUntil.get(p.getUniqueId());
-            if(active!=null) active.entrySet().removeIf(en -> en.getValue()<=now);
+            if(active!=null) {
+                for(var entry:new ArrayList<>(active.entrySet())) {
+                    if(entry.getValue()<=now && active.remove(entry.getKey(),entry.getValue())) {
+                        beginCooldown(p,entry.getKey(),now);
+                        if(entry.getKey().equals("haste")) {
+                            removeAttributeModifier(p,Attribute.ATTACK_SPEED,"haste_spark");
+                            removeAttributeModifier(p,Attribute.BLOCK_BREAK_SPEED,"haste_spark_break");
+                        }
+                    }
+                }
+            }
             Map<String,Long> playerCooldowns=cooldowns.get(p.getUniqueId());
             if(playerCooldowns!=null){
                 for(var entry:new ArrayList<>(playerCooldowns.entrySet()))if(entry.getValue()>0&&entry.getValue()<=now){
@@ -264,6 +262,20 @@ public final class InfuseMechanics implements Listener {
             }
         }
     }
+    private void beginCooldown(Player player,String effect,long now) {
+        long cooldown=Math.max(0,plugin.getConfig().getLong("effects."+effect+".cooldown_seconds",defaultCooldown(effect)));
+        int factor=0;
+        for(String slot:List.of("primary","secondary")) {
+            String equipped=plugin.getEquippedEffect(player.getUniqueId(),slot);
+            if(equipped!=null&&equipped.replace("_augmented","").equals(effect)) {
+                factor++;
+                if(equipped.endsWith("_augmented"))factor++;
+            }
+        }
+        cooldown=Math.max(0,cooldown/Math.max(1,Math.min(4,factor)));
+        if(cooldown>0) cooldowns.computeIfAbsent(player.getUniqueId(),k->new ConcurrentHashMap<>()).put(effect,now+cooldown*1000L);
+    }
+
     private void applyHeartHealth(Player p){
         double maximum=20;
         if(hasEffect(p,"heart"))maximum=isActive(p.getUniqueId(),"heart")?plugin.getConfig().getDouble("effects.heart.spark_hearts",20):plugin.getConfig().getDouble("effects.heart.passive_hearts",15);
