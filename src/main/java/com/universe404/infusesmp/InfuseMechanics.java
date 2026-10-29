@@ -267,7 +267,10 @@ public final class InfuseMechanics implements Listener {
         for(String slot:List.of("primary","secondary")){
             String value=plugin.getEquippedEffect(id,slot);
             if(value==null)continue;
-            ItemStack item=plugin.createInfuseItem(value.replace("_augmented",""),value.endsWith("_augmented"));
+            String effect=value.replace("_augmented","");
+            activeUntil.computeIfAbsent(id,k->new ConcurrentHashMap<>()).remove(effect);
+            beginCooldown(p,effect,System.currentTimeMillis());
+            ItemStack item=plugin.createInfuseItem(effect,value.endsWith("_augmented"));
             if(item!=null)e.getDrops().add(item);
             plugin.clearEquippedEffect(id,slot);
         }
@@ -279,6 +282,9 @@ public final class InfuseMechanics implements Listener {
     }
     @EventHandler public void onJoin(PlayerJoinEvent e) {
         Player p=e.getPlayer();
+        Map<String,Long> cooldownMap=cooldowns.computeIfAbsent(p.getUniqueId(),k->new ConcurrentHashMap<>());
+        cooldownMap.clear();
+        for(String effect:List.of("emerald","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder","ender"))beginCooldown(p,effect,System.currentTimeMillis());
         Bukkit.getScheduler().runTaskLater(plugin,()->applyPassives(p),2L);
         if(p.hasPlayedBefore()||!plugin.getConfig().getBoolean("roll_first_join",false))return;
         List<String> choices=List.of("emerald","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder");
