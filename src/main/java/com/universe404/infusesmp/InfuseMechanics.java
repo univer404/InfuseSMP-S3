@@ -443,22 +443,41 @@ public final class InfuseMechanics implements Listener {
     }
 
     private void applyPassives(Player p) {
+        boolean haste=hasEffect(p,"haste");
+        if(haste) ensureAttributeModifier(p,Attribute.BLOCK_BREAK_SPEED,"haste_passive",plugin.getConfig().getDouble("effects.haste.break_speed_multiplier",1.5)-1.0);
+        else removeAttributeModifier(p,Attribute.BLOCK_BREAK_SPEED,"haste_passive");
         for(String slot:List.of("primary","secondary")) {
             String value=plugin.getEquippedEffect(p.getUniqueId(),slot);
-            if(value==null) continue;
+            if(value==null)continue;
             String e=value.replace("_augmented","");
-            if (!plugin.getConfig().getBoolean("effects." + e + ".enabled", true)) continue;
+            if(!plugin.getConfig().getBoolean("effects."+e+".enabled",true))continue;
             switch(e) {
                 case "fire" -> p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,80,0,true,false,true));
-                case "emerald" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,80,2,true,false,true));
-                case "ocean" -> {p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,80,0,true,false,true));p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,80,0,true,false,true));}
-                case "invisibility" -> p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,80,0,true,false,true));
-                case "regeneration" -> p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,80,0,true,false,true));
+                case "emerald" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,80,isActive(p.getUniqueId(),"emerald")?4:2,true,false,true));
+                case "ocean" -> {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,80,0,true,false,true));
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,80,0,true,false,true));
+                }
+                case "invisibility" -> {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,80,0,true,false,true));
+                    p.removePotionEffect(PotionEffectType.WITHER);
+                    p.removePotionEffect(PotionEffectType.DARKNESS);
+                }
+                case "regeneration" -> {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,80,0,true,false,true));
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,80,0,true,false,true));
+                }
                 case "speed" -> p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,80,0,true,false,true));
-                case "haste" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE,80,0,true,false,true));
-                case "feather" -> { if(p.getFallDistance()>3) p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,60,0,true,false,true)); }
+                case "feather" -> { if(p.getFallDistance()>3)p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,60,0,true,false,true)); }
             }
         }
+    }
+
+    private void ensureAttributeModifier(Player p,Attribute attribute,String key,double amount) {
+        var instance=p.getAttribute(attribute);if(instance==null)return;
+        NamespacedKey namespaced=new NamespacedKey(plugin,key);
+        for(AttributeModifier modifier:new ArrayList<>(instance.getModifiers()))if(modifier.getKey().equals(namespaced))return;
+        instance.addModifier(new AttributeModifier(namespaced,amount,AttributeModifier.Operation.MULTIPLY_SCALAR_1));
     }
 
     @EventHandler(ignoreCancelled=true) public void onExperience(PlayerExpChangeEvent event){
