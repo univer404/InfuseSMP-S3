@@ -26,6 +26,7 @@ public final class RitualCrafting implements Listener {
     private final NamespacedKey key;
     private final File tallyFile;
     private final org.bukkit.configuration.file.YamlConfiguration tally;
+    private final org.bukkit.configuration.file.YamlConfiguration gui;
     private final Map<UUID,Location> ritualBlocks=new HashMap<>();
     private final Map<UUID,BukkitTask> rituals=new HashMap<>();
     private static final int[] SLOTS={12,13,14,21,22,23,30,31,32};
