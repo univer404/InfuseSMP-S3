@@ -3,13 +3,17 @@
 Java Paper/Purpur conversion of the Infuse S3 Skript targeting Minecraft 1.21.11.
 
 ## Build
-Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions uploads the resulting JAR as a workflow artifact.
+Requires JDK 21 and Maven. Run `mvn clean package`. The GitHub Actions workflow builds pull requests and uploads the JAR as a workflow artifact when the build succeeds.
 
-## Configuration
-- `config.yml`: general settings.
-- `messages.yml`: MiniMessage messages; italics are disabled by the Java message renderer.
-- `gui.yml`: recipe GUI presentation settings.
-- `players.yml`: UUID-keyed player state.
+## Configuration and data
+- `config.yml`: general settings, effect durations, cooldowns, craft limits, disabled worlds and ritual duration.
+- `messages.yml`: MiniMessage messages rendered without italics.
+- `gui.yml`: recipe GUI defaults.
+- `players.yml`: UUID-keyed player state saved by the plugin.
+- `rituals.yml`: persistent craft tallies.
 
-## Source and parity
-The supplied archive includes `infuse_old` and `infuse_new`; `infuse_new` is the target for modern Skript/SkBee and Minecraft 1.21.11. The full source includes custom-model items, rituals, recipes, per-effect listeners and a tick heartbeat. This initial branch is a foundation and is not yet a feature-parity or production-ready release; see CONVERSION_STATUS.md.
+## Source of truth
+The supplied archive includes `infuse_old` and `infuse_new`. This port targets `infuse_new/` for Minecraft 1.21.11.
+
+## Status
+This is an active conversion branch. Several original effect-specific mechanics and resource-pack visuals still need porting and the latest CI build must pass before production use. See [CONVERSION_STATUS.md](CONVERSION_STATUS.md).

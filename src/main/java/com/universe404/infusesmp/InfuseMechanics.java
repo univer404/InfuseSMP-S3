@@ -183,7 +183,7 @@ public final class InfuseMechanics implements Listener {
         Player attacker=null;
         if(event.getDamager() instanceof Player p) attacker=p;
         else if(event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player p) attacker=p;
-        if(attacker==null || plugin.isDisabled(attacker.getUniqueId())) return;
+        if(attacker==null || plugin.isDisabled(attacker.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(attacker.getWorld().getName())) return;
         for(String slot:List.of("primary","secondary")) {
             String effect=plugin.getEquippedEffect(attacker.getUniqueId(),slot);
             if(effect==null) continue;
