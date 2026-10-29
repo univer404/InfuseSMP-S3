@@ -9,7 +9,7 @@ Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions builds the pl
 - `config.yml`: general settings, effect tuning, cooldowns, craft limits, effect tuning and disabled worlds. Infuse item colors, names, and lore are fixed in code to preserve the intended design..
 - `messages.yml`: MiniMessage messages rendered without italics.
 - `gui.yml`: recipe and ritual GUI titles, slots, materials, names and enable switches.
-- `players.yml`: UUID-keyed player state and per-slot history.
+- `playerdata.yml`: UUID-keyed player state, equipped effects, binds, trusted players, display settings and action history. Existing `players.yml` data is migrated automatically if `playerdata.yml` does not exist.
 - `rituals.yml`: persistent ritual craft tallies.
 - `regions.yml`: WorldGuard-mapped regions where Infuse effects are disabled.
 
