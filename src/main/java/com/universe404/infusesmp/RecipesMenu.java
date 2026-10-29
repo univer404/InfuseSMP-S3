@@ -16,7 +16,8 @@ import java.util.*;
 public final class RecipesMenu implements Listener {
     private final JavaPlugin plugin;
     private final MiniMessage mm=MiniMessage.miniMessage();
-    private final NamespacedKey menuKey;\n    private final InfuseItems items;
+    private final NamespacedKey menuKey;
+    private final InfuseItems items;
     private static final List<String> EFFECTS=List.of("emerald","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder","ender");
     private static final int[] MAIN_SLOTS={4,12,13,14,20,21,23,24,30,31,32,40,22};
     private static final Map<String,List<Material>> RECIPES=new LinkedHashMap<>();
@@ -66,7 +67,8 @@ public final class RecipesMenu implements Listener {
         Material mat=switch(effect){case "emerald"->Material.EMERALD;case "feather"->Material.FEATHER;case "fire"->Material.BLAZE_POWDER;case "frost"->Material.PACKED_ICE;case "haste"->Material.DIAMOND_PICKAXE;case "heart"->Material.ENCHANTED_GOLDEN_APPLE;case "invisibility"->Material.ENDER_EYE;case "ocean"->Material.HEART_OF_THE_SEA;case "regeneration"->Material.GHAST_TEAR;case "speed"->Material.RABBIT_FOOT;case "strength"->Material.NETHERITE_SWORD;case "thunder"->Material.TRIDENT;default->Material.DRAGON_EGG;};
         ItemStack custom=items.create(effect,false,true); return custom==null?button(mat,"<#A2C81C>"+effect.toUpperCase(Locale.ROOT),"effect:"+effect):tag(custom,"effect:"+effect);
     }
-    private ItemStack tag(ItemStack item,String action){ItemMeta meta=item.getItemMeta();meta.getPersistentDataContainer().set(menuKey,PersistentDataType.STRING,action);item.setItemMeta(meta);return item;}\n    private ItemStack button(Material mat,String name,String action){
+    private ItemStack tag(ItemStack item,String action){ItemMeta meta=item.getItemMeta();meta.getPersistentDataContainer().set(menuKey,PersistentDataType.STRING,action);item.setItemMeta(meta);return item;}
+    private ItemStack button(Material mat,String name,String action){
         ItemStack item=new ItemStack(mat);ItemMeta meta=item.getItemMeta();
         meta.displayName(mm.deserialize(name).decoration(TextDecoration.ITALIC,false));
         meta.getPersistentDataContainer().set(menuKey,PersistentDataType.STRING,action);

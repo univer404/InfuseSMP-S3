@@ -79,7 +79,6 @@ public final class InfuseMechanics implements Listener {
             }
             case "speed" -> p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,ticks,2,true,false,true));
             case "haste" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE,ticks,2,true,false,true));
-            case "heart" -> { }
             case "invisibility" -> p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,ticks,0,true,false,true));
             case "ocean" -> { p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,ticks,0,true,false,true)); p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,ticks,1,true,false,true)); }
             case "regeneration" -> p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,ticks,2,true,false,true));
