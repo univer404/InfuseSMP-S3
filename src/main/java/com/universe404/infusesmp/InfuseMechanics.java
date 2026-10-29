@@ -54,8 +54,18 @@ public final class InfuseMechanics implements Listener {
         if (cd > now) { plugin.tellRaw(p, "<red>ᴄᴏᴏʟᴅᴏᴡɴ: " + Math.max(1, (cd-now+999)/1000) + "s"); return; }
         long duration = Math.max(1, plugin.getConfig().getLong("effects."+effect+".spark_seconds", defaultSpark(effect)));
         long cooldown = Math.max(0, plugin.getConfig().getLong("effects."+effect+".cooldown_seconds", defaultCooldown(effect)));
+        int factor=0;
+        for(String equippedSlot:List.of("primary","secondary")){
+            String equipped=plugin.getEquippedEffect(p.getUniqueId(),equippedSlot);
+            if(equipped!=null&&equipped.replace("_augmented","").equals(effect)){
+                factor++;
+                if(equipped.endsWith("_augmented"))factor++;
+            }
+        }
+        int denominator=Math.max(1,Math.min(4,factor));
+        cooldown=Math.max(0,cooldown/denominator);
         activeUntil.get(p.getUniqueId()).put(effect, now + duration * 1000);
-        cooldowns.get(p.getUniqueId()).put(effect, now + (duration + cooldown) * 1000);
+        cooldowns.get(p.getUniqueId()).put(effect, now + cooldown * 1000);
         p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1.3f);
         p.getWorld().spawnParticle(Particle.ENCHANT, p.getLocation().add(0,1,0), 35, .7,.8,.7,.1);
         activate(p, effect, duration);
