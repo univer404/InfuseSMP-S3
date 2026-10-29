@@ -30,6 +30,10 @@ public final class InfuseMechanics implements Listener {
 
     public InfuseMechanics(InfuseSMP plugin) { this.plugin = plugin; }
 
+    public boolean isBusy(UUID id,String effect){
+        long now=System.currentTimeMillis();
+        return isActive(id,effect)||cooldowns.getOrDefault(id,Map.of()).getOrDefault(effect,0L)>now;
+    }
     public boolean resetCooldown(Player p,String slot){
         String value=plugin.getEquippedEffect(p.getUniqueId(),slot);if(value==null)return true;
         String effect=value.replace("_augmented","");

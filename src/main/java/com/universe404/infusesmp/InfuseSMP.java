@@ -93,8 +93,13 @@ public final class InfuseSMP extends JavaPlugin {
         if(Set.of("ldrain","pdrain","rdrain","sdrain").contains(cmd)) {
             if(playerOnly(sender))return true;Player p=(Player)sender;
             String sl=(cmd.equals("ldrain")||cmd.equals("pdrain"))?"primary":"secondary";
-            String old=slots(p.getUniqueId()).remove(sl);
-            if(old==null)tell(p,"effects-empty");else{log(p.getUniqueId(),"drained "+sl+" "+old);tell(p,"effect-removed",Map.of("slot",sl));saveState();}
+            String old=slots(p.getUniqueId()).get(sl);
+            if(old==null){tell(p,"effects-empty");return true;}
+            if(mechanics.isBusy(p.getUniqueId(),old.replace("_augmented",""))){tellRaw(p,"<red>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʀᴇᴍᴏᴠᴇ ᴛʜɪs ᴇғғᴇᴄᴛ ᴡʜɪʟᴇ ɪᴛ ɪs ᴀᴄᴛɪᴠᴇ ᴏʀ ᴏɴ ᴄᴏᴏʟᴅᴏᴡɴ!");return true;}
+            if(p.getInventory().firstEmpty()==-1){tellRaw(p,"<red>ʏᴏᴜʀ ɪɴᴠᴇɴᴛᴏʀʏ ɪs ғᴜʟʟ!");return true;}
+            ItemStack item=infuseItems.create(old.replace("_augmented",""),old.endsWith("_augmented"),false);
+            if(item!=null)p.getInventory().addItem(item);
+            slots(p.getUniqueId()).remove(sl);log(p.getUniqueId(),"drained "+sl+" "+old);tellRaw(p,"<green>ᴅʀᴀɪɴᴇᴅ "+old+" ғʀᴏᴍ ʏᴏᴜʀ "+sl+" sʟᴏᴛ.");saveState();
             return true;
         }
         if(cmd.equals("trust"))return trust(sender,args);
