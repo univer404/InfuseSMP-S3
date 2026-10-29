@@ -283,20 +283,30 @@ public final class InfuseMechanics implements Listener {
         if(Math.abs(p.getMaxHealth()-maximum)>0.01){p.setMaxHealth(maximum);if(p.getHealth()>maximum)p.setHealth(maximum);}
     }
     private void applyToolPassives(Player p){
-        boolean haste=hasEffect(p,"haste"),emerald=hasEffect(p,"emerald");
-        if(!haste&&!emerald)return;
+        ItemStack item=p.getInventory().getItemInMainHand();
+        if(item==null||item.getType()==Material.AIR)return;
+        String type=item.getType().name();
+        boolean haste=hasEffect(p,"haste"),emerald=hasEffect(p,"emerald"),ocean=hasEffect(p,"ocean");
+        boolean tool=type.endsWith("_PICKAXE")||type.endsWith("_AXE")||type.endsWith("_SHOVEL")||type.endsWith("_HOE")||type.endsWith("_SWORD");
+        boolean fortuneTool=type.endsWith("_PICKAXE")||type.endsWith("_SHOVEL")||type.endsWith("_HOE");
+        boolean weapon=type.endsWith("_SWORD")||type.endsWith("_AXE");
         boolean overwrite=plugin.getConfig().getBoolean("overwrite_enchants",true);
-        for(ItemStack item:p.getInventory().getContents()){
-            if(item==null||item.getType()==Material.AIR)continue;
-            String type=item.getType().name();
-            boolean tool=type.endsWith("_PICKAXE")||type.endsWith("_AXE")||type.endsWith("_SHOVEL")||type.endsWith("_HOE");
-            boolean weapon=type.endsWith("_SWORD")||type.endsWith("_AXE");
-            if(haste&&tool){
-                if(overwrite||!item.containsEnchantment(Enchantment.FORTUNE))item.addUnsafeEnchantment(Enchantment.FORTUNE,5);
-                if(overwrite||!item.containsEnchantment(Enchantment.UNBREAKING))item.addUnsafeEnchantment(Enchantment.UNBREAKING,10);
-            }
-            if(emerald&&weapon&&(overwrite||!item.containsEnchantment(Enchantment.LOOTING)))item.addUnsafeEnchantment(Enchantment.LOOTING,5);
-        }
+
+        if(emerald&&weapon) {
+            if(overwrite||!item.containsEnchantment(Enchantment.LOOTING))item.addUnsafeEnchantment(Enchantment.LOOTING,5);
+        } else if(item.getEnchantmentLevel(Enchantment.LOOTING)==5) item.removeEnchantment(Enchantment.LOOTING);
+
+        if(haste&&tool) {
+            if(overwrite||!item.containsEnchantment(Enchantment.UNBREAKING))item.addUnsafeEnchantment(Enchantment.UNBREAKING,10);
+        } else if(item.getEnchantmentLevel(Enchantment.UNBREAKING)==10) item.removeEnchantment(Enchantment.UNBREAKING);
+
+        if(haste&&fortuneTool) {
+            if(overwrite||!item.containsEnchantment(Enchantment.FORTUNE))item.addUnsafeEnchantment(Enchantment.FORTUNE,5);
+        } else if(item.getEnchantmentLevel(Enchantment.FORTUNE)==5) item.removeEnchantment(Enchantment.FORTUNE);
+
+        if(ocean&&item.getType()==Material.TRIDENT) {
+            if(overwrite||!item.containsEnchantment(Enchantment.LOYALTY))item.addUnsafeEnchantment(Enchantment.LOYALTY,5);
+        } else if(item.getEnchantmentLevel(Enchantment.LOYALTY)==5) item.removeEnchantment(Enchantment.LOYALTY);
     }
     private boolean hasEffect(Player p,String effect){
         if(plugin.isDisabled(p.getUniqueId())||plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())||plugin.isInDisabledRegion(p.getLocation()))return false;
