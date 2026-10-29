@@ -192,7 +192,7 @@ public final class InfuseItems {
         meta.lore(lore);
         meta.getPersistentDataContainer().set(effectKey,PersistentDataType.STRING,effect);
         meta.getPersistentDataContainer().set(augmentedKey,PersistentDataType.BYTE,(byte)(augmented?1:0));
-        meta.setEnchantmentGlintOverride(plugin.getConfig().getBoolean("items.glint",true));
+        meta.setEnchantmentGlintOverride(true);
         item.setItemMeta(meta);return item;
     }
     public String getEffect(ItemStack item){if(item==null||!item.hasItemMeta())return null;return item.getItemMeta().getPersistentDataContainer().get(effectKey,PersistentDataType.STRING);}
