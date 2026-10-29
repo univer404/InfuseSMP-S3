@@ -1,23 +1,31 @@
-# InfuseSMP-S3 configuration
+# Infuse S3 settings; values are read by the plugin.
 allow_same_effects: false
-max_augments_per_effect: 3
-trust_list_max: 10
-trust_action_cooldown_seconds: 10
-heartbeat_period_ticks: 1
-recipes_gui_enabled: true
-brewing_stand_enabled: false
-broadcast_craft_coordinates: true
-ritual_duration_seconds: 600
+trust_list_max: 3
+trust_list_delay_seconds: 10
+allow_true_damage: true
+roll_first_join: false
+do_roll_animation: true
+head_drop: false
+lock_effects: false
+overwrite_enchants: true
+charged_refresh_speed: 15
+recharge_sound: BLOCK_BEACON_POWER_SELECT
+use_sound: BLOCK_BEACON_ACTIVATE
+disabled_worlds: [disabled_world]
+primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]
+secondary_effects: [speed, fire, ocean, emerald]
 effects:
-  fire:
-    enabled: true
-    cooldown_seconds: 10
-    trigger_hits: 5
-  frost:
-    enabled: true
-    cooldown_seconds: 10
-    trigger_hits: 5
-  speed:
-    enabled: true
-    cooldown_seconds: 10
-    trigger_hits: 5
+  emerald: {enabled: true, cooldown_seconds: 30, spark_seconds: 10, trigger_hits: 10, spark_xp_gain: 2}
+  feather: {enabled: true, cooldown_seconds: 40, spark_seconds: 5}
+  fire: {enabled: true, cooldown_seconds: 90, spark_seconds: 4, trigger_hits: 5, ignite_radius: 6, ignite_duration_ticks: 200}
+  frost: {enabled: true, cooldown_seconds: 60, spark_seconds: 10, trigger_hits: 10}
+  haste: {enabled: true, cooldown_seconds: 60, spark_seconds: 15}
+  heart: {enabled: true, cooldown_seconds: 120, spark_seconds: 60, passive_hearts: 15, spark_hearts: 20}
+  invisibility: {enabled: true, cooldown_seconds: 90, spark_seconds: 10}
+  ocean: {enabled: true, cooldown_seconds: 90, spark_seconds: 5}
+  regeneration: {enabled: true, cooldown_seconds: 60, spark_seconds: 15}
+  speed: {enabled: true, cooldown_seconds: 20, spark_seconds: 1, multiplier: 0.2}
+  strength: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, mob_damage: 2}
+  thunder: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, trigger_hits: 10, true_damage: 1}
+  ender: {enabled: true, cooldown_seconds: 30, spark_seconds: 1}
+  earth: {enabled: true, cooldown_seconds: 60, spark_seconds: 10}

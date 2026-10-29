@@ -23,7 +23,7 @@ public final class InfuseSMP extends JavaPlugin {
     private final Set<UUID> simpleDisplay = ConcurrentHashMap.newKeySet();
     private File playersFile;
     private YamlConfiguration players;
-    private YamlConfiguration messages;
+    private YamlConfiguration messages;\n    private InfuseMechanics mechanics;\n    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
         saveDefaultConfig(); saveResource("messages.yml", false); saveResource("gui.yml", false);
@@ -122,18 +122,18 @@ public final class InfuseSMP extends JavaPlugin {
             return true;
         }
         if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
-        if(!sub.equals("add")&&!sub.equals("remove"))return usage(sender,"/infuse <add|remove|get|history>");
+        if(!sub.equals("add")&&!sub.equals("remove")&&!sub.equals("toggle"))return usage(sender,"/infuse <add|remove|get|history|toggle>");
         String sl=null,effect=null,targetName=null;boolean augmented=false;
         for(String arg:args){if(arg.startsWith("-s="))sl=arg.substring(3);else if(arg.startsWith("-e="))effect=arg.substring(3).toLowerCase(Locale.ROOT);else if(arg.startsWith("-p="))targetName=arg.substring(3);else if(arg.equalsIgnoreCase("-a=true"))augmented=true;}
         if(sl==null||!isSlot(sl))return usage(sender,"/infuse "+sub+" -s=<primary|secondary> -e=<effect> [-p=<player>] [-a=true]");
         Player target=targetName==null?(sender instanceof Player?(Player)sender:null):Bukkit.getPlayerExact(targetName);
         if(target==null){tell(sender,"player-only");return true;}
         String s=slot(sl);Map<String,String> m=slots(target.getUniqueId());
-        if(sub.equals("remove")){String old=m.remove(s);if(old==null)tell(sender,"effects-empty");else{log(target.getUniqueId(),"removed "+s+" "+old);tell(sender,"effect-removed",Map.of("slot",s));}}
+        if(sub.equals("toggle")) { if(args.length<2) return usage(sender,"/infuse toggle -p=<player>"); UUID tid=target.getUniqueId(); if(!disabled.add(tid))disabled.remove(tid); tellRaw(sender, disabled.contains(tid)?"<yellow>ɪɴғᴜsᴇ ᴅɪsᴀʙʟᴇᴅ.":"<green>ɪɴғᴜsᴇ ᴇɴᴀʙʟᴇᴅ."); saveState(); return true; }\n        if(sub.equals("remove")){String old=m.remove(s);if(old==null)tell(sender,"effects-empty");else{log(target.getUniqueId(),"removed "+s+" "+old);tell(sender,"effect-removed",Map.of("slot",s));}}
         else {
-            if(effect==null||!Set.of("fire","frost","speed","haste","heart","ocean","invis","invisibility","regen","thunder","ender","earth","feather","emerald","strength","apophis","thief").contains(effect)){tell(sender,"invalid-effect");return true;}
+            if(effect==null||!Set.of("fire","frost","speed","haste","heart","ocean","invis","invisibility","regeneration","regen","thunder","ender","earth","feather","emerald","strength","apophis","thief").contains(effect)){tell(sender,"invalid-effect");return true;}
             if((effect.equals("earth")||effect.equals("ender"))&&!augmented)return usage(sender,"earth and ender require -a=true");
-            String value=effect+(augmented?"_augmented":"");m.put(s,value);log(target.getUniqueId(),"set "+s+" "+value);tell(sender,"effect-set",Map.of("slot",s,"effect",value));
+            if(effect.equals("regen"))effect="regeneration"; String value=effect+(augmented?"_augmented":"");m.put(s,value);log(target.getUniqueId(),"set "+s+" "+value);tell(sender,"effect-set",Map.of("slot",s,"effect",value));
         }
         saveState();return true;
     }
@@ -152,13 +152,13 @@ public final class InfuseSMP extends JavaPlugin {
         }
         saveState();return true;
     }
-    private void loadState() {
+    public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }\n    public boolean isDisabled(UUID id){ return disabled.contains(id); }\n    public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }\n    public void tellKey(CommandSender sender,String key){ tell(sender,key); }\n    public void tellRaw(CommandSender sender,String value){ sender.sendMessage(render(value)); }\n    public void recordHistory(UUID id,String line){ log(id,line); }\n    public void saveStatePublic(){ saveState(); }\n\n    private void loadState() {
         for(String key:players.getKeys(false))try{
             UUID id=UUID.fromString(key);Map<String,String> m=new ConcurrentHashMap<>();
             for(String sl:List.of("primary","secondary")){String v=players.getString(key+".effects."+sl);if(v!=null)m.put(sl,v);}effects.put(id,m);
             Set<UUID> tr=ConcurrentHashMap.newKeySet();for(String v:players.getStringList(key+".trusted"))try{tr.add(UUID.fromString(v));}catch(IllegalArgumentException ignored){}trusted.put(id,tr);
             Map<String,String> b=new ConcurrentHashMap<>();for(String sl:List.of("primary","secondary")){String v=players.getString(key+".binds."+sl);if(v!=null)b.put(sl,v);}binds.put(id,b);
-            if(players.getBoolean(key+".simple-display"))simpleDisplay.add(id);history.put(id,new ArrayList<>(players.getStringList(key+".history")));
+            if(players.getBoolean(key+".simple-display"))simpleDisplay.add(id);if(players.getBoolean(key+".disabled"))disabled.add(id);history.put(id,new ArrayList<>(players.getStringList(key+".history")));
         }catch(IllegalArgumentException ignored){getLogger().warning("Ignoring invalid UUID in players.yml: "+key);}
     }
     private void saveState() {
@@ -166,7 +166,7 @@ public final class InfuseSMP extends JavaPlugin {
         for(UUID id:ids){String k=id.toString();for(String sl:List.of("primary","secondary"))players.set(k+".effects."+sl,effects.getOrDefault(id,Map.of()).get(sl));
             players.set(k+".trusted",trusted.getOrDefault(id,Set.of()).stream().map(UUID::toString).toList());
             for(var e:binds.getOrDefault(id,Map.of()).entrySet())players.set(k+".binds."+e.getKey(),e.getValue());
-            players.set(k+".simple-display",simpleDisplay.contains(id));players.set(k+".history",history.getOrDefault(id,List.of()));}
+            players.set(k+".simple-display",simpleDisplay.contains(id));players.set(k+".history",history.getOrDefault(id,List.of())); players.set(k+".disabled",disabled.contains(id));}
         try{players.save(playersFile);}catch(IOException e){getLogger().severe("Could not save players.yml: "+e.getMessage());}
     }
 }
