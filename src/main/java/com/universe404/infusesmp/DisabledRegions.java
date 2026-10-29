@@ -67,8 +67,7 @@ public final class DisabledRegions implements Listener {
         }
         return true;
     }
-    private boolean usage(CommandSender s){usage(s);return true;}
-    private void usage(CommandSender s){s.sendMessage("§e/mapregion add <region-id>");s.sendMessage("§e/mapregion delete <region-id>");s.sendMessage("§e/mapregion list");s.sendMessage("§e/mapregion clear");}
+    private boolean usage(CommandSender s){s.sendMessage("§e/mapregion add <region-id>");s.sendMessage("§e/mapregion delete <region-id>");s.sendMessage("§e/mapregion list");s.sendMessage("§e/mapregion clear");return true;}
     @EventHandler(ignoreCancelled=true)
     public void onClick(PlayerInteractEvent e){
         if(e.getAction()!=Action.RIGHT_CLICK_BLOCK||e.getClickedBlock()==null)return;

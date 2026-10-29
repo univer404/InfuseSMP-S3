@@ -214,7 +214,7 @@ public final class InfuseMechanics implements Listener {
     public void tick() {
         long now=System.currentTimeMillis();
         for(Player p:Bukkit.getOnlinePlayers()) {
-            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())) continue;
+            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) continue;
             applyPassives(p);
             Map<String,Long> active=activeUntil.get(p.getUniqueId());
             if(active!=null) active.entrySet().removeIf(en -> en.getValue()<=now);
@@ -262,6 +262,12 @@ public final class InfuseMechanics implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled=true) public void onFall(EntityDamageEvent event){
+        if(event.getEntity() instanceof Player p && event.getCause()==EntityDamageEvent.DamageCause.FALL
+          && !plugin.isDisabled(p.getUniqueId())
+          && !plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())
+          && !plugin.isInDisabledRegion(p.getLocation()) && hasEffect(p,"feather"))event.setCancelled(true);
+    }
     @EventHandler(ignoreCancelled=true) public void onCombat(EntityDamageByEntityEvent event) {
         Player attacker=null;
         if(event.getDamager() instanceof Player p) attacker=p;
