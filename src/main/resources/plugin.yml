@@ -34,6 +34,14 @@ commands:
     description: Read or change supported configuration.
   recipes:
     description: View Infuse crafting recipes.
+  resetcooldown:
+    description: Reset Infuse spark cooldowns.
+    aliases: [rscd, rcd, rscooldown]
+    permission: infuse.admin
+  resetcraft:
+    description: Reset ritual crafting tallies.
+    aliases: [rscraft]
+    permission: infuse.admin
   item:
     description: Give Infuse custom items.
     aliases: [giveitem, i, potion, pot]

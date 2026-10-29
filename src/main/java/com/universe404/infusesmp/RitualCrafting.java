@@ -148,6 +148,11 @@ public final class RitualCrafting implements Listener {
         for(int s:SLOTS){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)p.getInventory().addItem(item);}
         p.removeMetadata("infuse-ritual-gui",plugin);
     }
+    public boolean resetCraft(String effect){
+        if(effect==null){for(String e:RECIPES.keySet())tally.set(e+".crafted",0);saveTally();return true;}
+        if(!RECIPES.containsKey(effect.toLowerCase(Locale.ROOT)))return false;
+        tally.set(effect.toLowerCase(Locale.ROOT)+".crafted",0);saveTally();return true;
+    }
     private void stopRitual(UUID id){BukkitTask running=rituals.remove(id);if(running!=null)running.cancel();}
     private void saveTally(){try{tally.save(tallyFile);}catch(IOException ex){plugin.getLogger().severe("Could not save rituals.yml: "+ex.getMessage());}}
 }

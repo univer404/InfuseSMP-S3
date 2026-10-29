@@ -87,10 +87,8 @@ public final class InfuseSMP extends JavaPlugin {
         }
         if(cmd.equals("activate")) {
             if(playerOnly(sender))return true;
-            if(args.length!=1||!isSlot(args[0]))return usage(sender,"/activate <primary|secondary>");
-            String effect=slots(((Player)sender).getUniqueId()).get(slot(args[0]));
-            if(effect==null)tell(sender,"effects-empty");else tell(sender,"not-implemented");
-            return true;
+            if(args.length>1|| (args.length==1&&!isSlot(args[0])))return usage(sender,"/activate [primary|secondary]");
+            mechanics.startSpark((Player)sender,args.length==0?"primary":slot(args[0]));return true;
         }
         if(Set.of("ldrain","pdrain","rdrain","sdrain").contains(cmd)) {
             if(playerOnly(sender))return true;Player p=(Player)sender;
@@ -100,17 +98,38 @@ public final class InfuseSMP extends JavaPlugin {
             return true;
         }
         if(cmd.equals("trust"))return trust(sender,args);
+        if(cmd.equals("resetcooldown")) {
+            if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
+            if(playerOnly(sender))return true;
+            if(args.length>1||(args.length==1&&!isSlot(args[0])))return usage(sender,"/resetcooldown [primary|secondary]");
+            Player p=(Player)sender;List<String> chosen=args.length==0?List.of("primary","secondary"):List.of(slot(args[0]));
+            for(String sl:chosen){if(!mechanics.resetCooldown(p,sl)){tellRaw(sender,"<red>ᴛʜᴇ "+sl+" sᴘᴀʀᴋ ɪs sᴛɪʟʟ ᴀᴄᴛɪᴠᴇ.");return true;}}
+            tellRaw(sender,"<green>ʀᴇsᴇᴛ ᴄᴏᴏʟᴅᴏᴡɴ ғᴏʀ "+String.join(" ᴀɴᴅ ",chosen)+".");return true;
+        }
+        if(cmd.equals("resetcraft")) {
+            if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
+            if(args.length>1)return usage(sender,"/resetcraft [effect]");
+            if(!ritualCrafting.resetCraft(args.length==0?null:args[0])){tell(sender,"invalid-effect");return true;}
+            tellRaw(sender,"<green>ʀᴇsᴇᴛ ᴄʀᴀғᴛ ᴛᴀʟʟɪᴇs.");return true;
+        }
         if(cmd.equals("conf")) {
             if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
-            if(args.length<2)return usage(sender,"/conf <get|set> <key> [value]");
-            if(args[0].equalsIgnoreCase("get")){tellRaw(sender,"<gray>"+args[1]+" = <white>"+getConfig().getString(args[1],"undefined"));return true;}
-            if(args[0].equalsIgnoreCase("set")&&args.length>=3){
-                String value=String.join(" ",Arrays.copyOfRange(args,2,args.length));Object parsed=value;
-                if(value.equalsIgnoreCase("true")||value.equalsIgnoreCase("false"))parsed=Boolean.parseBoolean(value);
-                else try{parsed=Integer.parseInt(value);}catch(NumberFormatException ignored){}
-                getConfig().set(args[1],parsed);saveConfig();tellRaw(sender,"<green>ᴜᴘᴅᴀᴛᴇᴅ "+args[1]+".");return true;
+            if(args.length<2)return usage(sender,"/conf <get|set> <key> [subkey] [value]");
+            String path=args[1];int valueStart=2;
+            if(args[0].equalsIgnoreCase("get")){
+                if(args.length>=3){path=args[1]+"."+args[2];}
+                if(!getConfig().contains(path)){tellRaw(sender,"<red>ᴋᴇʏ ɴᴏᴛ ғᴏᴜɴᴅ: "+path);return true;}
+                tellRaw(sender,"<yellow>"+path+" <gray>ɪs: <white>"+String.valueOf(getConfig().get(path)));return true;
             }
-            return usage(sender,"/conf <get|set> <key> [value]");
+            if(args[0].equalsIgnoreCase("set")){
+                if(args.length<3)return usage(sender,"/conf set <key> <value> or /conf set <category> <key> <value>");
+                if(args.length>=4){path=args[1]+"."+args[2];valueStart=3;}
+                String value=String.join(" ",Arrays.copyOfRange(args,valueStart,args.length));Object parsed=value;
+                if(value.equalsIgnoreCase("true")||value.equalsIgnoreCase("false"))parsed=Boolean.parseBoolean(value);
+                else try{parsed=Integer.parseInt(value);}catch(NumberFormatException ignored){try{parsed=Double.parseDouble(value);}catch(NumberFormatException ignored2){}}
+                getConfig().set(path,parsed);saveConfig();tellRaw(sender,"<green>ᴜᴘᴅᴀᴛᴇᴅ "+path+".");return true;
+            }
+            return usage(sender,"/conf <get|set> <key> [subkey] [value]");
         }
         return false;
     }
