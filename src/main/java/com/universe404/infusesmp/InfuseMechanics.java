@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -222,6 +223,22 @@ public final class InfuseMechanics implements Listener {
                     p.playSound(p.getLocation(),plugin.getConfig().getString("recharge_sound","custom.health"),1f,1f);
                 }
             }
+        }
+    }
+    private void applyToolPassives(Player p){
+        boolean haste=hasEffect(p,"haste"),emerald=hasEffect(p,"emerald");
+        if(!haste&&!emerald)return;
+        boolean overwrite=plugin.getConfig().getBoolean("overwrite_enchants",true);
+        for(ItemStack item:p.getInventory().getContents()){
+            if(item==null||item.getType()==Material.AIR)continue;
+            String type=item.getType().name();
+            boolean tool=type.endsWith("_PICKAXE")||type.endsWith("_AXE")||type.endsWith("_SHOVEL")||type.endsWith("_HOE");
+            boolean weapon=type.endsWith("_SWORD")||type.endsWith("_AXE");
+            if(haste&&tool){
+                if(overwrite||!item.containsEnchantment(Enchantment.FORTUNE))item.addUnsafeEnchantment(Enchantment.FORTUNE,5);
+                if(overwrite||!item.containsEnchantment(Enchantment.UNBREAKING))item.addUnsafeEnchantment(Enchantment.UNBREAKING,10);
+            }
+            if(emerald&&weapon&&(overwrite||!item.containsEnchantment(Enchantment.LOOTING)))item.addUnsafeEnchantment(Enchantment.LOOTING,5);
         }
     }
     private void applyPassives(Player p) {

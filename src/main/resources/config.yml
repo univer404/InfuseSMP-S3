@@ -6,6 +6,7 @@ roll_first_join: false
 do_roll_animation: true
 head_drop: false
 lock_effects: false
+overwrite_enchants: true
 recharge_sound: "custom.health"
 use_sound: "custom.activate"
 disabled_worlds: [disabled_world]
