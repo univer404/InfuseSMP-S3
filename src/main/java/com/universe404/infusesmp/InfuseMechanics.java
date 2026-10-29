@@ -656,11 +656,15 @@ public final class InfuseMechanics implements Listener {
                 target.getWorld().spawnParticle(Particle.FLAME,target.getLocation().add(0,1,0),10,.3,.5,.3,.05);
             }
         }
-        if(hasEffect(attacker,"frost")&&(isActive(attackerId,"frost")||globalHits%Math.max(1,plugin.getConfig().getInt("effects.frost.trigger_hits",10))==0)){
-            target.setFreezeTicks(Math.max(target.getFreezeTicks(),plugin.getConfig().getInt("effects.frost.freeze_ticks",600)));
-            target.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE,plugin.getConfig().getInt("effects.frost.mining_fatigue_ticks",200),1,true,false,true));
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,100,1,true,false,true));
-            target.getWorld().spawnParticle(Particle.SNOWFLAKE,target.getLocation().add(0,1,0),20,.5,.6,.5,.02);
+        if(target instanceof Player frostVictim&&hasEffect(attacker,"frost")
+            &&(isActive(attackerId,"frost")||globalHits%Math.max(1,plugin.getConfig().getInt("effects.frost.trigger_hits",10))==0)){
+            if(!isActive(attackerId,"frost"))frostVictim.setCooldown(Material.WIND_CHARGE,Math.max(0,plugin.getConfig().getInt("effects.frost.wind_charge_cooldown_ticks",200)));
+            frostVictim.setFreezeTicks(Math.max(frostVictim.getFreezeTicks(),plugin.getConfig().getInt("effects.frost.freeze_ticks",600)));
+            frostVictim.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE,plugin.getConfig().getInt("effects.frost.mining_fatigue_ticks",200),Math.max(0,plugin.getConfig().getInt("effects.frost.mining_fatigue_tier",2)-1),true,false,true));
+            freezeStacks.merge(frostVictim.getUniqueId(),1,Integer::sum);
+            UUID frozenId=frostVictim.getUniqueId();
+            Bukkit.getScheduler().runTaskLater(plugin,()->freezeStacks.computeIfPresent(frozenId,(id,count)->count<=1?null:count-1),100L);
+            frostVictim.getWorld().spawnParticle(Particle.SNOWFLAKE,frostVictim.getLocation().add(0,1,0),20,.5,.6,.5,.02);
         }
         if(hasEffect(attacker,"strength")){
             if(!(target instanceof Player))event.setDamage(event.getDamage()*plugin.getConfig().getDouble("effects.strength.mob_damage",2.0));
