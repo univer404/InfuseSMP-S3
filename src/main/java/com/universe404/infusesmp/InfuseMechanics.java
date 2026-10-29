@@ -732,36 +732,71 @@ public final class InfuseMechanics implements Listener {
         }
     }
     private void startSpeedDash(Player p){
-        Vector dir=p.getLocation().getDirection();Vector velocity=new Vector(dir.getX(),dir.getY()*plugin.getConfig().getDouble("effects.speed.dash_damping",0.6),dir.getZ()).multiply(plugin.getConfig().getDouble("effects.speed.dash_power",2.6));
+        Vector dir=p.getLocation().getDirection();
+        Vector velocity=new Vector(dir.getX(),dir.getY()*plugin.getConfig().getDouble("effects.speed.dash_damping",0.6),dir.getZ()).multiply(plugin.getConfig().getDouble("effects.speed.dash_power",2.6));
         p.setVelocity(velocity);
+        Set<UUID> hitTargets=new HashSet<>();
+        int interval=Math.max(1,plugin.getConfig().getInt("effects.speed.dash_interval_ticks",1));
         new org.bukkit.scheduler.BukkitRunnable(){int ticks=0;final int max=plugin.getConfig().getInt("effects.speed.dash_iteration",14);
-            @Override public void run(){if(!p.isOnline()||ticks++>=max){cancel();return;}double radius=plugin.getConfig().getDouble("effects.speed.dash_effect_radius",1.5);
-                p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),8,.4,.3,.4,.02);
-                for(Entity ent:p.getNearbyEntities(radius,radius,radius))if(ent instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target))trueDamage(p,target,plugin.getConfig().getDouble("effects.speed.dash_true_damage",2));
-            }
-        }.runTaskTimer(plugin,1L,1L);
-    }
-    private void startFeatherSpark(Player p){
-        p.setVelocity(p.getVelocity().setY(Math.max(1.2,p.getVelocity().getY()+1.2)));
-        new org.bukkit.scheduler.BukkitRunnable(){int age=0;
-            @Override public void run(){if(!p.isOnline()||age++>200){cancel();return;}
-                if(age>8&&p.getVelocity().getY()<0&&p.getFallDistance()>=plugin.getConfig().getDouble("effects.feather.fall_trigger_threshold",10)){
-                    double fall=p.getFallDistance();double radius=Math.max(plugin.getConfig().getDouble("effects.feather.min_shockwave_radius",3),Math.min(plugin.getConfig().getDouble("effects.feather.max_shockwave_radius",8),fall/4));
-                    p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),1);p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),100,radius/2,.2,radius/2,.2);
-                    for(Entity ent:p.getNearbyEntities(radius,radius,radius))if(ent instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target)){trueDamage(p,target,plugin.getConfig().getDouble("effects.feather.shockwave_true_damage",2));target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,plugin.getConfig().getInt("effects.feather.slow_falling_ticks",100),0,true,false,true));}
-                    p.setFallDistance(0);p.setVelocity(p.getVelocity().setY(Math.max(.6,fall/plugin.getConfig().getDouble("effects.feather.bounce_coefficient",8))));cancel();
+            @Override public void run(){
+                if(!p.isOnline()||ticks++>=max){cancel();return;}
+                double radius=plugin.getConfig().getDouble("effects.speed.dash_effect_radius",1.5);
+                p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),4,.3,.5,.3,0);
+                p.getWorld().spawnParticle(Particle.FLAME,p.getLocation(),8,.2,0,.2,.05);
+                for(Entity ent:p.getNearbyEntities(radius,radius,radius))if(ent instanceof LivingEntity target&&target!=p&&hitTargets.add(target.getUniqueId())&&isTargetAllowed(p,target)&&!plugin.isInDisabledRegion(target.getLocation())){
+                    trueDamage(p,target,plugin.getConfig().getDouble("effects.speed.dash_true_damage",2));
+                    target.getWorld().spawnParticle(Particle.SWEEP_ATTACK,target.getLocation().add(0,1,0),8,.5,1,.5,0);
+                    target.getWorld().playSound(target.getLocation(),Sound.ENTITY_PLAYER_ATTACK_SWEEP,1f,1f);
                 }
             }
+        }.runTaskTimer(plugin,1L,interval);
+    }
+
+    private void startFeatherSpark(Player p){
+        Vector velocity=p.getVelocity();
+        p.setVelocity(new Vector(velocity.getX(),0,velocity.getZ()));
+        p.setVelocity(p.getVelocity().setY(plugin.getConfig().getDouble("effects.feather.initial_bounce_power",2.0)));
+        new org.bukkit.scheduler.BukkitRunnable(){int age=0;double maxFall=0;boolean airborne=false;
+            @Override public void run(){
+                if(!p.isOnline()||age++>1200){cancel();return;}
+                if(!airborne){
+                    if(!p.isOnGround()||p.getVelocity().getY()>0.05)airborne=true;
+                    else if(age>100){cancel();return;}
+                }
+                if(!airborne)return;
+                maxFall=Math.max(maxFall,p.getFallDistance());
+                Material under=p.getLocation().getBlock().getType();
+                if(under==Material.VINE||under==Material.LADDER||under==Material.TWISTING_VINES){cancel();return;}
+                if(!p.isOnGround()||age<3)return;
+                cancel();
+                if(maxFall<=plugin.getConfig().getDouble("effects.feather.fall_trigger_threshold",3))return;
+                double radius=Math.max(plugin.getConfig().getDouble("effects.feather.min_shockwave_radius",3),
+                    Math.min(plugin.getConfig().getDouble("effects.feather.max_shockwave_radius",12),maxFall/4));
+                Location impact=p.getLocation().clone();
+                p.getWorld().playSound(impact,Sound.ITEM_MACE_SMASH_GROUND_HEAVY,1f,1f);
+                for(Entity entity:p.getNearbyEntities(radius,radius,radius))if(entity instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target)&&!plugin.isInDisabledRegion(target.getLocation())){
+                    trueDamage(p,target,plugin.getConfig().getDouble("effects.feather.shockwave_true_damage",2));
+                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,plugin.getConfig().getInt("effects.feather.slow_falling_ticks",100),0,true,false,true));
+                }
+                p.setFallDistance(0);
+                if(!p.isSneaking()){
+                    Vector direction=p.getLocation().getDirection();
+                    p.setVelocity(direction.multiply(radius/Math.max(0.1,plugin.getConfig().getDouble("effects.feather.bounce_coefficient",1.5))));
+                }
+                int rings=Math.max(1,plugin.getConfig().getInt("effects.feather.shockwave_rings",8));
+                int ringDelay=Math.max(1,plugin.getConfig().getInt("effects.feather.shockwave_draw_interval_ticks",1));
+                new org.bukkit.scheduler.BukkitRunnable(){int ring=1;
+                    @Override public void run(){
+                        if(ring>rings){cancel();return;}
+                        double r=radius*ring/rings;
+                        for(int i=0;i<60;i++){double angle=Math.PI*2*i/60.0;Location point=impact.clone().add(Math.cos(angle)*r,0.1,Math.sin(angle)*r);impact.getWorld().spawnParticle(Particle.DUST,point,1,0,0,0,0,new Particle.DustOptions(Color.GRAY,2f));}
+                        ring++;
+                    }
+                }.runTaskTimer(plugin,0L,ringDelay);
+            }
         }.runTaskTimer(plugin,1L,1L);
     }
-    private void startThunderSpark(Player p){
-        new org.bukkit.scheduler.BukkitRunnable(){int count=0;final int max=plugin.getConfig().getInt("effects.thunder.strike_time_max",5);
-            @Override public void run(){if(!p.isOnline()||count++>=max){cancel();return;}
-                LivingEntity target=p.getNearbyEntities(12,8,12).stream().filter(e->e instanceof LivingEntity&&e!=p&&isTargetAllowed(p,(LivingEntity)e)).map(e->(LivingEntity)e).min(Comparator.comparingDouble(e->e.getLocation().distanceSquared(p.getLocation()))).orElse(null);
-                if(target!=null){target.getWorld().strikeLightningEffect(target.getLocation());trueDamage(p,target,plugin.getConfig().getDouble("effects.thunder.true_damage",1));}
-            }
-        }.runTaskTimer(plugin,0L,20L);
-    }
+
     private void startOceanPull(Player p,int iteration){
         int max=plugin.getConfig().getInt("effects.ocean.pull_iteration",50);if(!p.isOnline()||iteration>=max)return;
         double radius=plugin.getConfig().getDouble("effects.ocean.pull_radius",6),strength=plugin.getConfig().getDouble("effects.ocean.pull_strength",0.1);
