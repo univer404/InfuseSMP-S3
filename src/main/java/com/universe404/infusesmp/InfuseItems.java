@@ -176,8 +176,8 @@ public final class InfuseItems {
         ItemStack item=new ItemStack(configured);PotionMeta meta=(PotionMeta)item.getItemMeta();
         String color=COLORS.get(effect);
         meta.setColor(Color.fromRGB(Integer.parseInt(color.substring(1,3),16),Integer.parseInt(color.substring(3,5),16),Integer.parseInt(color.substring(5,7),16)));
-        int modelBase=plugin.getConfig().getInt("items.model_data_base",414001);
-        int augmentedOffset=plugin.getConfig().getInt("items.augmented_model_offset",100);
+        int modelBase=414001;
+        int augmentedOffset=100;
         meta.setCustomModelData(modelBase+IDS.get(effect)-1+(augmented?augmentedOffset:0));
         String display=NAMES.get(effect);
         meta.displayName(mm.deserialize(color+display+" ᴇғғᴇᴄᴛ").decoration(TextDecoration.ITALIC,false));
