@@ -226,7 +226,8 @@ public final class InfuseMechanics implements Listener {
 
     @EventHandler public void onQuit(PlayerQuitEvent e) {
         Player p=e.getPlayer();UUID id=p.getUniqueId();
-        cooldowns.remove(id);activeUntil.remove(id);hitCounts.remove(id);effectHitCounts.remove(id);recentDamage.remove(id);enderCurses.remove(id);
+        // Keep timestamp-based spark windows and cooldowns while the player is offline; otherwise relogging bypasses them.
+        hitCounts.remove(id);effectHitCounts.remove(id);recentDamage.remove(id);
         hitsFrom.remove(id);for(Map<UUID,Integer> map:hitsFrom.values())map.remove(id);
         removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"speed_stack");
         removeAttributeModifier(p,Attribute.ATTACK_SPEED,"attack_speed_stack");
