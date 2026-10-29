@@ -4,6 +4,8 @@ import org.bukkit.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -33,6 +35,11 @@ public final class InfuseMechanics implements Listener {
     private final Map<UUID, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
     private final Map<UUID, Map<String, Long>> activeUntil = new ConcurrentHashMap<>();
     private final Map<UUID, Map<String, Integer>> hitCounts = new ConcurrentHashMap<>();
+    private final Map<UUID,Map<UUID,Integer>> hitsFrom = new ConcurrentHashMap<>();
+    private final Map<UUID,Double> recentDamage = new ConcurrentHashMap<>();
+    private final Map<UUID,Integer> enderCurses = new ConcurrentHashMap<>();
+    private final Map<UUID,Double> speedStacks = new ConcurrentHashMap<>();
+    private final Map<UUID,Double> attackStacks = new ConcurrentHashMap<>();
     private final Map<UUID, Double> maxHealthBeforeHeart = new ConcurrentHashMap<>();
 
     public InfuseMechanics(InfuseSMP plugin) { this.plugin = plugin; }
@@ -358,7 +365,7 @@ public final class InfuseMechanics implements Listener {
             double fall=attacker.getFallDistance();Vector velocity=attacker.getVelocity();
             attacker.setVelocity(new Vector(velocity.getX(),plugin.getConfig().getDouble("effects.feather.wind_burst_power",1.5),velocity.getZ()));
             event.setDamage(event.getDamage()+fall*plugin.getConfig().getDouble("effects.feather.wind_burst_damage_multiplier",0.5));
-            attacker.getWorld().spawnParticle(Particle.GUST_EMITTER,target.getLocation().add(0,1,0),1);
+            attacker.getWorld().spawnParticle(Particle.CLOUD,target.getLocation().add(0,1,0),1);
         }
         if(hasEffect(attacker,"fire")){
             if(isActive(attackerId,"fire")){
@@ -439,6 +446,18 @@ public final class InfuseMechanics implements Listener {
         NamespacedKey namespaced=new NamespacedKey(plugin,key);
         for(AttributeModifier modifier:new ArrayList<>(instance.getModifiers()))if(modifier.getKey().equals(namespaced))instance.removeModifier(modifier);
         if(Math.abs(amount)>0.0001)instance.addModifier(new AttributeModifier(namespaced,amount,AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+    }
+    private void lightningChain(Player owner,LivingEntity victim,double damage,int remaining,double radius,Set<UUID> visited){
+        if(!victim.isValid()||victim.isDead()||visited.contains(victim.getUniqueId()))return;
+        visited.add(victim.getUniqueId());
+        victim.getWorld().strikeLightningEffect(victim.getLocation());trueDamage(owner,victim,damage);
+        victim.getWorld().playSound(victim.getLocation(),Sound.ENTITY_LIGHTNING_BOLT_THUNDER,1f,1f);
+        if(remaining<=0)return;
+        LivingEntity next=victim.getNearbyEntities(radius,radius,radius).stream()
+            .filter(e->e instanceof LivingEntity&&e!=owner&&e!=victim&&e.isValid()&&!visited.contains(e.getUniqueId()))
+            .map(e->(LivingEntity)e).filter(e->isTargetAllowed(owner,e))
+            .min(Comparator.comparingDouble(e->e.getLocation().distanceSquared(victim.getLocation()))).orElse(null);
+        if(next!=null)Bukkit.getScheduler().runTaskLater(plugin,()->lightningChain(owner,next,damage,remaining-1,radius,visited),2L);
     }
     private void trueDamage(Player owner,LivingEntity victim,double amount){
         if(!victim.isValid()||victim.isDead()||victim.getNoDamageTicks()>0||amount<=0)return;
