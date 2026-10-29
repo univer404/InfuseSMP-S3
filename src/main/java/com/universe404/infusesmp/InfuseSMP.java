@@ -38,6 +38,7 @@ public final class InfuseSMP extends JavaPlugin {
         saveDefaultConfig();
         saveResource("messages.yml", false);
         saveResource("gui.yml", false);
+        saveResource("recipes.yml", false);
         playersFile = new File(getDataFolder(), "players.yml");
         players = YamlConfiguration.loadConfiguration(playersFile);
         messages = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
