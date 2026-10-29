@@ -195,19 +195,38 @@ public final class InfuseSMP extends JavaPlugin {
     }
 
     private boolean trust(CommandSender sender,String[] args) {
-        if(playerOnly(sender))return true;Player p=(Player)sender;Set<UUID> set=trusted.computeIfAbsent(p.getUniqueId(),k->ConcurrentHashMap.newKeySet());
+        if(playerOnly(sender))return true;
+        Player p=(Player)sender;UUID owner=p.getUniqueId();
+        Set<UUID> set=trusted.computeIfAbsent(owner,k->ConcurrentHashMap.newKeySet());
         if(args.length==0)return usage(sender,"/trust <add|remove|list|clear> [player]");
-        switch(args[0].toLowerCase(Locale.ROOT)){
-            case "list" -> set.forEach(id->tellRaw(sender,"<gray>"+Optional.ofNullable(Bukkit.getOfflinePlayer(id).getName()).orElse(id.toString())));
-            case "clear" -> set.clear();
-            case "add","remove" -> {
-                if(args.length<2)return usage(sender,"/trust "+args[0]+" <player>");
-                UUID id=Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                if(args[0].equalsIgnoreCase("add")){if(set.size()>=getConfig().getInt("trust_list_max",10)){tellRaw(sender,"<red>ᴛʀᴜsᴛ ʟɪsᴛ ɪs ғᴜʟʟ.");return true;}set.add(id);}else set.remove(id);
-            }
-            default -> {return usage(sender,"/trust <add|remove|list|clear> [player]");}
+        String action=args[0].toLowerCase(Locale.ROOT);
+        if(action.equals("list")){
+            if(set.isEmpty()){tellRaw(sender,"<gray>ʏᴏᴜʀ ᴛʀᴜsᴛ ʟɪsᴛ ɪs ᴇᴍᴘᴛʏ.");return true;}
+            tellRaw(sender,"<yellow>ᴛʀᴜsᴛ ʟɪsᴛ <dark_gray>("+set.size()+"/"+getConfig().getInt("trust_list_max",3)+")");
+            int i=0;for(UUID id:set){i++;tellRaw(sender,"<yellow>"+i+". <white>"+Optional.ofNullable(Bukkit.getOfflinePlayer(id).getName()).orElse(id.toString())+" <dark_gray>("+id+")");}
+            return true;
         }
-        saveState();return true;
+        if(!Set.of("add","remove","clear").contains(action))return usage(sender,"/trust <add|remove|list|clear> [player]");
+        UUID targetId=null;
+        if(!action.equals("clear")){
+            if(args.length<2)return usage(sender,"/trust "+action+" <player>");
+            targetId=Bukkit.getOfflinePlayer(args[1]).getUniqueId();
+        }
+        if(action.equals("add")){
+            if(set.contains(targetId)){tellRaw(sender,"<gray>ᴛʜᴀᴛ ᴘʟᴀʏᴇʀ ɪs ᴀʟʀᴇᴀᴅʏ ᴛʀᴜsᴛᴇᴅ.");return true;}
+            if(set.size()>=getConfig().getInt("trust_list_max",3)&&!sender.hasPermission("trust.bypass_limit")){tellRaw(sender,"<red>ʏᴏᴜ ʜᴀᴠᴇ ʀᴇᴀᴄʜᴇᴅ ʏᴏᴜʀ ᴛʀᴜsᴛ ʟɪsᴛ ʟɪᴍɪᴛ.");return true;}
+        }
+        if(action.equals("remove")&&!set.contains(targetId)){tellRaw(sender,"<gray>ᴛʜᴀᴛ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴛʀᴜsᴛᴇᴅ.");return true;}
+        tellRaw(sender,"<yellow>ᴀᴄᴛɪᴏɴ ᴘᴇɴᴅɪɴɢ...");
+        long delay=Math.max(0,getConfig().getLong("trust_list_delay_seconds",10))*20L;
+        UUID finalTargetId=targetId;
+        Bukkit.getScheduler().runTaskLater(this,()->{
+            if(action.equals("clear")){set.clear();tellRaw(p,"<gray>ᴛʀᴜsᴛ ʟɪsᴛ ᴄʟᴇᴀʀᴇᴅ.");}
+            else if(action.equals("add")){set.add(finalTargetId);tellRaw(p,"<gray>ᴀᴅᴅᴇᴅ <white>"+Optional.ofNullable(Bukkit.getOfflinePlayer(finalTargetId).getName()).orElse(args[1])+" <gray>ᴛᴏ ʏᴏᴜʀ ᴛʀᴜsᴛ ʟɪsᴛ.");}
+            else {set.remove(finalTargetId);tellRaw(p,"<gray>ʀᴇᴍᴏᴠᴇᴅ <white>"+Optional.ofNullable(Bukkit.getOfflinePlayer(finalTargetId).getName()).orElse(args[1])+" <gray>ғʀᴏᴍ ʏᴏᴜʀ ᴛʀᴜsᴛ ʟɪsᴛ.");}
+            saveState();
+        },delay);
+        return true;
     }
     public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }
     public String getBind(UUID id,String slot){return binds.getOrDefault(id,Map.of()).getOrDefault(slot,"none");}
