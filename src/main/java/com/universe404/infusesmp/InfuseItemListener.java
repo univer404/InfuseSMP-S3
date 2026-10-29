@@ -16,7 +16,8 @@ public final class InfuseItemListener implements Listener {
     private final InfuseItems items;
     public InfuseItemListener(InfuseSMP plugin,InfuseItems items){this.plugin=plugin;this.items=items;}
     private boolean hasEffect(Player p,String effect){
-        for(String slot:List.of("primary","secondary")){String value=plugin.getEquippedEffect(p.getUniqueId(),slot);if(value!=null&&value.replace("_augmented","").equals(effect)&&plugin.getConfig().getBoolean("effects."+effect+".enabled",true))return true;}
+        if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation()) || !plugin.getConfig().getBoolean("effects."+effect+".enabled",true)) return false;
+        for(String slot:List.of("primary","secondary")){String value=plugin.getEquippedEffect(p.getUniqueId(),slot);if(value!=null&&value.replace("_augmented","").equals(effect))return true;}
         return false;
     }
     private boolean isFilteredConsumable(Material m){
