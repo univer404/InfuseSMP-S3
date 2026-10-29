@@ -1,0 +1,40 @@
+name: InfuseSMP-S3
+version: 1.0.0
+main: com.universe404.infusesmp.InfuseSMP
+api-version: '1.21.11'
+authors: [univer404]
+description: Java conversion of the Infuse S3 Skript.
+commands:
+  infuse:
+    description: Manage Infuse effects.
+    usage: /infuse <add|remove|get|history>
+    permission: infuse.command
+  bind:
+    description: Bind an Infuse slot activation.
+    aliases: [controls, controlset, control]
+  toggledisplay:
+    description: Toggle Infuse item display style.
+    aliases: [display, toggleicon, simpleicon]
+  activate:
+    description: Activate an Infuse slot.
+    aliases: [u, use, a]
+  swap:
+    description: Swap primary and secondary effects.
+    aliases: [swapeff, swapeffects, swapslots]
+  trust:
+    description: Manage trusted players.
+  ldrain:
+    description: Drain the primary effect.
+  pdrain:
+    description: Drain the primary effect.
+  rdrain:
+    description: Drain the secondary effect.
+  sdrain:
+    description: Drain the secondary effect.
+  conf:
+    description: Read or change supported configuration.
+permissions:
+  infuse.command:
+    default: true
+  infuse.admin:
+    default: op

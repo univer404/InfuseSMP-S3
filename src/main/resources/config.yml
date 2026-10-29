@@ -1,0 +1,23 @@
+# InfuseSMP-S3 configuration
+allow_same_effects: false
+max_augments_per_effect: 3
+trust_list_max: 10
+trust_action_cooldown_seconds: 10
+heartbeat_period_ticks: 1
+recipes_gui_enabled: true
+brewing_stand_enabled: false
+broadcast_craft_coordinates: true
+ritual_duration_seconds: 600
+effects:
+  fire:
+    enabled: true
+    cooldown_seconds: 10
+    trigger_hits: 5
+  frost:
+    enabled: true
+    cooldown_seconds: 10
+    trigger_hits: 5
+  speed:
+    enabled: true
+    cooldown_seconds: 10
+    trigger_hits: 5
