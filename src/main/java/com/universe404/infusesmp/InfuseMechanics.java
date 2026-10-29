@@ -591,9 +591,13 @@ public final class InfuseMechanics implements Listener {
             if(hasEffect(attacker,"ender")&&enderCurses.getOrDefault(victim.getUniqueId(),0)>0){
                 double reflected=Math.max(0,event.getDamage());
                 final Player attackingPlayer=attacker;
-                for(Player cursed:Bukkit.getOnlinePlayers())if(!cursed.equals(victim)&&enderCurses.getOrDefault(cursed.getUniqueId(),0)>0&&!plugin.isTrusted(attackerId,cursed.getUniqueId())){
-                    cursed.setMetadata("infuse-isolate-hit",new org.bukkit.metadata.FixedMetadataValue(plugin,true));
-                    Bukkit.getScheduler().runTask(plugin,()->{if(cursed.isOnline()&&cursed.isValid()){cursed.damage(reflected,attackingPlayer);cursed.removeMetadata("infuse-isolate-hit",plugin);}});
+                for(Player cursed:Bukkit.getOnlinePlayers())if(!cursed.equals(victim)&&enderCurses.getOrDefault(cursed.getUniqueId(),0)>0){
+                    Bukkit.getScheduler().runTask(plugin,()->{
+                        if(!attackingPlayer.isOnline()||!cursed.isOnline()||!cursed.isValid())return;
+                        attackingPlayer.setMetadata("infuse-isolate-hit",new org.bukkit.metadata.FixedMetadataValue(plugin,true));
+                        try { cursed.damage(reflected,attackingPlayer); }
+                        finally { attackingPlayer.removeMetadata("infuse-isolate-hit",plugin); }
+                    });
                 }
             }
         }
