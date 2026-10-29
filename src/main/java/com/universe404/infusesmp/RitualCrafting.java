@@ -54,7 +54,7 @@ public final class RitualCrafting implements Listener {
     }
     @EventHandler(ignoreCancelled=true)
     public void onBrewingStand(PlayerInteractEvent e){
-        if(e.getAction()!=Action.RIGHT_CLICK_BLOCK||e.getClickedBlock()==null||e.getClickedBlock().getType()!=Material.BREWING_STAND||!e.getPlayer().isSneaking())return;
+        if(!gui.getBoolean("ritual.enabled",true)||e.getAction()!=Action.RIGHT_CLICK_BLOCK||e.getClickedBlock()==null||e.getClickedBlock().getType()!=Material.BREWING_STAND||!e.getPlayer().isSneaking())return;
         e.setCancelled(true);ritualBlocks.put(e.getPlayer().getUniqueId(),e.getClickedBlock().getLocation());open(e.getPlayer());
     }
     private int[] ingredientSlots(){

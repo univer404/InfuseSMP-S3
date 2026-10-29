@@ -63,7 +63,7 @@ public final class InfuseSMP extends JavaPlugin {
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         String cmd=command.getName().toLowerCase(Locale.ROOT);
         if(cmd.equals("infuse"))return infuse(sender,args);
-        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; recipesMenu.openMain((Player)sender); return true; }
+        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; if(!recipesMenu.isEnabled()){tellRaw(sender,"<red>ʀᴇᴄɪᴘᴇ ɢᴜɪ ɪs ᴅɪsᴀʙʟᴇᴅ.");return true;} recipesMenu.openMain((Player)sender); return true; }
         if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){p.getInventory().addItem(infuseItems.create(e,false,false));if(!e.equals("ender"))p.getInventory().addItem(infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}p.getInventory().addItem(result);}return true; }
         if(cmd.equals("swap")) {
             if(playerOnly(sender))return true; UUID id=((Player)sender).getUniqueId(); Map<String,String> m=slots(id);

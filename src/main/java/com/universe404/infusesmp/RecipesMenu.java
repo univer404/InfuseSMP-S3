@@ -41,6 +41,7 @@ public final class RecipesMenu implements Listener {
     }
     private static void put(String e,String... mats){ RECIPES.put(e,Arrays.stream(mats).map(Material::matchMaterial).filter(Objects::nonNull).toList()); }
     public RecipesMenu(JavaPlugin plugin,InfuseItems items){this.plugin=plugin;this.items=items;this.menuKey=new NamespacedKey(plugin,"recipes_menu");this.gui=YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(),"gui.yml"));}
+    public boolean isEnabled(){return gui.getBoolean("recipes.enabled",true);}
     public void openMain(Player p){
         int rows=Math.max(1,Math.min(6,gui.getInt("recipes.rows",5)));
         Inventory inv=Bukkit.createInventory(p,rows*9,mm.deserialize(gui.getString("recipes.title","<gradient:#A2C81C:#21CD76>ʀᴇᴄɪᴘᴇs")).decoration(TextDecoration.ITALIC,false));
