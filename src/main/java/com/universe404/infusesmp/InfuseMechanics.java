@@ -26,7 +26,7 @@ public final class InfuseMechanics implements Listener {
     public InfuseMechanics(InfuseSMP plugin) { this.plugin = plugin; }
 
     public boolean isActive(UUID id,String effect){return activeUntil.getOrDefault(id,Map.of()).getOrDefault(effect,0L)>System.currentTimeMillis();}\n\n    public void startSpark(Player p, String slot) {
-        if (plugin.isDisabled(p.getUniqueId())) { plugin.tellKey(p, "disabled"); return; }
+        if (plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())) { plugin.tellKey(p, "disabled"); return; }
         String effect = plugin.getEquippedEffect(p.getUniqueId(), slot);
         if (effect == null) { plugin.tellKey(p, "effects-empty"); return; }
         effect = effect.replace("_augmented", "");
@@ -111,7 +111,7 @@ public final class InfuseMechanics implements Listener {
     public void tick() {
         long now=System.currentTimeMillis();
         for(Player p:Bukkit.getOnlinePlayers()) {
-            if(plugin.isDisabled(p.getUniqueId())) continue;
+            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())) continue;
             applyPassives(p);
             Map<String,Long> active=activeUntil.get(p.getUniqueId());
             if(active!=null) active.entrySet().removeIf(en -> en.getValue()<=now);

@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Player;\nimport org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
@@ -162,7 +162,7 @@ public final class InfuseSMP extends JavaPlugin {
         }catch(IllegalArgumentException ignored){getLogger().warning("Ignoring invalid UUID in players.yml: "+key);}
     }
     private void saveState() {
-        if(players==null)return;Set<UUID> ids=new HashSet<>(effects.keySet());ids.addAll(trusted.keySet());ids.addAll(binds.keySet());ids.addAll(simpleDisplay);ids.addAll(history.keySet());
+        if(players==null)return;Set<UUID> ids=new HashSet<>(effects.keySet());ids.addAll(trusted.keySet());ids.addAll(binds.keySet());ids.addAll(simpleDisplay);ids.addAll(history.keySet());ids.addAll(disabled);
         for(UUID id:ids){String k=id.toString();for(String sl:List.of("primary","secondary"))players.set(k+".effects."+sl,effects.getOrDefault(id,Map.of()).get(sl));
             players.set(k+".trusted",trusted.getOrDefault(id,Set.of()).stream().map(UUID::toString).toList());
             for(var e:binds.getOrDefault(id,Map.of()).entrySet())players.set(k+".binds."+e.getKey(),e.getValue());
