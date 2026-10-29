@@ -96,7 +96,7 @@ public final class RitualCrafting implements Listener {
         if(e.getRawSlots().stream().anyMatch(s->s<e.getView().getTopInventory().getSize()&&!Arrays.stream(ingredientSlots()).anyMatch(v->v==s)))e.setCancelled(true);
     }
     private void clamp(Inventory inv,Player p){
-        for(int slot:ingredientSlots()){ItemStack i=inv.getItem(slot);if(i!=null&&i.getAmount()>1){ItemStack extra=i.clone();extra.setAmount(i.getAmount()-1);i.setAmount(1);inv.setItem(slot,i);p.getInventory().addItem(extra);}}
+        for(int slot:ingredientSlots()){ItemStack i=inv.getItem(slot);if(i!=null&&i.getAmount()>1){ItemStack extra=i.clone();extra.setAmount(i.getAmount()-1);i.setAmount(1);inv.setItem(slot,i);plugin.giveOrDrop(p,extra);}}
     }
     private void craft(Player p,Inventory inv){
         String effect=match(inv);
@@ -157,7 +157,7 @@ public final class RitualCrafting implements Listener {
     @EventHandler public void close(InventoryCloseEvent e){
         if(!(e.getPlayer() instanceof Player p)||!p.hasMetadata("infuse-ritual-gui"))return;
         Inventory inv=e.getInventory();
-        for(int s:ingredientSlots()){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)p.getInventory().addItem(item);}
+        for(int s:ingredientSlots()){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)plugin.giveOrDrop(p,item);}
         p.removeMetadata("infuse-ritual-gui",plugin);
     }
     public boolean resetCraft(String effect){
