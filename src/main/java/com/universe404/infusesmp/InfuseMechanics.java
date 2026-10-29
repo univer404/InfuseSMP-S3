@@ -240,7 +240,12 @@ public final class InfuseMechanics implements Listener {
     public void tick() {
         long now=System.currentTimeMillis();
         for(Player p:Bukkit.getOnlinePlayers()) {
-            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) {p.sendActionBar(Component.empty());continue;}
+            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) {
+                p.sendActionBar(Component.empty());
+                if(p.getMaxHealth()!=20){p.setMaxHealth(20);if(p.getHealth()>20)p.setHealth(20);}
+                continue;
+            }
+            applyHeartHealth(p);
             applyPassives(p);
             applyToolPassives(p);
             updateDisplay(p);
@@ -254,6 +259,12 @@ public final class InfuseMechanics implements Listener {
                 }
             }
         }
+    }
+    private void applyHeartHealth(Player p){
+        double maximum=20;
+        if(hasEffect(p,"heart"))maximum=isActive(p.getUniqueId(),"heart")?plugin.getConfig().getDouble("effects.heart.spark_hearts",20):plugin.getConfig().getDouble("effects.heart.passive_hearts",15);
+        maximum=Math.max(1,maximum);
+        if(Math.abs(p.getMaxHealth()-maximum)>0.01){p.setMaxHealth(maximum);if(p.getHealth()>maximum)p.setHealth(maximum);}
     }
     private void applyToolPassives(Player p){
         boolean haste=hasEffect(p,"haste"),emerald=hasEffect(p,"emerald");
