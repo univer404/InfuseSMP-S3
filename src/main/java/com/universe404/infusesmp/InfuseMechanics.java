@@ -283,6 +283,7 @@ public final class InfuseMechanics implements Listener {
         }
     }
     private boolean hasEffect(Player p,String effect){
+        if(plugin.isDisabled(p.getUniqueId())||plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())||plugin.isInDisabledRegion(p.getLocation()))return false;
         for(String slot:List.of("primary","secondary")){
             String value=plugin.getEquippedEffect(p.getUniqueId(),slot);
             if(value!=null&&value.replace("_augmented","").equals(effect)
