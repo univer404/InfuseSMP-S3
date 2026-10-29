@@ -180,7 +180,7 @@ public final class InfuseItems {
         int augmentedOffset=100;
         meta.setCustomModelData(modelBase+IDS.get(effect)-1+(augmented?augmentedOffset:0));
         String display=NAMES.get(effect);
-        meta.displayName(mm.deserialize(color+display+" ᴇғғᴇᴄᴛ").decoration(TextDecoration.ITALIC,false));
+        meta.displayName(mm.deserialize("<"+color+">"+display+" ᴇғғᴇᴄᴛ").decoration(TextDecoration.ITALIC,false));
         List<net.kyori.adventure.text.Component> lore=new ArrayList<>();
         lore.add(mm.deserialize("<dark_gray>ɪɴғᴜsᴇ s3").decoration(TextDecoration.ITALIC,false));
         for(String line:LORE.getOrDefault(effect,List.of()))lore.add(mm.deserialize(line).decoration(TextDecoration.ITALIC,false));
