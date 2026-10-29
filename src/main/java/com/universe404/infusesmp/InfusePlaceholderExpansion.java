@@ -69,4 +69,5 @@ public final class InfusePlaceholderExpansion extends PlaceholderExpansion {
             default -> "";
         };
         return abbreviation.isEmpty() ? "" : abbreviation + (augmented(value) ? "+" : "");
-    }}
+    }
+}
