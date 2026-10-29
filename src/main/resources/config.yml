@@ -86,15 +86,15 @@ items:
     ender:
       - "<green>sᴘᴀʀᴋ: <gray>ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ"
 effects:
-  emerald: {enabled: true, cooldown_seconds: 30, spark_seconds: 10, trigger_hits: 10, spark_xp_gain: 2, craft_limit: -1, augment_limit: 0}
+  emerald: {enabled: true, cooldown_seconds: 30, spark_seconds: 10, trigger_hits: 10, xp_gain: 1, spark_xp_gain: 2, no_consume_chance: 0.5, spark_no_consume_chance: 0.75, craft_limit: -1, augment_limit: 0}
   feather: {enabled: true, cooldown_seconds: 40, spark_seconds: 5, craft_limit: -1, augment_limit: 0}
   fire: {enabled: true, cooldown_seconds: 90, spark_seconds: 4, trigger_hits: 5, ignite_radius: 6, ignite_duration_ticks: 200, craft_limit: -1, augment_limit: 0}
   frost: {enabled: true, cooldown_seconds: 60, spark_seconds: 10, trigger_hits: 10, mining_fatigue_ticks: 200, craft_limit: -1, augment_limit: 0}
   haste: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, craft_limit: -1, augment_limit: 0}
-  heart: {enabled: true, cooldown_seconds: 120, spark_seconds: 60, passive_hearts: 15, spark_hearts: 20, craft_limit: -1, augment_limit: 0}
+  heart: {enabled: true, cooldown_seconds: 120, spark_seconds: 60, passive_hearts: 15, spark_hearts: 20, food_item_absorption_tier: 1, egap_absorption_tier: 5, food_item_duration_seconds: 60, egap_item_duration_seconds: 60, craft_limit: -1, augment_limit: 0}
   invisibility: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, craft_limit: -1, augment_limit: 0}
   ocean: {enabled: true, cooldown_seconds: 90, spark_seconds: 5, pull_radius: 6, pull_strength: 0.1, craft_limit: -1, augment_limit: 0}
-  regeneration: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, craft_limit: -1, augment_limit: 0}
+  regeneration: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, food: 3, saturation: 0, craft_limit: -1, augment_limit: 0}
   speed: {enabled: true, cooldown_seconds: 20, spark_seconds: 1, multiplier: 0.2, craft_limit: -1, augment_limit: 0}
   strength: {enabled: true, cooldown_seconds: 60, spark_seconds: 15, mob_damage: 2, craft_limit: -1, augment_limit: 0}
   thunder: {enabled: true, cooldown_seconds: 90, spark_seconds: 10, trigger_hits: 10, true_damage: 1, craft_limit: -1, augment_limit: 0}

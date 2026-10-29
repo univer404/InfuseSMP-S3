@@ -13,6 +13,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -304,6 +306,16 @@ public final class InfuseMechanics implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled=true) public void onExperience(PlayerExpChangeEvent event){
+        Player p=event.getPlayer();
+        if(!hasEffect(p,"emerald"))return;
+        double bonus=plugin.getConfig().getDouble("effects.emerald.xp_gain",1.0);
+        if(isActive(p.getUniqueId(),"emerald"))bonus+=plugin.getConfig().getDouble("effects.emerald.spark_xp_gain",2.0);
+        event.setAmount(Math.max(0,(int)Math.round(event.getAmount()*(1+bonus))));
+    }
+    @EventHandler(ignoreCancelled=true) public void onFood(FoodLevelChangeEvent event){
+        if(event.getEntity() instanceof Player p&&hasEffect(p,"regeneration"))event.setFoodLevel(10);
+    }
     @EventHandler(ignoreCancelled=true) public void onFall(EntityDamageEvent event){
         if(event.getEntity() instanceof Player p && event.getCause()==EntityDamageEvent.DamageCause.FALL
           && !plugin.isDisabled(p.getUniqueId())
