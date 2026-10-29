@@ -73,7 +73,6 @@ public final class RecipesMenu implements Listener {
     private void openTagged(Player p,Inventory inv,String state){
         // state is stored in the inventory holder via a custom holder
         p.openInventory(inv);
-        p.getOpenInventory().getTopInventory().setItem(44, inv.getItem(44));
         p.setMetadata("infuse-recipes-state",new org.bukkit.metadata.FixedMetadataValue(plugin,state));
     }
     private Material material(String path,Material fallback){Material m=Material.matchMaterial(gui.getString(path,""));return m==null?fallback:m;}
