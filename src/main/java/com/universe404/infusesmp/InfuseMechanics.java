@@ -487,7 +487,7 @@ public final class InfuseMechanics implements Listener {
             @Override public void run(){if(!p.isOnline()||age++>200){cancel();return;}
                 if(age>8&&p.getVelocity().getY()<0&&p.getFallDistance()>=plugin.getConfig().getDouble("effects.feather.fall_trigger_threshold",10)){
                     double fall=p.getFallDistance();double radius=Math.max(plugin.getConfig().getDouble("effects.feather.min_shockwave_radius",3),Math.min(plugin.getConfig().getDouble("effects.feather.max_shockwave_radius",8),fall/4));
-                    p.getWorld().spawnParticle(Particle.GUST_EMITTER,p.getLocation(),1);p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),100,radius/2,.2,radius/2,.2);
+                    p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),1);p.getWorld().spawnParticle(Particle.CLOUD,p.getLocation(),100,radius/2,.2,radius/2,.2);
                     for(Entity ent:p.getNearbyEntities(radius,radius,radius))if(ent instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target)){trueDamage(p,target,plugin.getConfig().getDouble("effects.feather.shockwave_true_damage",2));target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,plugin.getConfig().getInt("effects.feather.slow_falling_ticks",100),0,true,false,true));}
                     p.setFallDistance(0);p.setVelocity(p.getVelocity().setY(Math.max(.6,fall/plugin.getConfig().getDouble("effects.feather.bounce_coefficient",8))));cancel();
                 }
