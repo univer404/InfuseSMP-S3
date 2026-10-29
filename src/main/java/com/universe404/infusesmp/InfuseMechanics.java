@@ -93,56 +93,148 @@ public final class InfuseMechanics implements Listener {
                 p.setHealth(Math.min(p.getMaxHealth(),p.getHealth()+Math.max(0,heal)));
                 p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,ticks,4,true,false,true));
             }
-            case "fire" -> {
-                p.setFireTicks(0);
-                for(Entity ent:p.getNearbyEntities(6,6,6)) if(ent instanceof LivingEntity target && target!=p && isTargetAllowed(p,target)) {
-                    target.setFireTicks(200);
-                    target.setVelocity(target.getVelocity().add(new Vector(0,.65,0)));
-                }
-                p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,ticks,0,true,false,true));
-            }
-            case "frost" -> {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,ticks,1,true,false,true));
-                for(Entity ent:p.getNearbyEntities(6,4,6)) if(ent instanceof LivingEntity target && target!=p && isTargetAllowed(p,target)) {
-                    target.setFreezeTicks(Math.min(target.getMaxFreezeTicks(), 140));
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,100,2,true,false,true));
-                }
-                p.getWorld().spawnParticle(Particle.SNOWFLAKE,p.getLocation().add(0,1,0),80,3,1,3,.03);
-            }
+            case "fire" -> startFireSpark(p,seconds);
+            case "frost" -> p.getWorld().spawnParticle(Particle.SNOWFLAKE,p.getLocation().add(0,1,0),80,3,1,3,.03);
             case "speed" -> startSpeedDash(p);
-            case "haste" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE,ticks,2,true,false,true));
-            case "invisibility" -> p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,ticks,0,true,false,true));
-            case "ocean" -> {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,ticks,0,true,false,true));
-                p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,ticks,1,true,false,true));
-                startOceanPull(p,0);
+            case "haste" -> {
+                addAttributeModifier(p,Attribute.ATTACK_SPEED,"haste_spark",plugin.getConfig().getDouble("effects.haste.spark_atkspd_increase",0.5));
+                addAttributeModifier(p,Attribute.BLOCK_BREAK_SPEED,"haste_spark_break",1024.0);
             }
-            case "regeneration" -> p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,ticks,2,true,false,true));
-            case "strength" -> p.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH,ticks,1,true,false,true));
-            case "feather" -> startFeatherSpark(p);
+            case "invisibility" -> startInvisibilitySpark(p);
+            case "ocean" -> startOceanPull(p,0);
+            case "regeneration" -> startRegenerationSpark(p);
+            case "strength" -> p.getWorld().spawnParticle(Particle.CRIT,p.getLocation().add(0,1,0),18,.5,.6,.5,.15);
             case "thunder" -> startThunderSpark(p);
-            case "emerald" -> { p.giveExp((int)plugin.getConfig().getLong("effects.emerald.spark_xp_gain",2)); p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,ticks,2,true,false,true)); }
+            case "emerald" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,ticks,4,true,false,true));
             case "ender" -> {
-                int radius=plugin.getConfig().getInt("effects.ender.teleport_max_radius",12);
+                int radius=plugin.getConfig().getInt("effects.ender.teleport_max_radius",15);
                 Block targetBlock=p.getTargetBlockExact(radius);
-                if(targetBlock!=null){
-                    Location destination=targetBlock.getLocation().add(0.5,1,0.5);
+                Location destination;
+                if(targetBlock!=null) {
+                    destination=targetBlock.getLocation().add(0.5,1,0.5);
                     destination.setDirection(p.getLocation().getDirection());
-                    if(destination.getBlock().isPassable()&&destination.clone().add(0,1,0).getBlock().isPassable())p.teleport(destination);
-                }else{
+                } else {
                     Vector direction=p.getLocation().getDirection().normalize();
-                    Location destination=p.getLocation().add(direction.multiply(radius)).add(0,0.5,0);
-                    if(destination.getBlock().isPassable())p.teleport(destination);
+                    destination=p.getLocation().clone().add(direction.multiply(radius)).add(0,0.5,0);
                 }
-                for(Entity entity:p.getNearbyEntities(2,2,2)){
-                    if(entity instanceof Player victim&&!victim.equals(p)&&!plugin.isTrusted(p.getUniqueId(),victim.getUniqueId())){
-                        enderCurses.merge(victim.getUniqueId(),1,Integer::sum);
-                        Bukkit.getScheduler().runTaskLater(plugin,()->enderCurses.computeIfPresent(victim.getUniqueId(),(id,count)->count<=1?null:count-1),Math.max(1,plugin.getConfig().getLong("effects.ender.curse_duration_seconds",30))*20L);
-                    }else if(entity instanceof LivingEntity mob&&!(mob instanceof Player)&&mob.getType()!=EntityType.ENDER_DRAGON&&mob.getType()!=EntityType.WITHER&&mob.getType()!=EntityType.WARDEN)mob.setHealth(0);
+                if(destination.getBlock().isPassable()&&destination.clone().add(0,1,0).getBlock().isPassable()) {
+                    p.getWorld().spawnParticle(Particle.END_ROD,p.getLocation().add(0,1,0),20,.5,.7,.5,.05);
+                    p.teleport(destination);
+                    p.getWorld().spawnParticle(Particle.DUST,p.getLocation().add(0,1,0),30,.5,1,.5,.5,new Particle.DustOptions(Color.fromRGB(138,51,162),3f));
+                    for(Entity entity:p.getNearbyEntities(2,2,2)) {
+                        if(entity instanceof Player victim&&!victim.equals(p)&&!plugin.isTrusted(p.getUniqueId(),victim.getUniqueId())) {
+                            addEnderCurse(victim);
+                            Map<String,Long> cd=cooldowns.get(p.getUniqueId());
+                            if(cd!=null&&cd.remove("ender")!=null)p.playSound(p.getLocation(),plugin.getConfig().getString("recharge_sound","custom.health"),1f,1f);
+                        } else if(entity instanceof LivingEntity mob&&!(mob instanceof Player)&&mob.getType()!=EntityType.ENDER_DRAGON&&mob.getType()!=EntityType.WITHER&&mob.getType()!=EntityType.WARDEN) mob.setHealth(0);
+                    }
                 }
             }
-            case "earth" -> { p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE,ticks,2,true,false,true)); p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,ticks,0,true,false,true)); }
+            case "earth" -> {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE,ticks,2,true,false,true));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,ticks,0,true,false,true));
+            }
         }
+    }
+
+    private void addAttributeModifier(Player player,Attribute attribute,String key,double amount) {
+        var instance=player.getAttribute(attribute);
+        if(instance==null)return;
+        NamespacedKey namespaced=new NamespacedKey(plugin,key);
+        for(AttributeModifier modifier:new ArrayList<>(instance.getModifiers()))if(modifier.getKey().equals(namespaced))instance.removeModifier(modifier);
+        if(Math.abs(amount)>0.0001)instance.addModifier(new AttributeModifier(namespaced,amount,AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+    }
+
+    private void addEnderCurse(Player victim) {
+        enderCurses.merge(victim.getUniqueId(),1,Integer::sum);
+        long curseTicks=Math.max(1,plugin.getConfig().getLong("effects.ender.curse_duration_seconds",15))*20L;
+        UUID id=victim.getUniqueId();
+        Bukkit.getScheduler().runTaskLater(plugin,()->enderCurses.computeIfPresent(id,(key,count)->count<=1?null:count-1),curseTicks);
+    }
+
+    private void startFireSpark(Player p,long seconds) {
+        double radius=plugin.getConfig().getDouble("effects.fire.ignite_radius",6);
+        for(Player target:p.getWorld().getPlayers()) {
+            if(target.equals(p)||target.getLocation().distanceSquared(p.getLocation())>radius*radius||!isTargetAllowed(p,target)||plugin.isInDisabledRegion(target.getLocation()))continue;
+            target.setFireTicks(Math.max(target.getFireTicks(),plugin.getConfig().getInt("effects.fire.ignite_duration_ticks",200)));
+            target.setVelocity(target.getVelocity().add(new Vector(0,plugin.getConfig().getDouble("effects.fire.launch_power",3),0)));
+        }
+        int iterations=Math.max(1,(int)(seconds*2));
+        new org.bukkit.scheduler.BukkitRunnable(){int iteration=0;
+            @Override public void run(){
+                if(!p.isOnline()||iteration++>=iterations){cancel();return;}
+                double burnRadius=plugin.getConfig().getDouble("effects.fire.burn_radius",6);
+                for(int x=(int)-burnRadius;x<=burnRadius;x++)for(int y=(int)-burnRadius;y<=burnRadius;y++)for(int z=(int)-burnRadius;z<=burnRadius;z++){
+                    if(x*x+y*y+z*z>burnRadius*burnRadius)continue;
+                    Block block=p.getLocation().getBlock().getRelative(x,y,z);
+                    if(plugin.isInDisabledRegion(block.getLocation()))continue;
+                    Material type=block.getType();
+                    if(type==Material.WATER||type==Material.COBWEB){block.setType(Material.AIR,false);p.getWorld().spawnParticle(Particle.CLOUD,block.getLocation().add(.5,.5,.5),2,.2,.2,.2,.01);}
+                    else if(type.isAir()&&ThreadLocalRandom.current().nextDouble()<0.02){block.setType(Material.FIRE,false);}
+                }
+                p.getWorld().playSound(p.getLocation(),Sound.BLOCK_LAVA_EXTINGUISH,.7f,1f);
+            }
+        }.runTaskTimer(plugin,1L,10L);
+    }
+
+    private void startRegenerationSpark(Player p) {
+        int iterations=Math.max(1,plugin.getConfig().getInt("effects.regeneration.spark_heal_iteration",15));
+        double total=recentDamage.getOrDefault(p.getUniqueId(),0.0)*plugin.getConfig().getDouble("effects.regeneration.spark_heal_percentage",0.2);
+        double healPerTick=total/iterations;
+        long interval=Math.max(1,plugin.getConfig().getLong("effects.regeneration.spark_heal_interval_ticks",20));
+        new org.bukkit.scheduler.BukkitRunnable(){int count=0;
+            @Override public void run(){
+                if(!p.isOnline()||count++>=iterations){cancel();return;}
+                healSafely(p,healPerTick);
+                p.getWorld().spawnParticle(Particle.DUST,p.getLocation().add(0,1,0),3,.3,.4,.3,.2,new Particle.DustOptions(Color.fromRGB(252,0,221),3f));
+                double radius=plugin.getConfig().getDouble("effects.regeneration.spark_heal_radius",8);
+                for(Player teammate:p.getWorld().getPlayers())if(!teammate.equals(p)&&teammate.getLocation().distanceSquared(p.getLocation())<=radius*radius&&plugin.isTrusted(p.getUniqueId(),teammate.getUniqueId())&&!plugin.isInDisabledRegion(teammate.getLocation()))healSafely(teammate,healPerTick);
+            }
+        }.runTaskTimer(plugin,0L,interval);
+    }
+
+    private void healSafely(LivingEntity entity,double amount) {
+        if(entity.isDead()||!entity.isValid()||amount<=0)return;
+        double max=entity instanceof Player player?player.getMaxHealth():entity.getAttribute(Attribute.MAX_HEALTH).getValue();
+        entity.setHealth(Math.min(max,entity.getHealth()+amount));
+    }
+
+    private void startInvisibilitySpark(Player p) {
+        UUID owner=p.getUniqueId();
+        Set<UUID> hidden=new HashSet<>();
+        for(Player viewer:Bukkit.getOnlinePlayers())if(!viewer.equals(p))viewer.hidePlayer(plugin,p);
+        int iterations=Math.max(1,plugin.getConfig().getInt("effects.invisibility.invis_iteration",50));
+        long interval=Math.max(1,plugin.getConfig().getLong("effects.invisibility.invis_interval_ticks",4));
+        new org.bukkit.scheduler.BukkitRunnable(){int iteration=0;
+            @Override public void run(){
+                if(!p.isOnline()||iteration++>=iterations){cleanupInvisibility(p,hidden);cancel();return;}
+                double maxRadius=plugin.getConfig().getDouble("effects.invisibility.max_spark_radius",12);
+                int teammates=0;
+                for(Player other:p.getWorld().getPlayers())if(!other.equals(p)&&plugin.isTrusted(owner,other.getUniqueId())&&other.getLocation().distanceSquared(p.getLocation())<=maxRadius*maxRadius&&!plugin.isInDisabledRegion(other.getLocation()))teammates++;
+                double radius=Math.min(plugin.getConfig().getDouble("effects.invisibility.base_spark_radius",8)+teammates*plugin.getConfig().getDouble("effects.invisibility.teammate_coefficient",1),maxRadius);
+                Set<UUID> nowHidden=new HashSet<>();
+                for(Player other:p.getWorld().getPlayers()){
+                    if(other.equals(p)||!plugin.isTrusted(owner,other.getUniqueId())||other.getLocation().distanceSquared(p.getLocation())>radius*radius||plugin.isInDisabledRegion(other.getLocation()))continue;
+                    nowHidden.add(other.getUniqueId());
+                    other.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,25,0,true,false,true));
+                    other.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,25,0,true,false,true));
+                    p.showPlayer(plugin,other);
+                    for(Player viewer:Bukkit.getOnlinePlayers())if(!viewer.equals(p))viewer.hidePlayer(plugin,other);
+                }
+                for(UUID previous:new HashSet<>(hidden))if(!nowHidden.contains(previous)){
+                    Player old=Bukkit.getPlayer(previous);
+                    if(old!=null)for(Player viewer:Bukkit.getOnlinePlayers())viewer.showPlayer(plugin,old);
+                    hidden.remove(previous);
+                }
+                hidden.addAll(nowHidden);
+                p.getWorld().spawnParticle(Particle.SQUID_INK,p.getLocation().add(0,1,0),3,radius/2,1,radius/2,0);
+            }
+        }.runTaskTimer(plugin,0L,interval);
+    }
+
+    private void cleanupInvisibility(Player owner,Set<UUID> hidden) {
+        for(Player viewer:Bukkit.getOnlinePlayers())if(!viewer.equals(owner))viewer.showPlayer(plugin,owner);
+        for(UUID id:hidden){Player target=Bukkit.getPlayer(id);if(target!=null)for(Player viewer:Bukkit.getOnlinePlayers())viewer.showPlayer(plugin,target);}
     }
 
     private boolean isTargetAllowed(Player owner, LivingEntity target) {
