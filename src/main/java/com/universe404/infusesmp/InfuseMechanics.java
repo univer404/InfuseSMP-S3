@@ -605,10 +605,16 @@ public final class InfuseMechanics implements Listener {
         if(event.getEntity() instanceof Player p&&hasEffect(p,"regeneration"))event.setFoodLevel(10);
     }
     @EventHandler(ignoreCancelled=true) public void onFall(EntityDamageEvent event){
-        if(event.getEntity() instanceof Player p && event.getCause()==EntityDamageEvent.DamageCause.FALL
-          && !plugin.isDisabled(p.getUniqueId())
-          && !plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())
-          && !plugin.isInDisabledRegion(p.getLocation()) && hasEffect(p,"feather"))event.setCancelled(true);
+        if(!(event.getEntity() instanceof Player p))return;
+        if(plugin.isDisabled(p.getUniqueId())||plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())||plugin.isInDisabledRegion(p.getLocation()))return;
+        if(hasEffect(p,"feather")&&(event.getCause()==EntityDamageEvent.DamageCause.FALL||event.getCause()==EntityDamageEvent.DamageCause.FLY_INTO_WALL)) {
+            event.setCancelled(true);
+            return;
+        }
+        if(event.getCause()==EntityDamageEvent.DamageCause.FALL&&hasEffect(p,"fire")) {
+            for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++)for(int z=-1;z<=1;z++)
+                if(p.getLocation().getBlock().getRelative(x,y,z).getType()==Material.LAVA){event.setCancelled(true);return;}
+        }
     }
     @EventHandler(ignoreCancelled=true) public void onCombat(EntityDamageByEntityEvent event) {
         Player attacker=null;
