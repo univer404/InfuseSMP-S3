@@ -23,7 +23,7 @@ public final class InfuseSMP extends JavaPlugin {
     private final Set<UUID> simpleDisplay = ConcurrentHashMap.newKeySet();
     private File playersFile;
     private YamlConfiguration players;
-    private YamlConfiguration messages;\n    private InfuseMechanics mechanics;\n    private RecipesMenu recipesMenu;\n    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
+    private YamlConfiguration messages;\n    private InfuseMechanics mechanics;\n    private RecipesMenu recipesMenu;\n    private InfuseItems infuseItems;\n    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
         saveDefaultConfig(); saveResource("messages.yml", false); saveResource("gui.yml", false);
@@ -56,7 +56,7 @@ public final class InfuseSMP extends JavaPlugin {
 
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         String cmd=command.getName().toLowerCase(Locale.ROOT);
-        if(cmd.equals("infuse"))return infuse(sender,args);\n        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; recipesMenu.openMain((Player)sender); return true; }
+        if(cmd.equals("infuse"))return infuse(sender,args);\n        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; recipesMenu.openMain((Player)sender); return true; }\n        if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){p.getInventory().addItem(infuseItems.create(e,false,false));if(!e.equals("ender"))p.getInventory().addItem(infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}p.getInventory().addItem(result);}return true; }
         if(cmd.equals("swap")) {
             if(playerOnly(sender))return true; UUID id=((Player)sender).getUniqueId(); Map<String,String> m=slots(id);
             String p=m.get("primary"),s=m.get("secondary");
@@ -152,7 +152,7 @@ public final class InfuseSMP extends JavaPlugin {
         }
         saveState();return true;
     }
-    public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }\n    public boolean isDisabled(UUID id){ return disabled.contains(id); }\n    public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }\n    public void tellKey(CommandSender sender,String key){ tell(sender,key); }\n    public void tellRaw(CommandSender sender,String value){ sender.sendMessage(render(value)); }\n    public void recordHistory(UUID id,String line){ log(id,line); }\n    public void saveStatePublic(){ saveState(); }\n\n    private void loadState() {
+    public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }\n    public void setEquippedEffect(UUID id,String slot,String effect,boolean augmented){String value=effect+(augmented?"_augmented":"");slots(id).put(slot,value);log(id,"equipped "+slot+" "+value);saveState();}\n    public boolean isSparkActive(UUID id,String effect){return mechanics!=null&&mechanics.isActive(id,effect);}\n    public ItemStack createInfuseItem(String effect,boolean augmented){return infuseItems.create(effect,augmented,false);}\n    public boolean isDisabled(UUID id){ return disabled.contains(id); }\n    public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }\n    public void tellKey(CommandSender sender,String key){ tell(sender,key); }\n    public void tellRaw(CommandSender sender,String value){ sender.sendMessage(render(value)); }\n    public void recordHistory(UUID id,String line){ log(id,line); }\n    public void saveStatePublic(){ saveState(); }\n\n    private void loadState() {
         for(String key:players.getKeys(false))try{
             UUID id=UUID.fromString(key);Map<String,String> m=new ConcurrentHashMap<>();
             for(String sl:List.of("primary","secondary")){String v=players.getString(key+".effects."+sl);if(v!=null)m.put(sl,v);}effects.put(id,m);

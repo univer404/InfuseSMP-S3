@@ -26,16 +26,18 @@ commands:
     aliases: [t]
   ldrain:
     description: Drain the primary effect.
-  pdrain:
-    description: Drain the primary effect.
+    aliases: [pdrain]
   rdrain:
     description: Drain the secondary effect.
-  sdrain:
-    description: Drain the secondary effect.
+    aliases: [sdrain]
   conf:
     description: Read or change supported configuration.
   recipes:
     description: View Infuse crafting recipes.
+  item:
+    description: Give Infuse custom items.
+    aliases: [giveitem, i, potion, pot]
+    permission: infuse.admin
 permissions:
   infuse.command:
     default: true
