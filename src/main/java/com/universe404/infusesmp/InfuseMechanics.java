@@ -25,7 +25,9 @@ public final class InfuseMechanics implements Listener {
 
     public InfuseMechanics(InfuseSMP plugin) { this.plugin = plugin; }
 
-    public boolean isActive(UUID id,String effect){return activeUntil.getOrDefault(id,Map.of()).getOrDefault(effect,0L)>System.currentTimeMillis();}\n\n    public void startSpark(Player p, String slot) {
+    public boolean isActive(UUID id,String effect){return activeUntil.getOrDefault(id,Map.of()).getOrDefault(effect,0L)>System.currentTimeMillis();}
+
+    public void startSpark(Player p, String slot) {
         if (plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName())) { plugin.tellKey(p, "disabled"); return; }
         String effect = plugin.getEquippedEffect(p.getUniqueId(), slot);
         if (effect == null) { plugin.tellKey(p, "effects-empty"); return; }

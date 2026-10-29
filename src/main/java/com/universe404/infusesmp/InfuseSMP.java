@@ -7,7 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;\nimport org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,11 @@ public final class InfuseSMP extends JavaPlugin {
     private final Set<UUID> simpleDisplay = ConcurrentHashMap.newKeySet();
     private File playersFile;
     private YamlConfiguration players;
-    private YamlConfiguration messages;\n    private InfuseMechanics mechanics;\n    private RecipesMenu recipesMenu;\n    private InfuseItems infuseItems;\n    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
+    private YamlConfiguration messages;
+    private InfuseMechanics mechanics;
+    private RecipesMenu recipesMenu;
+    private InfuseItems infuseItems;
+    private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
         saveDefaultConfig(); saveResource("messages.yml", false); saveResource("gui.yml", false);
@@ -56,7 +61,9 @@ public final class InfuseSMP extends JavaPlugin {
 
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         String cmd=command.getName().toLowerCase(Locale.ROOT);
-        if(cmd.equals("infuse"))return infuse(sender,args);\n        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; recipesMenu.openMain((Player)sender); return true; }\n        if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){p.getInventory().addItem(infuseItems.create(e,false,false));if(!e.equals("ender"))p.getInventory().addItem(infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}p.getInventory().addItem(result);}return true; }
+        if(cmd.equals("infuse"))return infuse(sender,args);
+        if(cmd.equals("recipes")) { if(playerOnly(sender))return true; recipesMenu.openMain((Player)sender); return true; }
+        if(cmd.equals("item")) { if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;} if(playerOnly(sender))return true; if(args.length<1)return usage(sender,"/item <effect|all> [true|false]"); Player p=(Player)sender; if(args[0].equalsIgnoreCase("all")){for(String e:List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender")){p.getInventory().addItem(infuseItems.create(e,false,false));if(!e.equals("ender"))p.getInventory().addItem(infuseItems.create(e,true,false));}}else{boolean aug=args.length>1&&Boolean.parseBoolean(args[1]);ItemStack result=infuseItems.create(args[0],aug,false);if(result==null){tell(sender,"invalid-effect");return true;}p.getInventory().addItem(result);}return true; }
         if(cmd.equals("swap")) {
             if(playerOnly(sender))return true; UUID id=((Player)sender).getUniqueId(); Map<String,String> m=slots(id);
             String p=m.get("primary"),s=m.get("secondary");
@@ -109,34 +116,64 @@ public final class InfuseSMP extends JavaPlugin {
     private boolean usage(CommandSender s,String usage){tell(s,"usage",Map.of("usage",usage));return true;}
 
     private boolean infuse(CommandSender sender,String[] args) {
-        if(args.length==0)return usage(sender,"/infuse <add|remove|get|history>");
+        if(args.length==0)return usage(sender,"/infuse <add|remove|get|history|toggle>");
         String sub=args[0].toLowerCase(Locale.ROOT);
-        if(sub.equals("get")||sub.equals("history")) {
-            if(args.length>1&&!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
-            Player target=args.length>1?Bukkit.getPlayerExact(args[1]):(sender instanceof Player?(Player)sender:null);
-            if(target==null){tell(sender,"player-only");return true;}
-            if(sub.equals("get")){
-                Map<String,String> m=slots(target.getUniqueId());if(m.isEmpty()){tell(sender,"effects-empty");return true;}
-                tell(sender,"effects-header");m.forEach((k,v)->tellRaw(sender,"<gray>"+k+": <white>"+v));
-            }else history.getOrDefault(target.getUniqueId(),List.of()).forEach(v->tellRaw(sender,"<gray>"+v));
-            return true;
+        String sl=null,effect=null,targetName=null; boolean augmented=false;
+        for(String arg:args){
+            if(arg.startsWith("-s="))sl=arg.substring(3);
+            else if(arg.startsWith("-e="))effect=arg.substring(3).toLowerCase(Locale.ROOT);
+            else if(arg.startsWith("-p="))targetName=arg.substring(3);
+            else if(arg.equalsIgnoreCase("-a=true"))augmented=true;
         }
-        if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
-        if(!sub.equals("add")&&!sub.equals("remove")&&!sub.equals("toggle"))return usage(sender,"/infuse <add|remove|get|history|toggle>");
-        String sl=null,effect=null,targetName=null;boolean augmented=false;
-        for(String arg:args){if(arg.startsWith("-s="))sl=arg.substring(3);else if(arg.startsWith("-e="))effect=arg.substring(3).toLowerCase(Locale.ROOT);else if(arg.startsWith("-p="))targetName=arg.substring(3);else if(arg.equalsIgnoreCase("-a=true"))augmented=true;}
-        if(sl==null||!isSlot(sl))return usage(sender,"/infuse "+sub+" -s=<primary|secondary> -e=<effect> [-p=<player>] [-a=true]");
         Player target=targetName==null?(sender instanceof Player?(Player)sender:null):Bukkit.getPlayerExact(targetName);
         if(target==null){tell(sender,"player-only");return true;}
-        String s=slot(sl);Map<String,String> m=slots(target.getUniqueId());
-        if(sub.equals("toggle")) { if(args.length<2) return usage(sender,"/infuse toggle -p=<player>"); UUID tid=target.getUniqueId(); if(!disabled.add(tid))disabled.remove(tid); tellRaw(sender, disabled.contains(tid)?"<yellow>ɪɴғᴜsᴇ ᴅɪsᴀʙʟᴇᴅ.":"<green>ɪɴғᴜsᴇ ᴇɴᴀʙʟᴇᴅ."); saveState(); return true; }\n        if(sub.equals("remove")){String old=m.remove(s);if(old==null)tell(sender,"effects-empty");else{log(target.getUniqueId(),"removed "+s+" "+old);tell(sender,"effect-removed",Map.of("slot",s));}}
-        else {
-            if(effect==null||!Set.of("fire","frost","speed","haste","heart","ocean","invis","invisibility","regeneration","regen","thunder","ender","earth","feather","emerald","strength","apophis","thief").contains(effect)){tell(sender,"invalid-effect");return true;}
+        UUID id=target.getUniqueId();
+        if(sub.equals("get")){
+            if(target!=sender&&!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
+            Map<String,String> m=slots(id);
+            if(sl!=null){
+                if(!isSlot(sl))return usage(sender,"/infuse get -p=<player> [-s=primary|secondary]");
+                String value=m.get(slot(sl));tellRaw(sender,"<yellow>"+slot(sl)+" <gray>» <white>"+(value==null?"none":value));return true;
+            }
+            tellRaw(sender,"<yellow>ᴘʀɪᴍᴀʀʏ <gray>» <white>"+m.getOrDefault("primary","none"));
+            tellRaw(sender,"<yellow>sᴇᴄᴏɴᴅᴀʀʏ <gray>» <white>"+m.getOrDefault("secondary","none"));return true;
+        }
+        if(sub.equals("history")){
+            if(target!=sender&&!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
+            if(sl==null||!isSlot(sl))return usage(sender,"/infuse history -s=<primary|secondary> [-p=<player>]");
+            List<String> h=history.getOrDefault(id,List.of());
+            if(h.isEmpty()){tellRaw(sender,"<gray>ɴᴏ ʜɪsᴛᴏʀʏ ғᴏᴜɴᴅ.");return true;}
+            h.forEach(line->tellRaw(sender,"<gray>"+line));return true;
+        }
+        if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
+        if(!Set.of("add","remove","toggle").contains(sub))return usage(sender,"/infuse <add|remove|get|history|toggle> [-p=<player>] [-e=<effect>] [-s=<slot>] [-a=true]");
+        if(sub.equals("toggle")){
+            if(!disabled.add(id))disabled.remove(id);
+            tellRaw(sender,disabled.contains(id)?"<yellow>ɪɴғᴜsᴇ ᴅɪsᴀʙʟᴇᴅ.":"<green>ɪɴғᴜsᴇ ᴇɴᴀʙʟᴇᴅ.");
+            if(target!=sender)tellRaw(target,disabled.contains(id)?"<red>ʏᴏᴜʀ ɪɴғᴜsᴇ ᴇғғᴇᴄᴛs ʜᴀᴠᴇ ʙᴇᴇɴ ᴅɪsᴀʙʟᴇᴅ.":"<green>ʏᴏᴜʀ ɪɴғᴜsᴇ ᴇғғᴇᴄᴛs ʜᴀᴠᴇ ʙᴇᴇɴ ᴇɴᴀʙʟᴇᴅ.");
+            saveState();return true;
+        }
+        if(sl!=null&&!isSlot(sl))return usage(sender,"Slot must be primary or secondary.");
+        List<String> targetSlots=sl==null?List.of("primary","secondary"):List.of(slot(sl));
+        Map<String,String> m=slots(id);
+        if(sub.equals("remove")){
+            for(String s:targetSlots){String old=m.remove(s);if(old!=null)log(id,"removed "+s+" "+old);}
+            tellRaw(sender,"<green>ʀᴇᴍᴏᴠᴇᴅ ᴇғғᴇᴄᴛs ғʀᴏᴍ "+(sl==null?"ʙᴏᴛʜ sʟᴏᴛs":slot(sl)+" sʟᴏᴛ")+" ᴏғ "+target.getName()+".");
+        } else {
+            if(effect==null)return usage(sender,"/infuse add -p=<player> -e=<effect> [-s=<slot>] [-a=true]");
+            if(effect.equals("regen"))effect="regeneration";
+            if(!Set.of("earth","emerald","ender","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder").contains(effect)){tell(sender,"invalid-effect");return true;}
             if((effect.equals("earth")||effect.equals("ender"))&&!augmented)return usage(sender,"earth and ender require -a=true");
-            if(effect.equals("regen"))effect="regeneration"; String value=effect+(augmented?"_augmented":"");m.put(s,value);log(target.getUniqueId(),"set "+s+" "+value);tell(sender,"effect-set",Map.of("slot",s,"effect",value));
+            if(!getConfig().getBoolean("allow_same_effects",false)&&targetSlots.size()==1){
+                String other=m.get(targetSlots.get(0).equals("primary")?"secondary":"primary");
+                if(effect.equals(other==null?null:other.replace("_augmented",""))){tellRaw(sender,"<red>ᴇғғᴇᴄᴛ ᴀʟʀᴇᴀᴅʏ ᴇǫᴜɪᴘᴘᴇᴅ ɪɴ ᴏᴛʜᴇʀ sʟᴏᴛ.");return true;}
+            }
+            for(String s:targetSlots){String value=effect+(augmented?"_augmented":"");m.put(s,value);log(id,"set "+s+" "+value);}
+            tellRaw(sender,"<green>ᴀᴘᴘʟɪᴇᴅ "+effect+" ᴛᴏ "+(sl==null?"ʙᴏᴛʜ sʟᴏᴛs":slot(sl)+" sʟᴏᴛ")+" ᴏғ "+target.getName()+".");
         }
         saveState();return true;
     }
+
     private boolean trust(CommandSender sender,String[] args) {
         if(playerOnly(sender))return true;Player p=(Player)sender;Set<UUID> set=trusted.computeIfAbsent(p.getUniqueId(),k->ConcurrentHashMap.newKeySet());
         if(args.length==0)return usage(sender,"/trust <add|remove|list|clear> [player]");
@@ -152,7 +189,18 @@ public final class InfuseSMP extends JavaPlugin {
         }
         saveState();return true;
     }
-    public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }\n    public void setEquippedEffect(UUID id,String slot,String effect,boolean augmented){String value=effect+(augmented?"_augmented":"");slots(id).put(slot,value);log(id,"equipped "+slot+" "+value);saveState();}\n    public boolean isSparkActive(UUID id,String effect){return mechanics!=null&&mechanics.isActive(id,effect);}\n    public ItemStack createInfuseItem(String effect,boolean augmented){return infuseItems.create(effect,augmented,false);}\n    public boolean isDisabled(UUID id){ return disabled.contains(id); }\n    public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }\n    public void tellKey(CommandSender sender,String key){ tell(sender,key); }\n    public void tellRaw(CommandSender sender,String value){ sender.sendMessage(render(value)); }\n    public void recordHistory(UUID id,String line){ log(id,line); }\n    public void saveStatePublic(){ saveState(); }\n\n    private void loadState() {
+    public String getEquippedEffect(UUID id,String slot){ return slots(id).get(slot); }
+    public void setEquippedEffect(UUID id,String slot,String effect,boolean augmented){String value=effect+(augmented?"_augmented":"");slots(id).put(slot,value);log(id,"equipped "+slot+" "+value);saveState();}
+    public boolean isSparkActive(UUID id,String effect){return mechanics!=null&&mechanics.isActive(id,effect);}
+    public ItemStack createInfuseItem(String effect,boolean augmented){return infuseItems.create(effect,augmented,false);}
+    public boolean isDisabled(UUID id){ return disabled.contains(id); }
+    public boolean isTrusted(UUID owner,UUID target){ return trusted.getOrDefault(owner,Set.of()).contains(target); }
+    public void tellKey(CommandSender sender,String key){ tell(sender,key); }
+    public void tellRaw(CommandSender sender,String value){ sender.sendMessage(render(value)); }
+    public void recordHistory(UUID id,String line){ log(id,line); }
+    public void saveStatePublic(){ saveState(); }
+
+    private void loadState() {
         for(String key:players.getKeys(false))try{
             UUID id=UUID.fromString(key);Map<String,String> m=new ConcurrentHashMap<>();
             for(String sl:List.of("primary","secondary")){String v=players.getString(key+".effects."+sl);if(v!=null)m.put(sl,v);}effects.put(id,m);
