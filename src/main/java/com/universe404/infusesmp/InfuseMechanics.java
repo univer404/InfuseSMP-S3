@@ -217,17 +217,23 @@ public final class InfuseMechanics implements Listener {
     }
 
     @EventHandler public void onQuit(PlayerQuitEvent e) {
-        UUID id=e.getPlayer().getUniqueId();
-        cooldowns.remove(id); activeUntil.remove(id); hitCounts.remove(id);
-        Double old=maxHealthBeforeHeart.remove(id);
-        if(old!=null && e.getPlayer().isOnline()) e.getPlayer().setMaxHealth(old);
+        Player p=e.getPlayer();UUID id=p.getUniqueId();
+        cooldowns.remove(id);activeUntil.remove(id);hitCounts.remove(id);recentDamage.remove(id);enderCurses.remove(id);
+        hitsFrom.remove(id);for(Map<UUID,Integer> map:hitsFrom.values())map.remove(id);
+        removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"speed_stack");
+        removeAttributeModifier(p,Attribute.ATTACK_SPEED,"attack_speed_stack");
+        speedStacks.remove(id);attackStacks.remove(id);maxHealthBeforeHeart.remove(id);
+    }
+    private void removeAttributeModifier(Player p,Attribute attribute,String key){
+        var instance=p.getAttribute(attribute);if(instance==null)return;NamespacedKey namespaced=new NamespacedKey(plugin,key);
+        for(AttributeModifier modifier:new ArrayList<>(instance.getModifiers()))if(modifier.getKey().equals(namespaced))instance.removeModifier(modifier);
     }
 
     /** Keep permanent slot passives refreshed, and end temporary spark windows. */
     public void tick() {
         long now=System.currentTimeMillis();
         for(Player p:Bukkit.getOnlinePlayers()) {
-            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) continue;
+            if(plugin.isDisabled(p.getUniqueId()) || plugin.getConfig().getStringList("disabled_worlds").contains(p.getWorld().getName()) || plugin.isInDisabledRegion(p.getLocation())) {p.sendActionBar(Component.empty());continue;}
             applyPassives(p);
             applyToolPassives(p);
             updateDisplay(p);
@@ -280,6 +286,7 @@ public final class InfuseMechanics implements Listener {
     private String displayEffect(Player p,String value,boolean simple){
         if(value==null)return "";
         String effect=value.replace("_augmented","");
+        if(!plugin.getConfig().getBoolean("effects."+effect+".enabled",true))return "";
         long spark=getSparkRemainingMillis(p.getUniqueId(),effect),cooldown=getCooldownRemainingMillis(p.getUniqueId(),effect);
         long remain=spark>0?spark:cooldown;
         String timer=remain>0?String.format(Locale.ROOT,"%d:%02d",remain/60000,(remain/1000)%60):"";
