@@ -1,13 +1,19 @@
 name: Build InfuseSMP-S3
 on:
   push:
-    branches: [main, 'conversion/**']
+    branches:
+      - 'conversion/**'
   pull_request:
+    paths:
+      - '**.java'
+      - '**.yml'
+      - 'pom.xml'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   build:
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/heads/conversion/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
