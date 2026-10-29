@@ -214,6 +214,13 @@ public final class InfuseMechanics implements Listener {
             applyPassives(p);
             Map<String,Long> active=activeUntil.get(p.getUniqueId());
             if(active!=null) active.entrySet().removeIf(en -> en.getValue()<=now);
+            Map<String,Long> playerCooldowns=cooldowns.get(p.getUniqueId());
+            if(playerCooldowns!=null){
+                for(var entry:new ArrayList<>(playerCooldowns.entrySet()))if(entry.getValue()>0&&entry.getValue()<=now){
+                    playerCooldowns.remove(entry.getKey(),entry.getValue());
+                    p.playSound(p.getLocation(),plugin.getConfig().getString("recharge_sound","custom.health"),1f,1f);
+                }
+            }
         }
     }
     private void applyPassives(Player p) {
