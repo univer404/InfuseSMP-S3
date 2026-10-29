@@ -2,15 +2,12 @@
 allow_same_effects: false
 trust_list_max: 3
 trust_list_delay_seconds: 10
-allow_true_damage: true
 roll_first_join: false
 do_roll_animation: true
 head_drop: false
 lock_effects: false
-overwrite_enchants: true
-charged_refresh_speed: 15
-recharge_sound: BLOCK_BEACON_POWER_SELECT
-use_sound: BLOCK_BEACON_ACTIVATE
+recharge_sound: "custom.health"
+use_sound: "custom.activate"
 disabled_worlds: [disabled_world]
 ritual_duration_seconds: 600
 primary_effects: [heart, strength, regeneration, haste, invisibility, frost, thunder, feather]

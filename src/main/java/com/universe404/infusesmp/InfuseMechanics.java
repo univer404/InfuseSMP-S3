@@ -68,7 +68,7 @@ public final class InfuseMechanics implements Listener {
         cooldown=Math.max(0,cooldown/denominator);
         activeUntil.get(p.getUniqueId()).put(effect, now + duration * 1000);
         cooldowns.get(p.getUniqueId()).put(effect, now + cooldown * 1000);
-        p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1.3f);
+        p.playSound(p.getLocation(),plugin.getConfig().getString("use_sound","custom.activate"),1f,1.3f);
         p.getWorld().spawnParticle(Particle.ENCHANT, p.getLocation().add(0,1,0), 35, .7,.8,.7,.1);
         activate(p, effect, duration);
         plugin.recordHistory(p.getUniqueId(), "spark " + slot + " " + effect);
@@ -163,8 +163,42 @@ public final class InfuseMechanics implements Listener {
             if(item!=null)e.getDrops().add(item);
             plugin.clearEquippedEffect(id,slot);
         }
+        if(plugin.getConfig().getBoolean("head_drop",false)&&p.getKiller()!=null&&p.getKiller()!=p){
+            ItemStack head=new ItemStack(Material.PLAYER_HEAD);
+            if(head.getItemMeta() instanceof org.bukkit.inventory.meta.SkullMeta meta){meta.setOwningPlayer(p);head.setItemMeta(meta);}
+            e.getDrops().add(head);
+        }
     }
-    @EventHandler public void onJoin(PlayerJoinEvent e) { Bukkit.getScheduler().runTaskLater(plugin, () -> applyPassives(e.getPlayer()), 2L); }
+    @EventHandler public void onJoin(PlayerJoinEvent e) {
+        Player p=e.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin,()->applyPassives(p),2L);
+        if(p.hasPlayedBefore()||!plugin.getConfig().getBoolean("roll_first_join",false))return;
+        List<String> choices=List.of("emerald","feather","fire","frost","haste","heart","invisibility","ocean","regeneration","speed","strength","thunder");
+        if(plugin.getConfig().getBoolean("do_roll_animation",true)){
+            new org.bukkit.scheduler.BukkitRunnable(){
+                int elapsed=0;
+                @Override public void run(){
+                    if(!p.isOnline()){cancel();return;}
+                    String roll=choices.get(new Random().nextInt(choices.size()));
+                    p.sendTitle(roll.toUpperCase(Locale.ROOT),"ᴇғғᴇᴄᴛ",0,5,0);
+                    elapsed+=5;
+                    if(elapsed>=40){
+                        String chosen=choices.get(new Random().nextInt(choices.size()));
+                        plugin.setEquippedEffect(p.getUniqueId(),"primary",chosen,false);
+                        p.sendTitle(chosen.toUpperCase(Locale.ROOT),"ᴇғғᴇᴄᴛ",10,30,10);
+                        cancel();
+                    }
+                }
+            }.runTaskTimer(plugin,40L,5L);
+        }else{
+            Bukkit.getScheduler().runTaskLater(plugin,()->{
+                String chosen=choices.get(new Random().nextInt(choices.size()));
+                plugin.setEquippedEffect(p.getUniqueId(),"primary",chosen,false);
+                p.sendTitle(chosen.toUpperCase(Locale.ROOT),"ᴇғғᴇᴄᴛ",10,30,10);
+            },40L);
+        }
+    }
+
     @EventHandler public void onQuit(PlayerQuitEvent e) {
         UUID id=e.getPlayer().getUniqueId();
         cooldowns.remove(id); activeUntil.remove(id); hitCounts.remove(id);
