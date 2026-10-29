@@ -30,6 +30,8 @@ public final class InfuseMechanics implements Listener {
 
     public InfuseMechanics(InfuseSMP plugin) { this.plugin = plugin; }
 
+    public long getSparkRemainingMillis(UUID id,String effect){return Math.max(0,activeUntil.getOrDefault(id,Map.of()).getOrDefault(effect,0L)-System.currentTimeMillis());}
+    public long getCooldownRemainingMillis(UUID id,String effect){return Math.max(0,cooldowns.getOrDefault(id,Map.of()).getOrDefault(effect,0L)-System.currentTimeMillis());}
     public boolean isBusy(UUID id,String effect){
         long now=System.currentTimeMillis();
         return isActive(id,effect)||cooldowns.getOrDefault(id,Map.of()).getOrDefault(effect,0L)>now;

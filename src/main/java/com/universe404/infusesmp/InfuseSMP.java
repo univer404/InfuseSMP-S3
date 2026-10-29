@@ -32,13 +32,31 @@ public final class InfuseSMP extends JavaPlugin {
     private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
-        saveDefaultConfig(); saveResource("messages.yml", false); saveResource("gui.yml", false);
+        saveDefaultConfig();
+        saveResource("messages.yml", false);
+        saveResource("gui.yml", false);
         playersFile = new File(getDataFolder(), "players.yml");
         players = YamlConfiguration.loadConfiguration(playersFile);
         messages = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
         loadState();
-        getLogger().info("InfuseSMP-S3 loaded. Text rendering disables italics.");
+
+        mechanics = new InfuseMechanics(this);
+        getServer().getPluginManager().registerEvents(mechanics, this);
+        getServer().getScheduler().runTaskTimer(this, () -> mechanics.tick(), 20L, 20L);
+
+        infuseItems = new InfuseItems(this);
+        getServer().getPluginManager().registerEvents(new InfuseItemListener(this, infuseItems), this);
+        ritualCrafting = new RitualCrafting(this, infuseItems);
+        getServer().getPluginManager().registerEvents(ritualCrafting, this);
+        recipesMenu = new RecipesMenu(this, infuseItems);
+        getServer().getPluginManager().registerEvents(recipesMenu, this);
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new InfusePlaceholderExpansion(this, mechanics).register();
+        }
+        getLogger().info("InfuseSMP-S3 enabled. Text rendering disables italics.");
     }
+
     @Override public void onDisable() { saveState(); }
 
     private Component render(String value) {
