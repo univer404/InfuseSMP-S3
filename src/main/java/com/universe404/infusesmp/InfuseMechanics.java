@@ -383,7 +383,7 @@ public final class InfuseMechanics implements Listener {
         Material under=p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
         boolean icy=under==Material.ICE||under==Material.PACKED_ICE||under==Material.BLUE_ICE||under==Material.SNOW_BLOCK;
         if(icy) {
-            ensureAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed",plugin.getConfig().getDouble("effects.frost.spark_move_speed",2.0));
+            ensureAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed",plugin.getConfig().getDouble(isActive(id,"frost")?"effects.frost.spark_move_speed":"effects.frost.move_speed",isActive(id,"frost")?2.0:1.5));
             ensureAttributeModifier(p,Attribute.KNOCKBACK_RESISTANCE,"frost_kbres",plugin.getConfig().getDouble("effects.frost.knockback_resistance",1.3));
         } else {
             removeAttributeModifier(p,Attribute.MOVEMENT_SPEED,"frost_speed");
@@ -590,7 +590,10 @@ public final class InfuseMechanics implements Listener {
     private void ensureAttributeModifier(Player p,Attribute attribute,String key,double amount) {
         var instance=p.getAttribute(attribute);if(instance==null)return;
         NamespacedKey namespaced=new NamespacedKey(plugin,key);
-        for(AttributeModifier modifier:new ArrayList<>(instance.getModifiers()))if(modifier.getKey().equals(namespaced))return;
+        for(AttributeModifier modifier:new ArrayList<>(instance.getModifiers()))if(modifier.getKey().equals(namespaced)) {
+            if(Math.abs(modifier.getAmount()-amount)<0.0001)return;
+            instance.removeModifier(modifier);
+        }
         instance.addModifier(new AttributeModifier(namespaced,amount,AttributeModifier.Operation.MULTIPLY_SCALAR_1));
     }
 
