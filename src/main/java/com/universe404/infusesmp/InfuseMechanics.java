@@ -29,6 +29,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 /** Runtime mechanics port for the common passive effects and spark activations. */
 public final class InfuseMechanics implements Listener {
@@ -825,6 +826,28 @@ public final class InfuseMechanics implements Listener {
                 }.runTaskTimer(plugin,0L,ringDelay);
             }
         }.runTaskTimer(plugin,1L,1L);
+    }
+
+    private void startThunderSpark(Player p){
+        List<LivingEntity> targets=new ArrayList<>();
+        for(Entity entity:p.getNearbyEntities(20,20,20))if(entity instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target)&&!plugin.isInDisabledRegion(target.getLocation()))targets.add(target);
+        double radius=Math.min(targets.size()*3.0+3.0,20.0);
+        p.getWorld().spawnParticle(Particle.FLAME,p.getLocation().add(0,1,0),80,radius,0.1,radius,0.01);
+        for(LivingEntity target:targets)if(target.getLocation().distanceSquared(p.getLocation())<=radius*radius)strikeThunderRepeated(p,target);
+    }
+
+    private void strikeThunderRepeated(Player owner,LivingEntity target) {
+        int max=Math.max(1,plugin.getConfig().getInt("effects.thunder.strike_time_max",5));
+        new org.bukkit.scheduler.BukkitRunnable(){int count=0;
+            @Override public void run(){
+                if(!owner.isOnline()||!target.isValid()||target.isDead()||count++>=max){cancel();return;}
+                if(!plugin.isInDisabledRegion(target.getLocation())&&isTargetAllowed(owner,target)){
+                    target.getWorld().strikeLightningEffect(target.getLocation());
+                    trueDamage(owner,target,plugin.getConfig().getDouble("effects.thunder.true_damage",1));
+                    target.getWorld().playSound(target.getLocation(),Sound.ENTITY_LIGHTNING_BOLT_THUNDER,1f,1f);
+                }
+            }
+        }.runTaskTimer(plugin,0L,20L);
     }
 
     private void startOceanPull(Player p,int iteration){
