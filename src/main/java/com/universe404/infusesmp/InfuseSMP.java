@@ -177,8 +177,16 @@ public final class InfuseSMP extends JavaPlugin {
     private boolean usage(CommandSender s,String usage){tell(s,"usage",Map.of("usage",usage));return true;}
 
     private boolean infuse(CommandSender sender,String[] args) {
-        if(args.length==0)return usage(sender,"/infuse <add|remove|get|history|toggle>");
-        String sub=args[0].toLowerCase(Locale.ROOT);
+        String sub=args.length==0?"gui":args[0].toLowerCase(Locale.ROOT);
+        if(Set.of("gui","menu","recipes").contains(sub)){
+            if(playerOnly(sender))return true;
+            if(!recipesMenu.isEnabled()){
+                tellRaw(sender,"<red>ʀᴇᴄɪᴘᴇ ɢᴜɪ ɪs ᴅɪsᴀʙʟᴇᴅ.");
+                return true;
+            }
+            recipesMenu.openMain((Player)sender);
+            return true;
+        }
         String sl=null,effect=null,targetName=null; boolean augmented=false;
         for(String arg:args){
             if(arg.startsWith("-s="))sl=arg.substring(3);
@@ -207,7 +215,7 @@ public final class InfuseSMP extends JavaPlugin {
             h.forEach(line->tellRaw(sender,"<gray>"+line));return true;
         }
         if(!sender.hasPermission("infuse.admin")){tell(sender,"no-permission");return true;}
-        if(!Set.of("add","remove","toggle").contains(sub))return usage(sender,"/infuse <add|remove|get|history|toggle> [-p=<player>] [-e=<effect>] [-s=<slot>] [-a=true]");
+        if(!Set.of("add","remove","toggle").contains(sub))return usage(sender,"/infuse <gui|add|remove|get|history|toggle> [-p=<player>] [-e=<effect>] [-s=<slot>] [-a=true]");
         if(sub.equals("toggle")){
             if(!disabled.add(id))disabled.remove(id);
             tellRaw(sender,disabled.contains(id)?"<yellow>ɪɴғᴜsᴇ ᴅɪsᴀʙʟᴇᴅ.":"<green>ɪɴғᴜsᴇ ᴇɴᴀʙʟᴇᴅ.");
