@@ -1,19 +1,21 @@
 # InfuseSMP-S3
 
-Java Paper/Purpur conversion of the Infuse S3 Skript targeting Minecraft 1.21.11.
+Java Paper/Purpur conversion of the Infuse S3 Skript for Minecraft 1.21.11.
 
 ## Build
-Requires JDK 21 and Maven. Run `mvn clean package`. The GitHub Actions workflow builds pull requests and uploads the JAR as a workflow artifact when the build succeeds.
+Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions is configured to build the conversion branch and pull requests and upload a JAR artifact when the build succeeds.
 
 ## Configuration and data
-- `config.yml`: general settings, effect durations, cooldowns, craft limits, disabled worlds and ritual duration.
+- `config.yml`: general settings, effect tuning, cooldowns, craft limits, item colors/names/lore and disabled worlds.
 - `messages.yml`: MiniMessage messages rendered without italics.
-- `gui.yml`: recipe GUI defaults.
-- `players.yml`: UUID-keyed player state saved by the plugin.
-- `rituals.yml`: persistent craft tallies.
+- `gui.yml`: recipe and ritual GUI titles, slots, materials, names and enable switches.
+- `players.yml`: UUID-keyed player state and per-slot history.
+- `rituals.yml`: persistent ritual craft tallies.
+- `regions.yml`: WorldGuard-mapped regions where Infuse effects are disabled.
 
-## Source of truth
-The supplied archive includes `infuse_old` and `infuse_new`. This port targets `infuse_new/` for Minecraft 1.21.11.
+## Optional integrations
+- PlaceholderAPI: source-compatible `%infuse_...%` placeholders.
+- WorldGuard: `/mapregion add|delete|list|clear` region mapping; the plugin can run without WorldGuard installed.
 
-## Status
-This is an active conversion branch. Several original effect-specific mechanics and resource-pack visuals still need porting and the latest CI build must pass before production use. See [CONVERSION_STATUS.md](CONVERSION_STATUS.md).
+## Source and release status
+The supplied archive contains `infuse_old` and `infuse_new`; this port targets `infuse_new/`. It is still in progress and must not be treated as production-ready until CI succeeds and remaining effect/resource-pack behavior is tested. See [CONVERSION_STATUS.md](CONVERSION_STATUS.md).
