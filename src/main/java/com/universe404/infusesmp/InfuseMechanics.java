@@ -93,7 +93,8 @@ public final class InfuseMechanics implements Listener {
         int ticks=(int)Math.min(Integer.MAX_VALUE, seconds*20);
         switch(e) {
             case "heart" -> {
-                p.setHealth(Math.min(p.getMaxHealth(), p.getHealth()+p.getMaxHealth()*.2));
+                double heal=recentDamage.getOrDefault(p.getUniqueId(),0.0)*plugin.getConfig().getDouble("effects.heart.spark_heal_percentage",0.2);
+                p.setHealth(Math.min(p.getMaxHealth(),p.getHealth()+Math.max(0,heal)));
                 p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,ticks,4,true,false,true));
             }
             case "fire" -> {
@@ -112,30 +113,38 @@ public final class InfuseMechanics implements Listener {
                 }
                 p.getWorld().spawnParticle(Particle.SNOWFLAKE,p.getLocation().add(0,1,0),80,3,1,3,.03);
             }
-            case "speed" -> p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,ticks,2,true,false,true));
+            case "speed" -> startSpeedDash(p);
             case "haste" -> p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE,ticks,2,true,false,true));
             case "invisibility" -> p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,ticks,0,true,false,true));
             case "ocean" -> {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,ticks,0,true,false,true));
                 p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,ticks,1,true,false,true));
-                double radius=plugin.getConfig().getDouble("effects.ocean.pull_radius",6);
-                double strength=plugin.getConfig().getDouble("effects.ocean.pull_strength",0.1);
-                for(Entity ent:p.getNearbyEntities(radius,radius,radius))if(ent instanceof LivingEntity target&&target!=p&&isTargetAllowed(p,target)){
-                    Vector pull=p.getLocation().toVector().subtract(target.getLocation().toVector()).normalize().multiply(strength);
-                    target.setVelocity(target.getVelocity().add(pull));
-                }
+                startOceanPull(p,0);
             }
             case "regeneration" -> p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,ticks,2,true,false,true));
             case "strength" -> p.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH,ticks,1,true,false,true));
-            case "feather" -> {p.setVelocity(p.getVelocity().setY(Math.max(1.1,p.getVelocity().getY()+1.1)));p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,ticks,0,true,false,true));}
-            case "thunder" -> {
-                for(Entity ent:p.getNearbyEntities(12,8,12)) if(ent instanceof LivingEntity target && target!=p && isTargetAllowed(p,target)) {
-                    target.getWorld().strikeLightningEffect(target.getLocation());
-                    target.damage(plugin.getConfig().getDouble("effects.thunder.true_damage", 1.0), p);
+            case "feather" -> startFeatherSpark(p);
+            case "thunder" -> startThunderSpark(p);
+            case "emerald" -> { p.giveExp((int)plugin.getConfig().getLong("effects.emerald.spark_xp_gain",2)); p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,ticks,2,true,false,true)); }
+            case "ender" -> {
+                int radius=plugin.getConfig().getInt("effects.ender.teleport_max_radius",12);
+                Block targetBlock=p.getTargetBlockExact(radius);
+                if(targetBlock!=null){
+                    Location destination=targetBlock.getLocation().add(0.5,1,0.5);
+                    destination.setDirection(p.getLocation().getDirection());
+                    if(destination.getBlock().isPassable()&&destination.clone().add(0,1,0).getBlock().isPassable())p.teleport(destination);
+                }else{
+                    Vector direction=p.getLocation().getDirection().normalize();
+                    Location destination=p.getLocation().add(direction.multiply(radius)).add(0,0.5,0);
+                    if(destination.getBlock().isPassable())p.teleport(destination);
+                }
+                for(Entity entity:p.getNearbyEntities(2,2,2)){
+                    if(entity instanceof Player victim&&!victim.equals(p)&&!plugin.isTrusted(p.getUniqueId(),victim.getUniqueId())){
+                        enderCurses.merge(victim.getUniqueId(),1,Integer::sum);
+                        Bukkit.getScheduler().runTaskLater(plugin,()->enderCurses.computeIfPresent(victim.getUniqueId(),(id,count)->count<=1?null:count-1),Math.max(1,plugin.getConfig().getLong("effects.ender.curse_duration_seconds",30))*20L);
+                    }else if(entity instanceof LivingEntity mob&&!(mob instanceof Player)&&mob.getType()!=EntityType.ENDER_DRAGON&&mob.getType()!=EntityType.WITHER&&mob.getType()!=EntityType.WARDEN)mob.setHealth(0);
                 }
             }
-            case "emerald" -> { p.giveExp((int)plugin.getConfig().getLong("effects.emerald.spark_xp_gain",2)); p.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE,ticks,2,true,false,true)); }
-            case "ender" -> { Entity target=p.getTargetEntity(30); if(target!=null) { Location to=target.getLocation().clone().add(target.getLocation().getDirection().multiply(-2)); to.setDirection(p.getLocation().getDirection()); p.teleport(to); } else p.teleport(p.getLocation().add(p.getLocation().getDirection().multiply(6))); }
             case "earth" -> { p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE,ticks,2,true,false,true)); p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,ticks,0,true,false,true)); }
         }
     }
