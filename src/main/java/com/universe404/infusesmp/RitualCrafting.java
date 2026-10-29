@@ -148,5 +148,6 @@ public final class RitualCrafting implements Listener {
         for(int s:SLOTS){ItemStack item=inv.getItem(s);if(item!=null&&item.getType()!=Material.AIR)p.getInventory().addItem(item);}
         p.removeMetadata("infuse-ritual-gui",plugin);
     }
-    private void stopRitual(UUID id){BukkitTask running=rituals.remove(id);if(running!=null)running.cancel();}\n    private void saveTally(){try{tally.save(tallyFile);}catch(IOException ex){plugin.getLogger().severe("Could not save rituals.yml: "+ex.getMessage());}}
+    private void stopRitual(UUID id){BukkitTask running=rituals.remove(id);if(running!=null)running.cancel();}
+    private void saveTally(){try{tally.save(tallyFile);}catch(IOException ex){plugin.getLogger().severe("Could not save rituals.yml: "+ex.getMessage());}}
 }
