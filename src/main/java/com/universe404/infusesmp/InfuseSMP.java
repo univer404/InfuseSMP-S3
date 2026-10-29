@@ -27,7 +27,7 @@ public final class InfuseSMP extends JavaPlugin {
     private YamlConfiguration messages;
     private InfuseMechanics mechanics;
     private RecipesMenu recipesMenu;
-    private InfuseItems infuseItems;
+    private InfuseItems infuseItems;\n    private RitualCrafting ritualCrafting;
     private final Set<UUID> disabled = ConcurrentHashMap.newKeySet();
 
     @Override public void onEnable() {
