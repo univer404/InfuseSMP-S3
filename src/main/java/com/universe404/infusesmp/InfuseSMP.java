@@ -39,10 +39,21 @@ public final class InfuseSMP extends JavaPlugin {
         saveResource("messages.yml", false);
         saveResource("gui.yml", false);
         saveResource("recipes.yml", false);
-        playersFile = new File(getDataFolder(), "players.yml");
-        players = YamlConfiguration.loadConfiguration(playersFile);
+        playersFile = new File(getDataFolder(), "playerdata.yml");
+        File legacyPlayersFile = new File(getDataFolder(), "players.yml");
+        if (playersFile.exists()) {
+            players = YamlConfiguration.loadConfiguration(playersFile);
+        } else if (legacyPlayersFile.exists()) {
+            // Migrate existing player progress without resetting anyone's data.
+            players = YamlConfiguration.loadConfiguration(legacyPlayersFile);
+            getLogger().info("Migrating existing player progress from players.yml to playerdata.yml.");
+        } else {
+            players = YamlConfiguration.loadConfiguration(playersFile);
+        }
         messages = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
         loadState();
+        // Write the migrated data to the new file immediately.
+        if (!playersFile.exists() && legacyPlayersFile.exists()) saveState();
         disabledRegions = new DisabledRegions(this);
         getServer().getPluginManager().registerEvents(disabledRegions, this);
 
