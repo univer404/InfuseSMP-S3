@@ -44,13 +44,29 @@ public final class InfusePlaceholderExpansion extends PlaceholderExpansion {
         long ticks=(millis+49)/50,minutes=ticks/1200,seconds=(ticks/20)%60,centiseconds=(ticks%20)*5;
         return alternate?minutes+":"+String.format(Locale.ROOT,"%02d:%02d",seconds,centiseconds):minutes+":"+String.format(Locale.ROOT,"%02d",seconds);
     }
+    /**
+     * Return visible HUD labels instead of private-use glyphs that render as
+     * missing-character boxes unless a matching custom font is installed.
+     */
     private String icon(String value){
         if(value==null)return "";
-        String effect=value.replace("_augmented","");int cp=0xE000;
-        for(String current:ICON_ORDER){
-            if(current.equals("earth")||current.equals("ender")){if(current.equals(effect))return new String(Character.toChars(cp+20));cp+=42;}
-            else {if(current.equals(effect))return new String(Character.toChars(cp+(augmented(value)?41:20)));cp+=84;}
-        }
-        return "";
-    }
-}
+        String effect=value.replace("_augmented","");
+        String abbreviation=switch(effect){
+            case "earth" -> "EAR";
+            case "emerald" -> "EMR";
+            case "ender" -> "END";
+            case "feather" -> "FTH";
+            case "fire" -> "FIR";
+            case "frost" -> "FRO";
+            case "haste" -> "HST";
+            case "heart" -> "HRT";
+            case "invisibility" -> "INV";
+            case "ocean" -> "OCN";
+            case "regeneration" -> "REG";
+            case "speed" -> "SPD";
+            case "strength" -> "STR";
+            case "thunder" -> "THN";
+            default -> "";
+        };
+        return abbreviation.isEmpty() ? "" : abbreviation + (augmented(value) ? "+" : "");
+    }}
