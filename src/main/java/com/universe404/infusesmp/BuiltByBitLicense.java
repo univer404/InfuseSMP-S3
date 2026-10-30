@@ -70,7 +70,7 @@ public final class BuiltByBitLicense {
         HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
         HttpRequest request = HttpRequest.newBuilder(URI.create(ENDPOINT + java.net.URLEncoder.encode(NONCE, StandardCharsets.UTF_8)))
                 .timeout(Duration.ofSeconds(8))
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Shared " + token)
                 .header("Accept", "application/json")
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
