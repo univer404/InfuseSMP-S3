@@ -180,3 +180,40 @@ with zipfile.ZipFile(legacy_zip, "w", zipfile.ZIP_DEFLATED) as archive:
         json.dumps(legacy_model, indent=2) + "\\n"
     )
 print(f"Created {legacy_zip} ({legacy_zip.stat().st_size} bytes)")
+
+# Compatibility pack for Java 1.21.9 through 1.21.11.
+# These releases use the modern assets/<namespace>/items item-definition format,
+# but their range_dispatch schema does not require the newer 26.x index field.
+modern_1219_definition = {
+    "model": {
+        "type": "minecraft:range_dispatch",
+        "property": "minecraft:custom_model_data",
+        "fallback": {"type": "minecraft:model", "model": "minecraft:item/potion"},
+        "entries": entries,
+    }
+}
+modern_1219_mcmeta = {
+    "pack": {
+        "description": "InfuseSMP-S3 • Java 1.21.9–1.21.11",
+        "min_format": [69, 0],
+        "max_format": [75, 0]
+    }
+}
+write_json(ROOT / "pack-1.21.9.mcmeta", modern_1219_mcmeta)
+modern_1219_zip = OUT / "InfuseSMP-S3-ResourcePack-Java-1.21.9-1.21.11.zip"
+with zipfile.ZipFile(modern_1219_zip, "w", zipfile.ZIP_DEFLATED) as archive:
+    archive.write(ROOT / "pack-1.21.9.mcmeta", "pack.mcmeta")
+    archive.write(ROOT / "pack.png", "pack.png")
+    for path in ASSETS.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        if rel in ("assets/minecraft/items/potion.json", "assets/minecraft/models/item/potion.json"):
+            continue
+        archive.write(path, rel)
+    archive.writestr(
+        "assets/minecraft/items/potion.json",
+        json.dumps(modern_1219_definition, indent=2) + "\\n"
+    )
+print(f"Created {modern_1219_zip} ({modern_1219_zip.stat().st_size} bytes)")
+
