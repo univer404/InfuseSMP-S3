@@ -101,7 +101,7 @@ The plugin creates its YAML files in `plugins/InfuseSMP-S3/`.
 | `messages.yml` | Player-facing messages and formatting. |
 | `gui.yml` | Recipe and ritual GUI titles, slots, materials, names, and enable switches. |
 | `recipes.yml` | Recipe definitions used by the recipe and crafting systems. |
-| `license.yml` | BuiltByBit usage-rights verification settings for paid distributions. |
+| `license.yml` | BuiltByBit API token for mandatory paid-build usage-rights verification. |
 | `playerdata.yml` | UUID-based player data, equipped effects, bindings, trust, display settings, and action history. |
 | `rituals.yml` | Persistent ritual crafting tallies. |
 | `regions.yml` | WorldGuard region mappings where Infuse effects are disabled. |
@@ -139,7 +139,7 @@ GitHub Actions is configured to build the project and publish downloadable workf
 
 ## BuiltByBit licensing for paid releases
 
-The project includes a BuiltByBit V2 Embed API usage-rights check for paid distribution.
+The paid build includes a mandatory BuiltByBit V2 Embed API usage-rights check. There is no `enabled` toggle in the paid build; verification cannot be disabled through `license.yml`.
 
 Before publishing a buyer-ready JAR:
 
