@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'conversion/**'
+      - 'development/**'
   pull_request:
     paths:
       - '**.java'
@@ -29,7 +30,7 @@ jobs:
       - name: Upload plugin JAR
         uses: actions/upload-artifact@v4
         with:
-          name: InfuseSMP-S3-${{ github.run_number }}
+          name: ${{ startsWith(github.ref, 'refs/heads/development/') && 'InfuseSMP-S3-DEV' || 'InfuseSMP-S3' }}-${{ github.run_number }}
           path: target/InfuseSMP-S3-*.jar
           if-no-files-found: error
           retention-days: 30
