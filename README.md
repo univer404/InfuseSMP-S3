@@ -137,21 +137,9 @@ mvn clean package
 
 GitHub Actions is configured to build the project and publish downloadable workflow artifacts when the workflow completes successfully. Check the [Actions page](https://github.com/univer404/InfuseSMP-S3/actions) for the latest build.
 
-## BuiltByBit licensing for paid releases
+## Development build
 
-The paid build includes a mandatory BuiltByBit V2 Embed API usage-rights check. There is no `enabled` toggle in the paid build; verification cannot be disabled through `license.yml`.
-
-Before publishing a buyer-ready JAR:
-
-1. Create a BuiltByBit shareable API token with only the `resources.embed.latest` scope.
-2. Configure the token in `license.yml` under `api-token` before building the JAR intended for distribution.
-3. Keep the `%%__NONCE__%%` placeholder in the source unchanged so BuiltByBit can replace it during distribution.
-4. Do not publish a JAR that still contains the placeholder token `PUT_SHAREABLE_TOKEN_HERE`.
-5. Disclose the license/DRM check in the BuiltByBit listing and test the actual buyer download on a clean server.
-
-The plugin checks whether the server's installation has usage rights. Buyers should not need to manually enter an individual license key. A recent successful verification is cached for up to 24 hours to tolerate temporary API outages; without a valid token or usable successful cache, verification fails closed.
-
-Read the official [BuiltByBit license-check documentation](https://builtbybit.com/help/developers/v2-embed-api/license-checks-via-builtbybit/).
+This branch produces a development-only JAR. BuiltByBit license verification is intentionally omitted so the developer can test the plugin on a personal server without a purchase check. This build is not the buyer distribution and must not be uploaded as the paid product. The paid build remains on `conversion/paper-plugin-1.0.0` and enforces BuiltByBit usage-rights verification with no configuration toggle.
 
 ## Project status
 
