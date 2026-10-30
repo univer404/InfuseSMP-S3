@@ -65,6 +65,18 @@ public final class RecipesMenu implements Listener {
         int arrow=gui.getInt("recipes.result_arrow_slot",23),result=gui.getInt("recipes.result_slot",24);
         if(arrow>=0&&arrow<inv.getSize())inv.setItem(arrow,button(material("recipes.result_arrow_material",Material.ARROW),gui.getString("recipes.result_arrow_name","<gray>▶ <white>ʀᴇsᴜʟᴛ"),"result"));
         if(result>=0&&result<inv.getSize())inv.setItem(result,effectIcon(effect));
+        // Show both normal and augmented variants in the recipe detail view.
+        int augmentedSlot = result + 1;
+        int backSlot = gui.getInt("recipes.back.slot",36), exitSlot = gui.getInt("recipes.exit.slot",44);
+        if (augmentedSlot >= 0 && augmentedSlot < inv.getSize() && augmentedSlot != backSlot && augmentedSlot != exitSlot) {
+            ItemStack augmentedItem = items.create(effect, true, true);
+            if (augmentedItem != null) {
+                ItemMeta augmentedMeta = augmentedItem.getItemMeta();
+                augmentedMeta.getPersistentDataContainer().set(menuKey, PersistentDataType.STRING, "augmented:" + effect);
+                augmentedItem.setItemMeta(augmentedMeta);
+                inv.setItem(augmentedSlot, augmentedItem);
+            }
+        }
         int back=gui.getInt("recipes.back.slot",36),exit=gui.getInt("recipes.exit.slot",44);
         if(back>=0&&back<inv.getSize())inv.setItem(back,button(material("recipes.back.material",Material.ARROW),gui.getString("recipes.back.name","<gray><bold>← ʙᴀᴄᴋ"),"back"));
         if(exit>=0&&exit<inv.getSize())inv.setItem(exit,button(material("recipes.exit.material",Material.BARRIER),gui.getString("recipes.exit.name","<#E13030><bold>ᴇxɪᴛ"),"exit"));
