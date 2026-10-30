@@ -1,6 +1,4 @@
-# InfuseSMP-S3 BuiltByBit license settings
-# This file is separate from config.yml and is created automatically.
-# Before publishing, replace the token below with a PUBLIC/shareable BuiltByBit API token
-# with ONLY the resources.embed.latest scope. Never include a private token.
-enabled: true
-api-token: "kqAM76Iv8kYA1UcDQ5BEQSiSye1UhziZ"
+# InfuseSMP-S3 BuiltByBit license token
+# Paid builds always verify usage rights. There is no disable toggle.
+# Set this to your shareable BuiltByBit token with ONLY resources.embed.latest scope.
+api-token: "PUT_SHAREABLE_TOKEN_HERE"
