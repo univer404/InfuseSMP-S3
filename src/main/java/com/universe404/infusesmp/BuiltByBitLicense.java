@@ -32,10 +32,6 @@ public final class BuiltByBitLicense {
     public boolean verifyOnStartup() {
         File licenseFile = new File(plugin.getDataFolder(), "license.yml");
         YamlConfiguration license = YamlConfiguration.loadConfiguration(licenseFile);
-        if (!license.getBoolean("enabled", true)) {
-            plugin.getLogger().severe("BuiltByBit licensing is enabled by default and cannot be disabled in a paid release.");
-            return false;
-        }
         String token = license.getString("api-token", "").trim();
         if (token.isEmpty() || token.equalsIgnoreCase("PUT_SHAREABLE_TOKEN_HERE")) {
             plugin.getLogger().severe("BuiltByBit API token is not configured. Add a shareable token with ONLY resources.embed.latest scope to config.yml.");
