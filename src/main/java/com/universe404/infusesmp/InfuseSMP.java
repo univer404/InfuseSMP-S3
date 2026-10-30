@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class InfuseSMP extends JavaPlugin {
+public final class InfuseSMP extends JavaPlugin implements org.bukkit.command.TabCompleter {
     private final MiniMessage mini = MiniMessage.miniMessage();
     private final Map<UUID, Map<String,String>> effects = new ConcurrentHashMap<>();
     private final Map<UUID, List<String>> history = new ConcurrentHashMap<>();
@@ -71,6 +72,7 @@ public final class InfuseSMP extends JavaPlugin {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new InfusePlaceholderExpansion(this, mechanics).register();
         }
+        for (String name : List.of("infuse","recipes","item","bind","activate","swap","toggledisplay","trust","ldrain","pdrain","rdrain","sdrain","conf","resetcooldown","resetcraft","mapregion")) { PluginCommand registered = getCommand(name); if (registered != null) registered.setTabCompleter(this); }
         getLogger().info("InfuseSMP-S3 enabled. Text rendering disables italics.");
     }
 
@@ -93,6 +95,36 @@ public final class InfuseSMP extends JavaPlugin {
     private void log(UUID id,String entry) {
         List<String> h=history.computeIfAbsent(id,k->Collections.synchronizedList(new ArrayList<>()));
         h.add(0,System.currentTimeMillis()+" "+entry); while(h.size()>30)h.remove(h.size()-1);
+    }
+
+
+    @Override public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        String cmd = command.getName().toLowerCase(Locale.ROOT);
+        List<String> options = new ArrayList<>();
+        if (cmd.equals("infuse")) {
+            if (args.length == 1) options.addAll(List.of("gui","add","remove","get","history","toggle"));
+            else if (args.length >= 2) {
+                options.add("-p=");
+                options.add("-s=primary"); options.add("-s=secondary");
+                options.add("-e=emerald"); options.add("-e=feather"); options.add("-e=fire");
+                options.add("-e=frost"); options.add("-e=thunder"); options.add("-e=haste");
+                options.add("-e=heart"); options.add("-e=invisibility"); options.add("-e=ocean");
+                options.add("-e=regeneration"); options.add("-e=speed"); options.add("-e=strength");
+                options.add("-e=ender"); options.add("-e=earth"); options.add("-a=true");
+            }
+        } else if (cmd.equals("item") && args.length == 1) options.addAll(List.of("all","emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender"));
+        else if (cmd.equals("item") && args.length == 2) options.addAll(List.of("true","false"));
+        else if (cmd.equals("bind") && args.length == 1) options.addAll(List.of("primary","secondary"));
+        else if (cmd.equals("bind") && args.length == 2) options.addAll(List.of("swap","drop","sneak","sneak-drop","sneak-swap","none"));
+        else if (cmd.equals("activate") && args.length == 1) options.addAll(List.of("primary","secondary"));
+        else if (cmd.equals("trust") && args.length == 1) options.addAll(List.of("add","remove","list","clear"));
+        else if (cmd.equals("trust") && args.length == 2 && Set.of("add","remove").contains(args[0].toLowerCase(Locale.ROOT))) Bukkit.getOnlinePlayers().forEach(p -> options.add(p.getName()));
+        else if (cmd.equals("conf") && args.length == 1) options.addAll(List.of("get","set"));
+        else if (cmd.equals("resetcooldown") && args.length == 1) options.addAll(List.of("primary","secondary"));
+        else if (cmd.equals("resetcraft") && args.length == 1) options.addAll(List.of("emerald","feather","fire","frost","thunder","haste","heart","invisibility","ocean","regeneration","speed","strength","ender"));
+        else if (cmd.equals("mapregion") && args.length == 1) options.addAll(List.of("add","delete","list","clear"));
+        String current = args.length == 0 ? "" : args[args.length - 1].toLowerCase(Locale.ROOT);
+        return options.stream().filter(s -> s.toLowerCase(Locale.ROOT).startsWith(current)).distinct().sorted().toList();
     }
 
     @Override public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
