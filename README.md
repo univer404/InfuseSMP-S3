@@ -26,7 +26,7 @@ The supplied archive contains `infuse_old` and `infuse_new`; this port targets `
 This plugin includes a BuiltByBit V2 Embed API usage-rights check. Before uploading a paid release:
 
 1. Create a BuiltByBit API token with **only** the `resources.embed.latest` scope.
-2. Put that shareable token into `license.api-token` in `config.yml` before building the buyer JAR. Never embed a token with broader permissions.
+2. Put that shareable token into `license.yml` under `api-token` before building the buyer JAR. Never embed a token with broader permissions. The plugin creates `plugins/InfuseSMP-S3/license.yml` automatically on first startup.
 3. Keep the `%%__NONCE__%%` placeholder unchanged in the compiled plugin so BuiltByBit can replace it during distribution.
 4. In the BuiltByBit listing, disclose the BuiltByBit API/DRM check and link to the official BuiltByBit licensing documentation in the Dependencies section. Select the DRM/licensing filter accurately.
 5. Test the exact uploaded JAR by downloading it through the listing and starting it on a clean Paper/Purpur 1.21.11 server. A recent successful verification is cached for up to 24 hours if the API is temporarily unavailable.
