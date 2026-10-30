@@ -1,10 +1,3 @@
-# Paid release licensing (BuiltByBit V2 Embed API)
-# Create a shareable API token with ONLY the resources.embed.latest scope.
-# Set the token before publishing the final JAR. Never use a token with other scopes.
-license:
-  enabled: true
-  api-token: "PUT_SHAREABLE_TOKEN_HERE"
-
 # General behavior and effect tuning
 allow_same_effects: false
 trust_list_max: 3
