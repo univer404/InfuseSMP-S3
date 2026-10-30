@@ -135,3 +135,48 @@ with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
         if path.is_file():
             archive.write(path, path.relative_to(ROOT).as_posix())
 print(f"Created {zip_path} ({zip_path.stat().st_size} bytes)")
+
+
+# Compatibility pack for Java 1.21 through 1.21.8.
+# These versions use legacy item-model overrides and the pack_format 34-64 range.
+legacy_mcmeta = {
+    "pack": {
+        "pack_format": 34,
+        "supported_formats": {"min_inclusive": 34, "max_inclusive": 64},
+        "description": "InfuseSMP-S3 • Java 1.21–1.21.8"
+    }
+}
+write_json(ROOT / "pack-legacy.mcmeta", legacy_mcmeta)
+
+legacy_items = []
+for i, (name, color) in enumerate(EFFECTS.items(), start=1):
+    legacy_items.append({
+        "predicate": {"custom_model_data": BASE + i - 1},
+        "model": f"infusesmp:item/{name}"
+    })
+    legacy_items.append({
+        "predicate": {"custom_model_data": BASE + i - 1 + AUGMENT_OFFSET},
+        "model": f"infusesmp:item/{name}_augmented"
+    })
+
+legacy_model = {
+    "parent": "minecraft:item/generated",
+    "textures": {"layer0": "minecraft:item/potion"},
+    "overrides": legacy_items
+}
+legacy_zip = OUT / "InfuseSMP-S3-ResourcePack-Java-1.21-1.21.8.zip"
+with zipfile.ZipFile(legacy_zip, "w", zipfile.ZIP_DEFLATED) as archive:
+    archive.write(ROOT / "pack-legacy.mcmeta", "pack.mcmeta")
+    archive.write(ROOT / "pack.png", "pack.png")
+    for path in ASSETS.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        if rel == "assets/minecraft/items/potion.json":
+            continue
+        archive.write(path, rel)
+    archive.writestr(
+        "assets/minecraft/models/item/potion.json",
+        json.dumps(legacy_model, indent=2) + "\\n"
+    )
+print(f"Created {legacy_zip} ({legacy_zip.stat().st_size} bytes)")
