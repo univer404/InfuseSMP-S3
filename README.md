@@ -1,46 +1,162 @@
 # InfuseSMP-S3
 
-Java Paper/Purpur conversion of the Infuse S3 Skript for Minecraft 1.21.11.
+**InfuseSMP-S3** is a Paper/Purpur plugin port of the Infuse S3 Skript. It adds custom Infuse items, equipable effects, two-slot activation controls, recipe browsing, ritual crafting, and player-to-player trust settings.
 
-## Build
-Requires JDK 21 and Maven. Run `mvn clean package`. GitHub Actions builds the plugin and generates separate downloadable plugin JAR and Java 26.3 resource-pack ZIP artifacts when both steps succeed.
+> **Minecraft version:** 1.21.11  
+> **Java:** 21  
+> **Build system:** Maven
 
-## Configuration and data
-- `config.yml`: general settings, effect tuning, cooldowns, craft limits, effect tuning and disabled worlds. Infuse item colors, names, and lore are fixed in code to preserve the intended design..
-- `messages.yml`: MiniMessage messages rendered without italics.
-- `gui.yml`: recipe and ritual GUI titles, slots, materials, names and enable switches.
-- `playerdata.yml`: UUID-keyed player state, equipped effects, binds, trusted players, display settings and action history. Existing `players.yml` data is migrated automatically if `playerdata.yml` does not exist.
-- `rituals.yml`: persistent ritual craft tallies.
-- `regions.yml`: WorldGuard-mapped regions where Infuse effects are disabled.
+## Features
 
-## Optional integrations
-- PlaceholderAPI: source-compatible `%infuse_...%` placeholders.
-- WorldGuard: `/mapregion add|delete|list|clear` region mapping; the plugin can run without WorldGuard installed.
+### Infuse effects and slots
+- Equip and manage Infuse effects through the `/infuse` command and its GUI.
+- Use primary and secondary effect slots.
+- Bind slot activation to supported controls, then activate effects in-game.
+- Swap the primary and secondary effects.
+- Drain the primary or secondary effect when needed.
+- Configure effect behavior and tuning through the plugin configuration.
+- Toggle the Infuse item display style.
 
-## Source and release status
-The supplied archive contains `infuse_old` and `infuse_new`; this port targets `infuse_new/`. The resource pack targets Java Edition 26.3 (resource pack format 97.1). The plugin port is still in progress and must not be treated as production-ready until CI succeeds and remaining effect behavior is tested in-game. See [CONVERSION_STATUS.md](CONVERSION_STATUS.md).
+### Custom Infuse items
+- Includes custom Infuse items used by the plugin's effect and crafting systems.
+- Custom item identity is tracked with plugin data, rather than relying only on display names.
+- Admins can give supported Infuse items with the item command.
 
+### Recipes and ritual crafting
+- Browse available Infuse recipes in an inventory menu.
+- Open recipe details and inspect the augmented item preview.
+- Use the configured recipe and ritual crafting systems.
+- Ritual craft tallies are saved so progress persists across restarts.
+- Administrators can reset ritual crafting tallies.
 
-## Paid release / BuiltByBit licensing
+### Player controls and trust
+- Configure activation bindings.
+- Toggle the Infuse display style.
+- Manage trusted players using the trust command.
+- View Infuse history and current effect information through the management command.
 
-This plugin includes a BuiltByBit V2 Embed API usage-rights check. Before uploading a paid release:
+### Region support
+- Optional WorldGuard integration.
+- Map WorldGuard regions where Infuse effects are disabled.
+- The plugin can run without WorldGuard; region integration is only available when WorldGuard is installed.
 
-1. Create a BuiltByBit API token with **only** the `resources.embed.latest` scope.
-2. Put that shareable token into `license.yml` under `api-token` before building the buyer JAR. Never embed a token with broader permissions. The plugin creates `plugins/InfuseSMP-S3/license.yml` automatically on first startup.
-3. Keep the `%%__NONCE__%%` placeholder unchanged in the compiled plugin so BuiltByBit can replace it during distribution.
-4. In the BuiltByBit listing, disclose the BuiltByBit API/DRM check and link to the official BuiltByBit licensing documentation in the Dependencies section. Select the DRM/licensing filter accurately.
-5. Test the exact uploaded JAR by downloading it through the listing and starting it on a clean Paper/Purpur 1.21.11 server. A recent successful verification is cached for up to 24 hours if the API is temporarily unavailable.
+### PlaceholderAPI support
+- Optional PlaceholderAPI integration.
+- Provides the plugin's `%infuse_...%` placeholders when PlaceholderAPI is installed.
 
-The license check fails closed when no configured token exists or when neither the API nor a recent successful cache can verify usage rights. Do not publish a JAR that still contains `PUT_SHAREABLE_TOKEN_HERE`.
+### Persistent data
+The plugin stores player state and plugin data in YAML files, including:
+- Player effects, equipped slots, bindings, trusted players, display settings, and action history.
+- Ritual crafting tallies.
+- WorldGuard region mappings.
+- Existing `players.yml` data is migrated to `playerdata.yml` when the new file does not already exist.
 
-See BuiltByBit's official [license check guide](https://builtbybit.com/help/developers/v2-embed-api/license-checks-via-builtbybit/) and [resource dependency rules](https://builtbybit.com/help/resource-creators/your-listing/dependencies).
+## Commands
 
-## Pre-publication checklist
+| Command | Description |
+|---|---|
+| `/infuse` | Open or manage Infuse effects. Supports the GUI and management actions such as add, remove, get, history, and toggle. |
+| `/bind` | Set an activation binding for an Infuse slot. |
+| `/activate` | Activate a bound Infuse slot. |
+| `/swap` | Swap the primary and secondary effects. |
+| `/toggledisplay` | Toggle the Infuse item display style. |
+| `/trust` | Manage trusted players. |
+| `/ldrain` | Drain the primary effect. |
+| `/rdrain` | Drain the secondary effect. |
+| `/conf` | Read or change supported configuration options. |
+| `/recipes` | Open the recipe browser. |
+| `/resetcooldown` | Reset Infuse spark cooldowns. |
+| `/resetcraft` | Reset ritual crafting tallies. |
+| `/mapregion` | Manage regions where Infuse effects are disabled. |
+| `/item` | Give supported Infuse custom items. |
 
-- [ ] Build succeeds on JDK 21 and the GitHub Actions workflow completes.
-- [ ] Test all commands, GUIs, crafting, augmented items, persistence and permissions on Paper/Purpur 1.21.11.
-- [ ] Test licensing using a real shareable BuiltByBit token and a JAR downloaded through BuiltByBit.
-- [ ] Confirm the shipped JAR contains the configured token and the BuiltByBit nonce placeholder is preserved/replaced as expected.
-- [ ] Include the plugin JAR, compatible resource pack(s), setup instructions, dependency/DRM disclosure, supported versions, permissions, commands, configuration guide and changelog in the product package.
-- [ ] Confirm you own or have redistribution rights for every source asset and the included resource pack.
-- [ ] Set the BuiltByBit EULA, price, version filters and dependency fields accurately.
+Some commands have aliases:
+- `/bind`: `/controls`, `/controlset`, `/control`
+- `/toggledisplay`: `/display`, `/toggleicon`, `/simpleicon`
+- `/activate`: `/u`, `/use`, `/a`
+- `/swap`: `/swapeff`, `/swapeffects`, `/swapslots`
+- `/trust`: `/t`
+- `/ldrain`: `/pdrain`
+- `/rdrain`: `/sdrain`
+- `/resetcooldown`: `/rscd`, `/rcd`, `/rscooldown`
+- `/resetcraft`: `/rscraft`
+- `/item`: `/giveitem`, `/i`, `/potion`, `/pot`
+
+### Permissions
+
+| Permission | Default | Purpose |
+|---|---|---|
+| `infuse.command` | Everyone | Use the main Infuse command. |
+| `infuse.admin` | Operators | Use administrative commands such as cooldown/craft resets, region management, and item giving. |
+
+Check the command's in-game usage for its supported arguments and subcommands.
+
+## Configuration
+
+The plugin creates its YAML files in `plugins/InfuseSMP-S3/`.
+
+| File | Purpose |
+|---|---|
+| `config.yml` | General settings, effect tuning, cooldowns, craft limits, and disabled worlds. |
+| `messages.yml` | Player-facing messages and formatting. |
+| `gui.yml` | Recipe and ritual GUI titles, slots, materials, names, and enable switches. |
+| `recipes.yml` | Recipe definitions used by the recipe and crafting systems. |
+| `license.yml` | BuiltByBit usage-rights verification settings for paid distributions. |
+| `playerdata.yml` | UUID-based player data, equipped effects, bindings, trust, display settings, and action history. |
+| `rituals.yml` | Persistent ritual crafting tallies. |
+| `regions.yml` | WorldGuard region mappings where Infuse effects are disabled. |
+| `license-cache.yml` | Cached successful BuiltByBit verification data. |
+
+Infuse item names, colors, and lore are currently defined by the plugin to retain the intended item presentation. GUI settings are provided separately in `gui.yml`.
+
+## Requirements and optional integrations
+
+- Paper or a compatible Purpur server running Minecraft 1.21.11.
+- Java 21 runtime.
+- PlaceholderAPI is optional and enables Infuse placeholders.
+- WorldGuard is optional and enables the region-mapping integration.
+
+## Installation
+
+1. Download the plugin JAR from the project's GitHub Actions artifact or official release.
+2. Place the JAR in your server's `plugins` folder.
+3. Start the server once to generate the plugin's configuration files.
+4. Stop the server and review `config.yml`, `messages.yml`, `gui.yml`, and `recipes.yml`.
+5. Install PlaceholderAPI and/or WorldGuard if you want their optional integrations.
+6. Start the server and check the console for plugin startup messages.
+
+Back up your YAML data files before updating the plugin.
+
+## Building from source
+
+Requires JDK 21 and Maven:
+
+```bash
+mvn clean package
+```
+
+GitHub Actions is configured to build the project and publish downloadable workflow artifacts when the workflow completes successfully. Check the [Actions page](https://github.com/univer404/InfuseSMP-S3/actions) for the latest build.
+
+## BuiltByBit licensing for paid releases
+
+The project includes a BuiltByBit V2 Embed API usage-rights check for paid distribution.
+
+Before publishing a buyer-ready JAR:
+
+1. Create a BuiltByBit shareable API token with only the `resources.embed.latest` scope.
+2. Configure the token in `license.yml` under `api-token` before building the JAR intended for distribution.
+3. Keep the `%%__NONCE__%%` placeholder in the source unchanged so BuiltByBit can replace it during distribution.
+4. Do not publish a JAR that still contains the placeholder token `PUT_SHAREABLE_TOKEN_HERE`.
+5. Disclose the license/DRM check in the BuiltByBit listing and test the actual buyer download on a clean server.
+
+The plugin checks whether the server's installation has usage rights. Buyers should not need to manually enter an individual license key. A recent successful verification is cached for up to 24 hours to tolerate temporary API outages; without a valid token or usable successful cache, verification fails closed.
+
+Read the official [BuiltByBit license-check documentation](https://builtbybit.com/help/developers/v2-embed-api/license-checks-via-builtbybit/).
+
+## Project status
+
+This repository is a Skript-to-Java port and should be considered under active development until the current GitHub Actions build succeeds and the features have been tested on a live Paper/Purpur 1.21.11 server. A successful compile alone does not replace in-game testing of every effect, recipe, GUI interaction, persistence path, and optional integration.
+
+## Source
+
+[GitHub repository](https://github.com/univer404/InfuseSMP-S3/tree/conversion/paper-plugin-1.0.0)
