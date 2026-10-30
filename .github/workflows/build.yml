@@ -44,5 +44,6 @@ jobs:
           path: |
             target/InfuseSMP-S3-ResourcePack-26.3.zip
             target/InfuseSMP-S3-ResourcePack-Java-1.21-1.21.8.zip
+            target/InfuseSMP-S3-ResourcePack-Java-1.21.9-1.21.11.zip
           if-no-files-found: error
           retention-days: 30
