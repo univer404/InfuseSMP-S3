@@ -10,7 +10,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,11 +30,13 @@ public final class BuiltByBitLicense {
     }
 
     public boolean verifyOnStartup() {
-        if (!plugin.getConfig().getBoolean("license.enabled", true)) {
+        File licenseFile = new File(plugin.getDataFolder(), "license.yml");
+        YamlConfiguration license = YamlConfiguration.loadConfiguration(licenseFile);
+        if (!license.getBoolean("enabled", true)) {
             plugin.getLogger().severe("BuiltByBit licensing is enabled by default and cannot be disabled in a paid release.");
             return false;
         }
-        String token = plugin.getConfig().getString("license.api-token", "").trim();
+        String token = license.getString("api-token", "").trim();
         if (token.isEmpty() || token.equalsIgnoreCase("PUT_SHAREABLE_TOKEN_HERE")) {
             plugin.getLogger().severe("BuiltByBit API token is not configured. Add a shareable token with ONLY resources.embed.latest scope to config.yml.");
             return false;
