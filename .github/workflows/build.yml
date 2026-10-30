@@ -16,7 +16,7 @@ permissions:
   contents: read
 jobs:
   build:
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/heads/conversion/')
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/heads/conversion/') || startsWith(github.ref, 'refs/heads/development/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
