@@ -85,6 +85,10 @@ for i, (name, color) in enumerate(EFFECTS.items(), start=1):
         texture_path.parent.mkdir(parents=True, exist_ok=True)
         draw_icon(name, color, augmented).save(texture_path)
 
+# range_dispatch entries must be sorted by increasing threshold, not grouped
+# normal/augmented per effect. Otherwise Minecraft rejects the item definition.
+entries.sort(key=lambda entry: entry["threshold"])
+
 # Reproduce the Skript's private-use HUD glyph behavior with a default-font
 # provider. Placeholders return raw glyphs (not MiniMessage font tags).
 font_providers = []
@@ -158,6 +162,8 @@ for i, (name, color) in enumerate(EFFECTS.items(), start=1):
         "predicate": {"custom_model_data": BASE + i - 1 + AUGMENT_OFFSET},
         "model": f"infusesmp:item/{name}_augmented"
     })
+
+legacy_items.sort(key=lambda entry: entry["predicate"]["custom_model_data"])
 
 legacy_model = {
     "parent": "minecraft:item/generated",
