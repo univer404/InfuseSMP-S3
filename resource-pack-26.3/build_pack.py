@@ -177,7 +177,7 @@ with zipfile.ZipFile(legacy_zip, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.write(path, rel)
     archive.writestr(
         "assets/minecraft/models/item/potion.json",
-        json.dumps(legacy_model, indent=2) + "\\n"
+        json.dumps(legacy_model, indent=2) + "\n"
     )
 print(f"Created {legacy_zip} ({legacy_zip.stat().st_size} bytes)")
 
@@ -213,7 +213,7 @@ with zipfile.ZipFile(modern_1219_zip, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.write(path, rel)
     archive.writestr(
         "assets/minecraft/items/potion.json",
-        json.dumps(modern_1219_definition, indent=2) + "\\n"
+        json.dumps(modern_1219_definition, indent=2) + "\n"
     )
 print(f"Created {modern_1219_zip} ({modern_1219_zip.stat().st_size} bytes)")
 
