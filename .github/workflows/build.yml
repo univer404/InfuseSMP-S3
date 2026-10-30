@@ -37,10 +37,12 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python resource-pack-26.3/build_pack.py
-      - name: Upload Java 26.3 resource pack
+      - name: Upload resource packs
         uses: actions/upload-artifact@v4
         with:
-          name: InfuseSMP-S3-ResourcePack-26.3-${{ github.run_number }}
-          path: target/InfuseSMP-S3-ResourcePack-26.3.zip
+          name: InfuseSMP-S3-ResourcePacks-${{ github.run_number }}
+          path: |
+            target/InfuseSMP-S3-ResourcePack-26.3.zip
+            target/InfuseSMP-S3-ResourcePack-Java-1.21-1.21.8.zip
           if-no-files-found: error
           retention-days: 30
