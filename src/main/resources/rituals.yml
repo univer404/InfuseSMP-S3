@@ -1,0 +1,31 @@
+# Infuse ritual crafting progress
+# The plugin records each effect's completed craft count here.
+# Do not edit these values unless you intentionally want to adjust craft limits.
+# Use /resetcraft [effect] in-game to reset progress safely.
+
+emerald:
+  crafted: 0
+feather:
+  crafted: 0
+fire:
+  crafted: 0
+frost:
+  crafted: 0
+haste:
+  crafted: 0
+heart:
+  crafted: 0
+invisibility:
+  crafted: 0
+ocean:
+  crafted: 0
+regeneration:
+  crafted: 0
+speed:
+  crafted: 0
+strength:
+  crafted: 0
+thunder:
+  crafted: 0
+ender:
+  crafted: 0
