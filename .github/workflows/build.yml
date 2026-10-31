@@ -1,10 +1,14 @@
 name: Build InfuseSMP-S3
+
 on:
   push:
     branches:
-      - 'conversion/**'
-      - 'development/**'
+      - main
+      - develop
   pull_request:
+    branches:
+      - main
+      - develop
     paths:
       - '**.java'
       - '**.yml'
@@ -12,32 +16,45 @@ on:
       - 'resource-pack-26.3/**'
       - 'pom.xml'
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   build:
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/heads/conversion/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
+
       - name: Build plugin
         run: mvn --batch-mode --no-transfer-progress clean package
+
       - name: Upload plugin JAR
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ startsWith(github.ref, 'refs/heads/development/') && 'InfuseSMP-S3-DEV' || 'InfuseSMP-S3' }}-${{ github.run_number }}
+          name: InfuseSMP-S3-${{ github.ref_name == 'develop' && 'Development' || 'Build' }}-${{ github.run_number }}
           path: target/InfuseSMP-S3-*.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Build Java 26.3 resource pack
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Build Java 26.3 resource packs
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python resource-pack-26.3/build_pack.py
+
       - name: Upload resource packs
         uses: actions/upload-artifact@v4
         with:
