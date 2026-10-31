@@ -1,0 +1,6 @@
+# Infuse disabled regions
+# Regions are mapped in-game with WorldGuard installed:
+# /mapregion add <region-id>, then right-click a block inside that region.
+# The plugin saves the selected region's world and bounding coordinates below.
+
+regions: {}
