@@ -1,10 +1,10 @@
 # InfuseSMP-S3
 
 [![Build](https://github.com/univer404/InfuseSMP-S3/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/univer404/InfuseSMP-S3/actions/workflows/build.yml)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GPL-3.0 License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)](LICENSE)
 
-**InfuseSMP-S3 is free and open-source software, released under the MIT License.** You may use, study, modify, and redistribute this project, including in commercial projects, provided you retain the copyright and license notice. See [LICENSE](LICENSE) for the complete terms.
+**InfuseSMP-S3 is free and open-source software, released under the GNU General Public License v3.0 (GPL-3.0).** You may use, study, modify, and redistribute this project under the GPL-3.0 terms. If you distribute this plugin or a modified version, you must provide the corresponding source code and preserve the same GPL-3.0 freedoms for recipients. See [LICENSE](LICENSE) for the complete terms.
 
 InfuseSMP-S3 is an open-source Paper/Purpur plugin port of the Infuse S3 Skript. It brings custom Infuse items, equipable effects, two-slot activation, recipe browsing, ritual crafting, and player trust controls to a Java plugin.
 
@@ -115,7 +115,16 @@ Contributions, bug reports, and suggestions are welcome. Please read [CONTRIBUTI
 
 ## License
 
-<ins>This project is licensed under the MIT License.</ins> The MIT License allows use, modification, distribution, sublicensing, and sale of copies, subject to retaining the copyright and permission notice. It is provided without warranty. Read the full [MIT License](LICENSE) before using or redistributing the project.
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0-only)**. You are free to use, study, modify, and redistribute the plugin under the license terms.
+
+If you distribute the original plugin or a modified version, you must:
+
+- Provide recipients with the complete corresponding source code (or a valid way to obtain it) under GPL-3.0.
+- License the distributed work as a whole under GPL-3.0.
+- Keep the required copyright, license, and modification notices.
+- Include a copy of the GPL-3.0 license.
+
+**Important:** GPL-3.0 does not prohibit selling copies or charging for distribution/support. It requires that recipients receive the same freedoms, including access to the corresponding source code and the right to redistribute it. If your goal is to prohibit commercial resale, GPL-3.0 does not accomplish that. Read [LICENSE](LICENSE) for the full terms.
 
 ## Acknowledgements
 
