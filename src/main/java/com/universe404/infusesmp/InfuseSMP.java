@@ -40,6 +40,8 @@ public final class InfuseSMP extends JavaPlugin implements org.bukkit.command.Ta
         saveResource("messages.yml", false);
         saveResource("gui.yml", false);
         saveResource("recipes.yml", false);
+        saveResource("rituals.yml", false);
+        saveResource("regions.yml", false);
         playersFile = new File(getDataFolder(), "playerdata.yml");
         File legacyPlayersFile = new File(getDataFolder(), "players.yml");
         if (playersFile.exists()) {
