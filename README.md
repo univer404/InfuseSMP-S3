@@ -101,11 +101,9 @@ The plugin creates its YAML files in `plugins/InfuseSMP-S3/`.
 | `messages.yml` | Player-facing messages and formatting. |
 | `gui.yml` | Recipe and ritual GUI titles, slots, materials, names, and enable switches. |
 | `recipes.yml` | Recipe definitions used by the recipe and crafting systems. |
-| `license.yml` | BuiltByBit API token for mandatory paid-build usage-rights verification. |
 | `playerdata.yml` | UUID-based player data, equipped effects, bindings, trust, display settings, and action history. |
 | `rituals.yml` | Persistent ritual crafting tallies. |
 | `regions.yml` | WorldGuard region mappings where Infuse effects are disabled. |
-| `license-cache.yml` | Cached successful BuiltByBit verification data. |
 
 Infuse item names, colors, and lore are currently defined by the plugin to retain the intended item presentation. GUI settings are provided separately in `gui.yml`.
 
@@ -137,13 +135,13 @@ mvn clean package
 
 GitHub Actions is configured to build the project and publish downloadable workflow artifacts when the workflow completes successfully. Check the [Actions page](https://github.com/univer404/InfuseSMP-S3/actions) for the latest build.
 
-## Development build
-
-This branch produces a development-only JAR. BuiltByBit license verification is intentionally omitted so the developer can test the plugin on a personal server without a purchase check. This build is not the buyer distribution and must not be uploaded as the paid product. The paid build remains on `conversion/paper-plugin-1.0.0` and enforces BuiltByBit usage-rights verification with no configuration toggle.
-
 ## Project status
 
 This repository is a Skript-to-Java port and should be considered under active development until the current GitHub Actions build succeeds and the features have been tested on a live Paper/Purpur 1.21.11 server. A successful compile alone does not replace in-game testing of every effect, recipe, GUI interaction, persistence path, and optional integration.
+
+## Publishing
+
+This project is intended for distribution through Modrinth. No external license-verification service or API token is required.
 
 ## Source
 
