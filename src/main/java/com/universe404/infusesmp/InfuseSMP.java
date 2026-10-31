@@ -37,11 +37,6 @@ public final class InfuseSMP extends JavaPlugin implements org.bukkit.command.Ta
 
     @Override public void onEnable() {
         saveDefaultConfig();
-        saveResource("license.yml", false);
-        if (!new BuiltByBitLicense(this).verifyOnStartup()) {
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
         saveResource("messages.yml", false);
         saveResource("gui.yml", false);
         saveResource("recipes.yml", false);
