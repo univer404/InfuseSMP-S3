@@ -1,7 +1,10 @@
 # InfuseSMP-S3
 
 [![Build](https://github.com/univer404/InfuseSMP-S3/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/univer404/InfuseSMP-S3/actions/workflows/build.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)](LICENSE)
+
+**InfuseSMP-S3 is free and open-source software, released under the MIT License.** You may use, study, modify, and redistribute this project, including in commercial projects, provided you retain the copyright and license notice. See [LICENSE](LICENSE) for the complete terms.
 
 InfuseSMP-S3 is an open-source Paper/Purpur plugin port of the Infuse S3 Skript. It brings custom Infuse items, equipable effects, two-slot activation, recipe browsing, ritual crafting, and player trust controls to a Java plugin.
 
@@ -112,7 +115,7 @@ Contributions, bug reports, and suggestions are welcome. Please read [CONTRIBUTI
 
 ## License
 
-This project is distributed under the [MIT License](LICENSE).
+<ins>This project is licensed under the MIT License.</ins> The MIT License allows use, modification, distribution, sublicensing, and sale of copies, subject to retaining the copyright and permission notice. It is provided without warranty. Read the full [MIT License](LICENSE) before using or redistributing the project.
 
 ## Acknowledgements
 
