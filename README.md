@@ -6,9 +6,9 @@
 
 **InfuseSMP-S3 is free and open-source software, released under the GNU General Public License v3.0 (GPL-3.0).** You may use, study, modify, and redistribute this project under the GPL-3.0 terms. If you distribute this plugin or a modified version, you must provide the corresponding source code and preserve the same GPL-3.0 freedoms for recipients. See [LICENSE](LICENSE) for the complete terms.
 
-InfuseSMP-S3 is an open-source Paper/Purpur plugin port of the Infuse S3 Skript. It brings custom Infuse items, equipable effects, two-slot activation, recipe browsing, ritual crafting, and player trust controls to a Java plugin.
+InfuseSMP-S3 is an open-source plugin for Paper and Purpur servers. It brings custom Infuse items, equipable effects, two-slot activation, recipe browsing, ritual crafting, and player trust controls to Minecraft servers.
 
-> **Status:** Active development. Some mechanics still need parity work and in-game verification. See [the development roadmap](CONVERSION_STATUS.md) before using this as a production replacement.
+> **Status:** Active development. Features and compatibility are continuing to be tested and improved.
 
 ## Compatibility
 
@@ -128,4 +128,4 @@ If you distribute the original plugin or a modified version, you must:
 
 ## Acknowledgements
 
-This project is a Java port of the Infuse S3 Skript. The goal is to preserve the original behavior while making the implementation maintainable as a Paper/Purpur plugin.
+Thanks to everyone who tests the plugin, reports issues, and contributes improvements.
